@@ -74,9 +74,13 @@ const passWordCheck = async (_rule: Rule, value: string) => {
   }
 }
 
+
+
 // 登录按钮：路由跳转
 function Login_Submit() {
   console.log(userNameCheck);
+  const userName = formState.userName;
+  const passWord = formState.passWord
   // router.push('/');
 }
 

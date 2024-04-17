@@ -11,17 +11,17 @@
                 v-model:value="formState.userName"
             ></Input>
           </FormItem>
-          <FormItem :rules="[{validator: userNameCheck, trigger: 'blur'}]" name="userName">
+          <FormItem :rules="[{validator: emailCheck, trigger: 'blur'}]" name="email">
             <Input
                 placeholder="请输入邮箱"
-                v-model:value="formState.userName"
+                v-model:value="formState.email"
             ></Input>
           </FormItem>
           <FormItem name="passWord" :rules="[{validator: passWordCheck, trigger: 'blur'}]">
             <InputPassword placeholder="请输入密码" v-model:value="formState.passWord"></InputPassword>
             </FormItem>
-            <FormItem name="passWord" :rules="[{validator: passWordCheck, trigger: 'blur'}]">
-            <InputPassword placeholder="请再次输入密码" v-model:value="formState.passWord"></InputPassword>
+            <FormItem name="passWord2" :rules="[{validator: passWordCheck2, trigger: 'blur'}]">
+            <InputPassword placeholder="请再次输入密码" v-model:value="formState.passWord2"></InputPassword>
             </FormItem>
           <FormItem>
             
@@ -59,19 +59,32 @@
   // 定义表单域
   const formState = reactive({
     userName: '',
-    passWord: ''
+    email: '',
+    passWord: '',
+    passWord2: ''
   })
   
-  // 用户名校验规则
-  const userNameCheck = async (_rule: Rule, value: string) => {
-    if (!value) {
-      return Promise.reject('用户名不能为空')
-    } else if (value.length <= 2) {
-      return Promise.reject('用户名长度不能小于两个字符')
-    } else {
-      return Promise.resolve()
+    // 用户名校验规则
+    const userNameCheck = async (_rule: Rule, value: string) => {
+        if (!value) {
+        return Promise.reject('用户名不能为空')
+        } else if (value.length <= 2) {
+        return Promise.reject('用户名长度不能小于两个字符')
+        } else {
+        return Promise.resolve()
+        }
     }
-  }
+
+    // 邮箱校验规则
+    const emailCheck = async (_rule: Rule, value: string) => {
+    if (!value) {
+        return Promise.reject('邮箱不能为空');
+    } else if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$/.test(value)) {
+        return Promise.reject('请输入有效的邮箱地址');
+    } else {
+        return Promise.resolve();
+    }
+    };
   
   // 密码校验规则
   const passWordCheck = async (_rule: Rule, value: string) => {
@@ -79,6 +92,17 @@
       return Promise.reject('密码不能为空')
     } else if (value.length < 5) {
       return Promise.reject('密码长度不能小于5个字符')
+    } else {
+      return Promise.resolve()
+    }
+  }
+
+  // 检验两次密码是否一致
+  const passWordCheck2 = async (_rule: Rule, value: string) => {
+    if (!value) {
+      return Promise.reject('密码不能为空')
+    } else if (value !== formState.passWord) {
+      return Promise.reject('两次密码不一致')
     } else {
       return Promise.resolve()
     }
