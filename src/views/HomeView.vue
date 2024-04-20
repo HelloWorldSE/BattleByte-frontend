@@ -3,13 +3,13 @@
 import { Button } from 'ant-design-vue';
 
 import TestComponent from '@/components/TestComponent.vue'
-
+import TopNav from "@/components/TopNav.vue";
 
 </script>
 
 <template>
   <main>
-    ABCC
+    <TopNav/>
     <TestComponent/>
     <Button>Test Button</Button>
 
