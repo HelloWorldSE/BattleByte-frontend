@@ -1,5 +1,7 @@
 import type { ErrorData, WSProtocol } from "./interfaces"
 
+export type WSConnectState = "CONNECTED" | "CLOSED" | 'CONNECTING'
+
 class AutoIncrement {
     public num: number = 0
     
@@ -15,18 +17,35 @@ export class ConnectionClient {
     listeners: {[type: string]: (data: any)=>any} = {}
     errListeners: {[req: number]: (data: ErrorData)=>void} = {}
 
+    public state: WSConnectState
+
     retryDelay: number = 1  // 重试延迟秒数，max = 160
 
-    constructor(public server_addr: string) {
+    constructor(public server_addr: string,
+                public onRetry: (delaySec: number) => void = (_)=>{},
+                public onStateChange: (state: WSConnectState) => void = (_)=>{}
+            ) {
+        this.state = 'CLOSED'
         this.startNewWebSocketConnection()
     }
 
-    startNewWebSocketConnection() {
+    async startNewWebSocketConnection() {
         const server_addr = this.server_addr
+
+        this.state = 'CONNECTING';
+        (async () => {this.onStateChange(this.state)}) ();
+        
+        await (new Promise<void>((r) => {setTimeout(() => {
+            r()
+        }, 1000);}))
 
         this.socket = new WebSocket(server_addr)
         this.socket.onopen = (e: Event) => {
-            this.retryDelay = 1
+            this.retryDelay = 1;
+            this.state = 'CONNECTED';
+            
+            // callback (as async like an event)
+            (async () => {this.onStateChange(this.state)}) ();
 
             console.log(`[CC] WebSocket Connected to ${server_addr}`)
         }
@@ -39,7 +58,12 @@ export class ConnectionClient {
             console.error(`[CC] Error on ${server_addr}. Details:\n`, e)
         }
         this.socket.onclose = (e: Event) => {
-            console.error(`[CC] Connection to ${server_addr} has stopped.`)
+            console.error(`[CC] Connection to ${server_addr} has stopped.`);
+            
+            this.state = 'CLOSED';
+
+            // callback (as async like an event)
+            (async () => {this.onStateChange(this.state)}) ();
             this.reconnect()
         }
     }
@@ -47,6 +71,12 @@ export class ConnectionClient {
     private reconnect() {
         this.retryDelay = Math.min(this.retryDelay * 2, 160)
         console.log(`[CC] Retry connecting in ${this.retryDelay} seconds.`)
+
+        // callback (as async like an event)
+        const retryDelay = this.retryDelay;
+        const onRetry = this.onRetry;
+        (async () => {onRetry(retryDelay)}) ();
+
         setTimeout(() => {
             console.log(`[CC] Retry connecting...`)
             this.startNewWebSocketConnection()
