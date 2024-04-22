@@ -4,7 +4,7 @@
         <div id="backBox">
         <h1 class="title">欢迎注册</h1>
         <!-- 表单宽度55% -->
-        <Form style="width: 55%" :model="formState" ref="formRef" @finish="jump">
+        <Form style="width: 55%" :model="formState" ref="formRef">
           <FormItem :rules="[{validator: userNameCheck, trigger: 'blur'}]" name="userName">
             <Input
                 placeholder="请输入用户名"
@@ -44,6 +44,7 @@
   import type {Rule} from "ant-design-vue/es/form";
   import {useRouter} from 'vue-router';
   import { Form, Button, Input, FormItem, InputPassword } from "ant-design-vue";
+  import {generatePost} from "@/utils/protocol";
   
   const formItem = Form.Item;
   const inputPassword = Input.Password;
@@ -109,14 +110,34 @@
   }
   
   // 登录按钮：路由跳转
-  function Login_Submit() {
-    console.log(userNameCheck);
-    // router.push('/');
+  const Login_Submit = async () => {
+    const userName = formState.userName;
+    const passWord = formState.passWord;
+    const email = formState.email;
+
+    generatePost('auth/register', {userName:userName, passWord:passWord, email:email}).then((res) => {
+      console.log(res);
+      if (res.data.code === 200) {
+        // 登录成功
+        // 保存token
+        localStorage.setItem('token', res.data.token);
+        localStorage.setItem('userInfo', JSON.stringify(res.data));
+        // 跳转到首页
+        router.push('/');
+      } else {
+        // 登录失败
+        console.log('注册失败');
+        alert('注册失败');
+      }
+    }).catch((err) => {
+      console.log(err);
+    
+  });
   }
   
   // 登录按钮：路由跳转
   function Login_Page_Submit() {
-    console.log(userNameCheck);
+    // console.log(userNameCheck);
     router.push('/auth/login');
   }
   
