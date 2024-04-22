@@ -22,6 +22,11 @@ const router = createRouter({
       path: '/main',
       name: 'main',
       component: () => import('@/views/MainView_test.vue')
+    },
+    {
+      path: '/codeInput',
+      name: 'codeInput',
+      component: () => import('@/views/CodeInputView.vue')
     }
   ]
 })
