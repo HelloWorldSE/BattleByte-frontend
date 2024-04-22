@@ -53,3 +53,12 @@ jobs:
           USERNAME: ${{secrets.USERNAME}}
           HOST: ${{secrets.HOST}}
         run: sshpass -p $PASSWORD scp -r -o StrictHostKeyChecking=no ./dist.tar.gz $USERNAME@$HOST:/home/ubuntu/BattleByte-frontend
+      
+      - name: Unzip
+        env:
+          PASSWORD: ${{secrets.PASSWORD}}
+          USERNAME: ${{secrets.USERNAME}}
+          HOST: ${{secrets.HOST}}
+        run: sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USERNAME@$HOST "cd /home/ubuntu/BattleByte-frontend && rm -rf * && tar -xzvf dist.tar.gz && rm dist.tar.gz"
+      
+      
