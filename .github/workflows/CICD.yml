@@ -47,6 +47,13 @@ jobs:
       - name: Archieve dist
         run: tar -czvf dist.tar.gz *
 
+      - name: Clear server
+        env:
+          PASSWORD: ${{secrets.PASSWORD}}
+          USERNAME: ${{secrets.USERNAME}}
+          HOST: ${{secrets.HOST}}
+        run: sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USERNAME@$HOST "cd /home/ubuntu/BattleByte-frontend && rm -rf *"
+
       - name: Upload
         env:
           PASSWORD: ${{secrets.PASSWORD}}
@@ -59,6 +66,6 @@ jobs:
           PASSWORD: ${{secrets.PASSWORD}}
           USERNAME: ${{secrets.USERNAME}}
           HOST: ${{secrets.HOST}}
-        run: sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USERNAME@$HOST "cd /home/ubuntu/BattleByte-frontend && rm -rf * && tar -xzvf dist.tar.gz && rm dist.tar.gz"
+        run: sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USERNAME@$HOST "cd /home/ubuntu/BattleByte-frontend && tar -xzvf dist.tar.gz && rm dist.tar.gz"
       
       
