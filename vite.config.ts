@@ -18,7 +18,11 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '^/api': 'http://example.com'
+      '^/api': 'http://example.com',
+      '/socket': {
+        target: 'ws://localhost:5174',
+        ws: true
+      }
     }
   }
 })
