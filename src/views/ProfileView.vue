@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Grid, Row, Col, Avatar, Card, TabPane, Table, Tabs, List, ListItem, ListItemMeta, Pagination, Button, Skeleton, Flex } from "ant-design-vue";
+import { Grid, Row, Col, Avatar, Card, TabPane, Table, Tabs, List, ListItem, ListItemMeta, Pagination, Button, Skeleton, Flex, InputSearch } from "ant-design-vue";
 import { generateGet } from "@/utils/protocol";
 import { useRoute, useRouter } from "vue-router";
 import { ref, computed, reactive, onMounted, nextTick } from "vue";
@@ -76,6 +76,7 @@ const initFriendsLoading = ref(true);
 const friendsLoading = ref(false);
 const friendsData = ref([]);
 const friendsList = ref([]);
+const customGapSize = ref(40);
 
 onMounted(() => {
   fetch(fakeDataUrl)
@@ -196,7 +197,12 @@ function getBase64(file: File) {
                     </TabPane>
                     <TabPane key="2" tab="朋友">
 
-                        
+                        <InputSearch
+                            v-model:value="value"
+                            placeholder="input search friend"
+                            style="width: 100%; margin:auto;"
+                            @search="onSearch"
+                            />
                             <List
                                 class="demo-loadmore-list"
                                 :loading="initFriendsLoading"
@@ -210,7 +216,7 @@ function getBase64(file: File) {
                                     :style="{ textAlign: 'center', marginTop: '12px', height: '32px', lineHeight: '32px' }"
                                 >
                                     <!-- <Button @click="onLoadMoreFriends">loading more</Button> -->
-                                    <Pagination @change="onLoadMoreFriends1" :current="friendsPage" :total="200" :pageSize="5" simple="True"/>
+                                    <Pagination @change="onLoadMoreFriends1" :current="friendsPage" :total="200" :pageSize="5" simple/>
                                 </div>
                                 </template>
                                 <template #renderItem="{ item }">
@@ -242,7 +248,12 @@ function getBase64(file: File) {
             </Card>
         </Col>
     </Row>
-    
+    <Flex :gap="customGapSize" id="buttonGroup" justify="center" align="center">
+        <Button type="primary">修改个人信息</Button>
+        <Button type="primary">修改密码</Button>
+        <Button type="primary">添加好友</Button>
+        <Button type="primary">退出登录</Button>
+    </Flex>
 </template>
 
 <style scoped>
@@ -301,4 +312,6 @@ function getBase64(file: File) {
 :deep(.ant-list-item-meta-content h4) {
     margin-top: 0;
 }
+
+
 </style>

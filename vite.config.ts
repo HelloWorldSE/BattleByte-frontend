@@ -9,7 +9,7 @@ import mockDevServerPlugin from 'vite-plugin-mock-dev-server'
 export default defineConfig({
   plugins: [
     vue(),
-    mockDevServerPlugin()
+    // mockDevServerPlugin()
   ],
   resolve: {
     alias: {
