@@ -91,8 +91,8 @@ watch(() => route.path, (newPath, oldPath) => {
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-  background-color: #333;
-  color: #fff;
+  background-color: #fff;
+  color: #000;
 }
 
 .left {
@@ -108,6 +108,7 @@ watch(() => route.path, (newPath, oldPath) => {
 
 .title {
   font-size: 20px;
+  font-color: #000;
 }
 
 .middle {

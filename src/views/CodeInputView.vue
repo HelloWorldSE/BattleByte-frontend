@@ -3,7 +3,7 @@
     <div class="area1">
       <Select style="width: 80px" v-model:value="language" @change="changeLanguageHandle">
         <SelectOption value="c">c</SelectOption>
-        <SelectOption value="cpp">c++</SelectOption>
+        <SelectOption value="c++">c++</SelectOption>
         <SelectOption value="python">python</SelectOption>
         <SelectOption value="java">java</SelectOption>
         <SelectOption value="js">javascript</SelectOption>
@@ -47,14 +47,28 @@ import * as monaco from 'monaco-editor';
 import axios from 'axios';
 import {generateCompletionItems} from '@/components/generateCompletionItem'; // 注意路径是否正确
 import {editor} from "monaco-editor";
+import protocol from "@/utils/protocol.ts";
+
+import { useCookies } from "vue3-cookies";
 
 let monacoEditor = ref(null);
-const language = ref('cpp');
+const language = ref('c++');
 const style = ref('vs-dark');
 const font = ref('14');
 const height = ref('20');
 const selfDiv = ref(null);
 const main = ref(null);
+
+const cookies = useCookies()
+
+const cookies_to_set = {    "_pk_id.1.7ebb":"d3c89c8c7f0158ca.1713614493.; Path=/; Expires=Mon, 21 Apr 2025 07:11:01 GMT;",
+  "csrftoken":"vLH0iNGPu4ufpc9Lk1ekq5VmshkEM6a2aw6FGvxFZxz29Lqat88S4vfiHjQnNoV2; Path=/; Expires=Mon, 21 Apr 2025 07:11:19 GMT;",
+  "sessionid":"fowtr0r4jrylvsyybkd963kso2cu97am; Path=/; HttpOnly; Expires=Tue, 07 May 2024 01:18:41 GMT;"
+}
+
+for (const key in cookies_to_set) {
+  cookies.cookies.set(key, cookies_to_set[key]);
+}
 
 const codeTemplates = {
   cpp: `#include <iostream>\n\nint main() {\n\t// Your C++ code here\n\treturn 0;\n}`,
@@ -111,7 +125,7 @@ const handleSubmit = async () => {
   const code = editor.getModels()[0]?.getValue();
   console.log(code);
 
-  httpInstance.post("http://81.70.241.166/api/submission",{
+  protocol.post("http://81.70.241.166/submit/api/submission",{
     problem_id:"1",
     language: language.value,
     code: code

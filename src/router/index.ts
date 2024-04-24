@@ -27,6 +27,11 @@ const router = createRouter({
       path: '/codeInput',
       name: 'codeInput',
       component: () => import('@/views/CodeInputView.vue')
+    },
+    {
+      path: '/contest',
+      name: 'contest',
+      component: () => import('@/views/ContestView.vue')
     }
   ]
 })
