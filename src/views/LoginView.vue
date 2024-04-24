@@ -4,7 +4,7 @@
       <div id="backBox">
       <h1 class="title">欢迎登录</h1>
       <!-- 表单宽度55% -->
-      <Form style="width: 55%" :model="formState" ref="formRef" @finish="jump">
+      <Form style="width: 55%" :model="formState" ref="formRef">
         <FormItem :rules="[{validator: userNameCheck, trigger: 'blur'}]" name="userName">
           <Input
               placeholder="请输入用户名"
@@ -34,6 +34,9 @@ import {reactive, ref, defineComponent} from "vue";
 import type {Rule} from "ant-design-vue/es/form";
 import {useRouter} from 'vue-router';
 import { Form, Button, Input, FormItem, InputPassword } from "ant-design-vue";
+// import axios from 'axios';
+// import { useCookies } from "vue3-cookies";
+import {generatePost} from "@/utils/protocol";
 
 const formItem = Form.Item;
 const inputPassword = Input.Password;
@@ -75,18 +78,45 @@ const passWordCheck = async (_rule: Rule, value: string) => {
 }
 
 
+const Login_Submit = async () => {
+  const userName = formState.userName;
+  const passWord = formState.passWord;
+
+  generatePost('auth/login', {userName:userName, passWord:passWord}).then((res) => {
+    console.log(res);
+    if (res.data.code === 200) {
+      // 登录成功
+      // 保存token
+      localStorage.setItem('token', res.data.token);
+
+      // 保存所有
+      localStorage.setItem('userInfo', JSON.stringify(res.data));
+
+      let userId = res.data.userId;
+      // 跳转到个人主页
+      router.push('/user/profile/' + userId);
+    } else {
+      // 登录失败
+      console.log('登录失败');
+      alert('登录失败');
+    }
+  }).catch((err) => {
+    console.log(err);
+  // router.push('/');
+});
+}
 
 // 登录按钮：路由跳转
-function Login_Submit() {
-  console.log(userNameCheck);
-  const userName = formState.userName;
-  const passWord = formState.passWord
-  // router.push('/');
-}
+// function Login_Submit() {
+//   // console.log(userNameCheck);
+//   const userName = formState.userName;
+//   const passWord = formState.passWord;
+//   // router.push('/');
+// }
 
 // 注册按钮：路由跳转
 function Register_Submit() {
-  console.log(userNameCheck);
+  // console.log(userNameCheck);
   router.push('/auth/register');
 }
 

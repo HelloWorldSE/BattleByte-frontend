@@ -30,3 +30,5 @@ coverage
 *.tsbuildinfo
 
 src/views/TestView.vue
+src/assets/1.jpg
+mock/api.mock.ts
