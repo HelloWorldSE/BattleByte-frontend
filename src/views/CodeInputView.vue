@@ -1,49 +1,57 @@
 <template>
   <div class="components-code-input" ref="selfDiv">
     <div class="area1">
-      <select name="language" @change="changeLanguageHandle">
-        <option value="c">c</option>
-        <option value="cpp">c++</option>
-        <option value="python">python</option>
-        <option value="java">java</option>
-        <option value="javascript">javascript</option>
-      </select>
+      <Select style="width: 80px" v-model:value="language" @change="changeLanguageHandle">
+        <SelectOption value="c">c</SelectOption>
+        <SelectOption value="cpp">c++</SelectOption>
+        <SelectOption value="python">python</SelectOption>
+        <SelectOption value="java">java</SelectOption>
+        <SelectOption value="js">javascript</SelectOption>
+      </Select>
 
-      <select name="theme" @change="handleChangeTheme">
-        <option value="vs-dark">vsCode暗色主题</option>
-        <option value="vs-light">vsCode亮色主题</option>
-        <option value="hc-black">高对比度黑色主题</option>
-      </select>
+      <Select name="theme"  style="width: 150px" v-model:value="style" @change="handleChangeTheme">
+        <SelectOption value="vs-dark">vsCode暗色主题</SelectOption>
+        <SelectOption value="vs-light">vsCode亮色主题</SelectOption>
+        <SelectOption value="hc-black">高对比度黑色主题</SelectOption>
+      </Select>
 
       <span>字体大小</span>
-      <select name="fontSize" @change="handleChangeFontSize">
-        <option value="14">14</option>
-        <option value="18">18</option>
-        <option value="20">20</option>
-      </select>
+      <Select name="fontSize" style="width: 60px" v-model:value="font" @change="handleChangeFontSize">
+        <SelectOption value="14">14</SelectOption>
+        <SelectOption value="18">18</SelectOption>
+        <SelectOption value="20">20</SelectOption>
+      </Select>
+
       <span>行高</span>
-      <select name="lineHeight" @change="handleChangeLineHeight">
-        <option value="20">20</option>
-        <option value="24">24</option>
-        <option value="28">28</option>
-      </select>
+      <Select name="lineHeight" style="width: 60px" v-model:value="height" @change="handleChangeLineHeight">
+        <SelectOption value="20">20</SelectOption>
+        <SelectOption value="24">24</SelectOption>
+        <SelectOption value="28">28</SelectOption>
+      </Select>
 
     </div>
     <div class="area2">
-
-      <div ref="main" style="width: 100%; height: 1000px"/>
-
+      <div ref="main" class="editor"/>
+      <!-- 提交按钮 -->
+      <Button class="submit-button" @click="handleSubmit" type="primary" shape="round">
+        提交
+      </Button>
     </div>
   </div>
 </template>
 
-<script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+<script setup>
+import {ref, onMounted} from 'vue';
+import {Button,Select,SelectOption} from 'ant-design-vue';
 import * as monaco from 'monaco-editor';
-import { generateCompletionItems } from '@/components/generateCompletionItem'; // 注意路径是否正确
+import {generateCompletionItems} from '@/components/generateCompletionItem'; // 注意路径是否正确
 import {editor} from "monaco-editor";
 
 let monacoEditor = ref(null);
+const language = ref('cpp');
+const style = ref('vs-dark');
+const font = ref('14');
+const height = ref('20');
 const selfDiv = ref(null);
 const main = ref(null);
 
@@ -54,11 +62,8 @@ const codeTemplates = {
   java: `public class Main {\n\tpublic static void main(String[] args) {\n\t\t// Your Java code here\n\t}\n}`,
   javascript: `// Your JavaScript code here`,
 };
-onMounted(() => {
- init();
-});
 
-const init = () => {
+onMounted(() => {
   monacoEditor.value = monaco.editor.create(main.value, {
     theme: 'vs-dark',
     value: codeTemplates.cpp,
@@ -87,18 +92,25 @@ const init = () => {
       const lineText = model.getLineContent(position.lineNumber);
       // 根据当前行文本生成代码补全项
       const suggestions = generateCompletionItems(lineText);
-      return { suggestions };
+      return {suggestions};
     },
   });
-};
+
+});
 
 const theme = ref('vs-dark');
 const fontSize = ref(14);
 const lineHeight = ref(20);
 
 
+//处理提交事件
+const handleSubmit = () => {
+  const code = editor.getModels()[0]?.getValue();
+  console.log(code);
+};
+
 const changeLanguageHandle = (event) => {
-  const selectedLanguage = event.target.value;
+  const selectedLanguage = event;
   console.log(selectedLanguage);
   const selectedTemplate = codeTemplates[selectedLanguage];
   console.log(selectedTemplate);
@@ -107,26 +119,47 @@ const changeLanguageHandle = (event) => {
 
 
 const handleChangeTheme = (event) => {
-  const selectedTheme = event.target.value;
+  const selectedTheme = event;
   theme.value = selectedTheme;
   if (monacoEditor.value) {
-    monacoEditor.value.updateOptions({ theme: selectedTheme });
+    monacoEditor.value.updateOptions({theme: selectedTheme});
   }
 };
 
 
 const handleChangeFontSize = (event) => {
-  fontSize.value = parseInt(event.target.value);
+  fontSize.value = parseInt(event);
   if (monacoEditor.value) {
-    monacoEditor.value.updateOptions({ fontSize: fontSize.value });
+    monacoEditor.value.updateOptions({fontSize: fontSize.value});
   }
 };
 
 const handleChangeLineHeight = (event) => {
-  lineHeight.value = parseInt(event.target.value);
+  lineHeight.value = parseInt(event);
   if (monacoEditor.value) {
-    monacoEditor.value.updateOptions({ lineHeight: lineHeight.value });
+    monacoEditor.value.updateOptions({lineHeight: lineHeight.value});
   }
 };
 
 </script>
+
+<style scoped>
+.components-code-input {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.editor {
+  width: 100%;
+  height: 620px;
+  flex: 1;
+}
+
+.submit-button {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+</style>
