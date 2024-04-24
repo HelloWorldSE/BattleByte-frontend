@@ -1,0 +1,71 @@
+name: CICD
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build:
+    name: Build Vite Dist
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: npm install, build, and test
+        run: |
+          npm install
+          npm run build --if-present
+          npm run test --if-present
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: battlebyte-frontend
+          path: dist
+
+  deploy:
+    name: Deploy to Server
+    permissions:
+      contents: none
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: battlebyte-frontend
+      
+      - name: Archieve dist
+        run: tar -czvf dist.tar.gz *
+
+      - name: Clear server
+        env:
+          PASSWORD: ${{secrets.PASSWORD}}
+          USERNAME: ${{secrets.USERNAME}}
+          HOST: ${{secrets.HOST}}
+        run: sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USERNAME@$HOST "cd /home/ubuntu/BattleByte-frontend && rm -rf *"
+
+      - name: Upload
+        env:
+          PASSWORD: ${{secrets.PASSWORD}}
+          USERNAME: ${{secrets.USERNAME}}
+          HOST: ${{secrets.HOST}}
+        run: sshpass -p $PASSWORD scp -r -o StrictHostKeyChecking=no ./dist.tar.gz $USERNAME@$HOST:/home/ubuntu/BattleByte-frontend
+      
+      - name: Unzip
+        env:
+          PASSWORD: ${{secrets.PASSWORD}}
+          USERNAME: ${{secrets.USERNAME}}
+          HOST: ${{secrets.HOST}}
+        run: sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USERNAME@$HOST "cd /home/ubuntu/BattleByte-frontend && tar -xzvf dist.tar.gz && rm dist.tar.gz"
+      
+      
