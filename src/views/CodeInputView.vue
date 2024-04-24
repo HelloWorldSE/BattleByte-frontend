@@ -44,6 +44,7 @@
 import {ref, onMounted} from 'vue';
 import {Button,Select,SelectOption} from 'ant-design-vue';
 import * as monaco from 'monaco-editor';
+import axios from 'axios';
 import {generateCompletionItems} from '@/components/generateCompletionItem'; // 注意路径是否正确
 import {editor} from "monaco-editor";
 
@@ -103,10 +104,24 @@ const fontSize = ref(14);
 const lineHeight = ref(20);
 
 
+
 //处理提交事件
-const handleSubmit = () => {
+const handleSubmit = async () => {
+  //获取编辑器中的代码
   const code = editor.getModels()[0]?.getValue();
   console.log(code);
+
+  httpInstance.post("http://81.70.241.166/api/submission",{
+    problem_id:"1",
+    language: language.value,
+    code: code
+  }).then(res => {
+    if(res.data.code === 200){
+      console.log("提交成功");
+    }
+
+  })
+
 };
 
 const changeLanguageHandle = (event) => {
