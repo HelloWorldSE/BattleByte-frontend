@@ -14,16 +14,15 @@
   "dependencies": {
     "ant-design-vue": "^4.1.2",
     "axios": "^1.6.8",
-
     "install": "^0.13.0",
+    "js-base64": "^3.7.7",
     "monaco-editor": "^0.47.0",
     "npm": "^10.5.2",
-
     "pinia": "^2.1.7",
     "vite-plugin-mock-dev-server": "^1.5.0",
     "vue": "^3.4.21",
-    "vue-request": "^2.0.4",
     "vue-monaco": "^1.2.2",
+    "vue-request": "^2.0.4",
     "vue-router": "^4.3.0",
     "vue3-cookies": "^1.0.6"
   },
