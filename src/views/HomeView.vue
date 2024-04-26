@@ -651,8 +651,8 @@ export default {
   }
 };
 </script>
-<style lang="scss">
 
+<style scoped>
 #app {
   background-color: black; /* 设置背景为黑色 */
   min-height: 100vh; /* 至少为视口的100%高度 */
@@ -660,6 +660,9 @@ export default {
   flex-direction: column; /* 如果你需要垂直布局 */
   align-items: stretch; /* 使子元素填满容器宽度 */
 }
+</style>
+
+<style lang="scss">
 
 .planet_container,
 .planet,
