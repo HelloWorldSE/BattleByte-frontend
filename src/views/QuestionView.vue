@@ -1,6 +1,7 @@
 <template>
   <div class="components-question-area">
-    <h1>{{ title }}</h1>
+    <h1 v-if="title">{{ title }}</h1>
+    <h1 v-else>标题</h1>
     <h2>题目背景</h2>
     <p>{{ questionBackground }}</p>
     <h2>题目描述</h2>
@@ -62,5 +63,34 @@ export default {
 </script>
 
 <style scoped>
-/* 样式可以根据需要自行添加 */
+
+.components-question-area {
+  background-color: #1E1E1E; /* 设置背景为黑色 */
+  color: white; /* 设置文字颜色为白色 */
+}
+
+/* 可以添加更多选择器来确保所有文字都是白色，如果需要的话 */
+h1, h2, h3, p, .tag {
+  margin-left: 10px;
+  color: white;
+}
+
+h1 {
+  display: flex; /* 使用Flexbox布局 */
+  flex-direction: column; /* 设置主轴方向为垂直 */
+  align-items: center; /* 水平居中 */
+  justify-content: center; /* 垂直居中 */
+}
+
+/* 如果你想要代码块中的文本也是白色，可以添加以下样式 */
+.line {
+  background-color: #111; /* 或者其他深色调以便于阅读 */
+  color: white;
+}
+
+/* 如果你想要让整个组件的背景铺满整个屏幕，可以添加以下样式 */
+.components-question-area {
+  min-height: 100vh;
+}
 </style>
+

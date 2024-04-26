@@ -1,4 +1,7 @@
 <template>
+  <div class="topBar">
+    <TopNav/>
+  </div>
   <div id="app">
     <!-- MAIN CONTENT  -->
     <div class="sun" :style="sunStyle()"></div>
@@ -77,9 +80,11 @@
 
 <script>
 import {Modal, message} from 'ant-design-vue';
+import TopNav from "@/components/TopNav.vue";
 
 export default {
   components: {
+    TopNav,
     'a-modal': Modal
   },
   created() {
@@ -647,9 +652,13 @@ export default {
 };
 </script>
 <style lang="scss">
-body {
-  overflow: hidden;
-  background: black;
+
+#app {
+  background-color: black; /* 设置背景为黑色 */
+  min-height: 100vh; /* 至少为视口的100%高度 */
+  display: flex;
+  flex-direction: column; /* 如果你需要垂直布局 */
+  align-items: stretch; /* 使子元素填满容器宽度 */
 }
 
 .planet_container,
@@ -793,6 +802,11 @@ body {
     font-size: 16px;
     letter-spacing: 2px;
     color: white;
+  }
+  .topBar {
+    width: 100%;
+    height: 50px;
+    z-index: 1005;
   }
 }
 </style>
