@@ -1,20 +1,20 @@
 <template>
   <div class="components-question-area">
-    <h1 v-if="title">{{ title }}</h1>
+    <h1 v-if="data.title">{{ data.title }}</h1>
     <h1 v-else>标题</h1>
     <h2>题目背景</h2>
-    <p>{{ questionBackground }}</p>
+    <p>{{ data.questionBackground }}</p>
     <h2>题目描述</h2>
-    <p v-html="describe" />
+    <p v-html="data.describe" />
     <h2>交互格式说明</h2>
     <div class="leftRight">
       <div class="left">
         <h3>输入</h3>
-        <p v-html="inputDescribe" />
+        <p v-html="data.inputDescribe" />
       </div>
       <div class="right">
         <h3>输出</h3>
-        <p v-html="outputDescribe" />
+        <p v-html="data.outputDescribe" />
       </div>
     </div>
     <h2>交互格式样例</h2>
@@ -26,7 +26,7 @@
         <h3>输出</h3>
       </div>
     </div>
-    <div v-for="(ioObj, idx) in ioEgg" :key="idx" class="leftRight">
+    <div v-for="(ioObj, idx) in data.ioEgg" :key="idx" class="leftRight">
       <div class="left">
         <div class="showArea">
           <div v-for="(str, idx) in ioObj.in.split('\n')" :key="idx" class="line">{{ str }}</div>
@@ -39,27 +39,43 @@
       </div>
     </div>
     <h2>提示</h2>
-    <p v-html="tips" />
+    <p v-html="data.tips" />
     <h2>标签</h2>
     <div class="tags">
-      <span v-for="(str, idx) in tags" :key="idx" class="tag">{{ str }}</span>
+      <span v-for="(str, idx) in data.tags" :key="idx" class="tag">{{ str }}</span>
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    title: String,
-    describe: String,
-    inputDescribe: String,
-    outputDescribe: String,
-    ioEgg: Array,
-    tips: String,
-    tags: Array,
-    questionBackground: String,
-  },
-};
+<script lang="ts" setup>
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+
+
+const data = ref({
+  title: '',
+  describe: '',
+  inputDescribe: '',
+  outputDescribe: '',
+  ioEgg: [] as any[],
+  tips: '',
+  tags: [],
+  questionBackground: '',
+});
+
+onMounted(() => {
+  fetchData();
+});
+
+async function fetchData() {
+  try {
+    const response = await axios.get(' http://81.70.241.166:1233/api/admin/problem?id=746'); // 替换成你的API地址
+    Object.assign(data.value, response.data);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    // 处理错误情况
+  }
+}
 </script>
 
 <style scoped>
