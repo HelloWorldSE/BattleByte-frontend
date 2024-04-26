@@ -2,6 +2,7 @@
 
 import type { LoginRequestData, LoginResultData } from "@/core/comm/interfaces"
 import { useConnector } from "@/stores/connector"
+import { ref, type Ref } from "vue"
 
 enum HallStatus {
     OFFLINE,
@@ -14,7 +15,7 @@ enum HallStatus {
 
 export class Hall {
 
-    status: HallStatus = HallStatus.OFFLINE
+    status: Ref<HallStatus> = ref(HallStatus.OFFLINE)
     conn: ReturnType<typeof useConnector>
 
     constructor() {
@@ -26,7 +27,7 @@ export class Hall {
     }
 
     private rcv_login_ack(data: LoginResultData) {
-        this.status = HallStatus.ONLINE
+        this.status.value = HallStatus.ONLINE
     }
 
     login() {
@@ -37,10 +38,10 @@ export class Hall {
         }
 
         const login_req: LoginRequestData = {
-            token
+            token: token
         }
 
-        this.status = HallStatus.LOGGING_IN
+        this.status.value = HallStatus.LOGGING_IN
 
         this.conn.conn.send('LOGIN_REQ', login_req)
     }
@@ -54,21 +55,21 @@ export class Hall {
     }
 
     private rcv_match_start() {
-        this.status = HallStatus.MATCHING
+        this.status.value = HallStatus.MATCHING
 
     }
 
     private rcv_match_enter() {
-        this.status = HallStatus.IN_MATCH
+        this.status.value = HallStatus.IN_MATCH
 
     }
 
     private rcv_match_end() {
-       this.status = HallStatus.SETTLING
+       this.status.value = HallStatus.SETTLING
     }
 
     quit_settlement() {
-        this.status = HallStatus.ONLINE
+        this.status.value = HallStatus.ONLINE
     }
 
     send_submit_id(submit_id: string) {
@@ -76,5 +77,10 @@ export class Hall {
             task_no: 0,
             submit: submit_id
         })
+    }
+
+    logout() {
+        this.conn.conn.close()
+        this.status.value = HallStatus.OFFLINE
     }
 }
