@@ -43,7 +43,7 @@
   import {reactive, ref, defineComponent} from "vue";
   import type {Rule} from "ant-design-vue/es/form";
   import {useRouter} from 'vue-router';
-  import { Form, Button, Input, FormItem, InputPassword } from "ant-design-vue";
+  import { Form, Button, Input, FormItem, InputPassword, message } from "ant-design-vue";
   import {generatePost} from "@/utils/protocol";
   
   const formItem = Form.Item;
@@ -115,14 +115,11 @@
     const passWord = formState.passWord;
     const email = formState.email;
 
-    generatePost('auth/register', {userName:userName, passWord:passWord, email:email}).then((res) => {
+    generatePost('auth/register', {userName:userName, password:passWord, userEmail:email}).then((res) => {
       console.log(res);
-      if (res.data.code === 200) {
-        // 登录成功
-        // 保存token
-        localStorage.setItem('token', res.data.token);
-        localStorage.setItem('userInfo', JSON.stringify(res.data));
-        // 跳转到首页
+      if (res.data.status === 0) {
+        message.info('注册成功，请登录')
+        // 跳转到登录页
         router.push('/');
       } else {
         // 登录失败

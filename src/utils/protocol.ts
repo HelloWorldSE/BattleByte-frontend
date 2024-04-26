@@ -3,7 +3,7 @@ import axios, { type AxiosResponse } from "axios";
 // Path: src/utils/protocol.ts
 
 // const backend = '/api/'
-const backend = 'http://81.70.241.166:9090/'
+const backend = '/api/'
 export function generateGet<T = any>(path:string, params?:any): 
 Promise<AxiosResponse<T>> {
     return axios.get(backend + path, { params })    

@@ -38,6 +38,8 @@ import { Form, Button, Input, FormItem, InputPassword } from "ant-design-vue";
 // import { useCookies } from "vue3-cookies";
 import {generatePost} from "@/utils/protocol";
 
+import { getUserId } from "@/utils/auth";
+
 const formItem = Form.Item;
 const inputPassword = Input.Password;
 
@@ -82,17 +84,16 @@ const Login_Submit = async () => {
   const userName = formState.userName;
   const passWord = formState.passWord;
 
-  generatePost('auth/login', {userName:userName, passWord:passWord}).then((res) => {
+  generatePost('auth/login', {userName:userName, password:passWord}).then((res) => {
     console.log(res);
-    if (res.data.code === 200) {
+    if (res.data.status === 0) {
       // 登录成功
       // 保存token
-      localStorage.setItem('token', res.data.token);
-
-      // 保存所有
-      localStorage.setItem('userInfo', JSON.stringify(res.data));
-
-      let userId = res.data.userId;
+      localStorage.setItem('token', res.data.data.token);
+      
+      
+      
+      let userId = getUserId();
       // 跳转到个人主页
       router.push('/user/profile/' + userId);
     } else {
