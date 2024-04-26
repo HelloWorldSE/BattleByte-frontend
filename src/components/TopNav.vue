@@ -58,10 +58,12 @@ import { Menu, MenuItem, SubMenu, MenuItemGroup } from 'ant-design-vue';
 import type {Key} from "ant-design-vue/es/_util/type";
 
 const router = useRouter();
-const handleClick = (event: { key: string }) => {
+const handleClick = (event: { key: string | number }) => {
   const {key} = event;
   console.log(key);
-  router.push(key);
+  if (typeof key == 'string') {
+    router.push(key);
+  }
 };
 const current = ref<Key[]>(['首页']); // 修改类型为 Key[]
 
