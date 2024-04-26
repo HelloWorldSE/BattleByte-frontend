@@ -2,6 +2,7 @@
   <div class="top">
     <TopNav/>
   </div>
+  <div class="white"></div>
   <div class="left">
     <QuestionView/>
   </div>
@@ -24,6 +25,6 @@ import TopNav from "@/components/TopNav.vue";
 
 .top {
   width: 100%;
-  height: 50px;
+  height: 60px;
 }
 </style>

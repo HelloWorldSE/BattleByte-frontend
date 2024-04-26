@@ -3,7 +3,7 @@
     <div class="area1">
       <Select style="width: 80px" v-model:value="language" @change="changeLanguageHandle">
         <SelectOption value="c">c</SelectOption>
-        <SelectOption value="c++">c++</SelectOption>
+        <SelectOption value="cpp">cpp</SelectOption>
         <SelectOption value="python">python</SelectOption>
         <SelectOption value="java">java</SelectOption>
         <SelectOption value="js">javascript</SelectOption>
@@ -52,7 +52,7 @@ import protocol from "@/utils/protocol.ts";
 import { useCookies } from "vue3-cookies";
 
 let monacoEditor = ref(null);
-const language = ref('c++');
+const language = ref('cpp');
 const style = ref('vs-dark');
 const font = ref('14');
 const height = ref('20');
@@ -190,5 +190,6 @@ const handleChangeLineHeight = (event) => {
   position: absolute;
   bottom: 10px;
   right: 10px;
+  z-index: 1000; /* Ensure the button is above the editor */
 }
 </style>

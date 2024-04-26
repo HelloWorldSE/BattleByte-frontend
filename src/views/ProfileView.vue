@@ -3,6 +3,7 @@ import { Grid, Row, Col, Avatar, Card, TabPane, Table, Tabs, List, ListItem, Lis
 import { generateGet } from "@/utils/protocol";
 import { useRoute, useRouter } from "vue-router";
 import { ref, computed, reactive, onMounted, nextTick } from "vue";
+import TopNav from "@/components/TopNav.vue";
 
 // import { defineComponent } from '@vue/composition-api';
 
@@ -42,7 +43,7 @@ const initProfile = async () => {
             pageEmail.value = res.data.email;
             pageAvatar.value = res.data.avatar;
             console.log(pageAvatar);
-            
+
 
             // friends = res.data.friends;
         } else {
@@ -108,7 +109,7 @@ const onLoadMoreFriends = () => {
     });
 };
 
-let friendsPage = ref(1); 
+let friendsPage = ref(1);
 
 const onLoadMoreFriends1 = (val: any) => {
     friendsLoading.value = true;
@@ -176,6 +177,9 @@ const todo_member = ref("")
     <!-- Use grid layout to show Profile-->
     <!-- The left is Avatar, and the right is a card with tab-list
         tab-1 shows Username, email, and tab-2 shows  friends-->
+  <div class="topBar">
+    <TopNav/>
+  </div>
     <Row :gutter="24" id="main">
         <Col :span="12"  class="colBox">
             <Avatar id="avatar" src="https://i.pravatar.cc/700" />
@@ -188,11 +192,11 @@ const todo_member = ref("")
                     <TabPane key="1" tab="个人信息">
                         <List>
                             <ListItem>
-                                <ListItemMeta title="用户名"></ListItemMeta> 
+                                <ListItemMeta title="用户名"></ListItemMeta>
                                 <div>{{ pageUserName }}</div>
                             </ListItem>
                             <ListItem>
-                                <ListItemMeta title="邮箱"></ListItemMeta> 
+                                <ListItemMeta title="邮箱"></ListItemMeta>
                                 <div>{{ pageEmail }}</div>
                             </ListItem>
                         </List>
@@ -243,7 +247,7 @@ const todo_member = ref("")
                                 </ListItem>
                                 </template>
                             </List>
-                        
+
                     </TabPane>
                 </Tabs>
             </div>
@@ -314,6 +318,10 @@ const todo_member = ref("")
 :deep(.ant-list-item-meta-content h4) {
     margin-top: 0;
 }
-
+.topBar {
+  width: 100%;
+  height: 50px;
+  z-index: 1005;
+}
 
 </style>

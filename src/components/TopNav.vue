@@ -12,29 +12,22 @@
     <div class="middle">
       <Menu
           mode="horizontal"
+          theme="dark"
           class="menu"
-          :selectedKeys="current"
-          @select="()=>{/* TODO */}"
+          v-model:selectedKeys="current"
+          @click="handleClick"
       >
-        <MenuItem key="/home" class="menu-item">
+        <MenuItem key="/" class="menu-item">
           <AppstoreOutlined />
           首页
         </MenuItem>
-        <MenuItem key="/game">
-          <SkinOutlined />
-          好友
-        </MenuItem>
-        <MenuItem key="/mail">
-          <MailOutlined />
-          历史对局
-        </MenuItem>
-        <MenuItem key="/mail">
+        <MenuItem key="/rule">
           <MailOutlined />
           规则介绍
         </MenuItem>
-        <MenuItem key="/setting">
+        <MenuItem key="/user/profile/:id">
           <SettingOutlined />
-          设置
+          个人中心
         </MenuItem>
       </Menu>
     </div>
@@ -59,28 +52,19 @@
 
 <script lang="ts" setup>
 import {ref, watch} from 'vue';
-import {useRoute} from "vue-router";
+import { useRouter } from 'vue-router';
 import { MailOutlined, AppstoreOutlined, SettingOutlined,SkinOutlined } from '@ant-design/icons-vue';
 import { Menu, MenuItem, SubMenu, MenuItemGroup } from 'ant-design-vue';
 import type {Key} from "ant-design-vue/es/_util/type";
 
-
-const current = ref<Key[]>([]); // 修改类型为 Key[]
-const route = useRoute();
-
-const state = {
-  isLogin: false,
-  isUserPlaying: false,
-  modeName: '什么模式',
-  isMusicPlay: false,
-  isSoundPlay: false,
+const router = useRouter();
+const handleClick = (event: { key: string }) => {
+  const {key} = event;
+  console.log(key);
+  router.push(key);
 };
+const current = ref<Key[]>(['首页']); // 修改类型为 Key[]
 
-
-
-watch(() => route.path, (newPath, oldPath) => {
-  current.value = [newPath as Key];
-});
 
 </script>
 
@@ -90,7 +74,7 @@ watch(() => route.path, (newPath, oldPath) => {
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-  background-color: #fff;
+  background-color: #000 ;
   color: #000;
 }
 
@@ -107,7 +91,7 @@ watch(() => route.path, (newPath, oldPath) => {
 
 .title {
   font-size: 20px;
-  font-color: #000;
+  font-color: #fff;
 }
 
 .middle {
@@ -120,6 +104,7 @@ watch(() => route.path, (newPath, oldPath) => {
 .right {
   display: flex;
   align-items: center;
+  font-color: #ffffff;
 }
 
 .right img.headImg {
