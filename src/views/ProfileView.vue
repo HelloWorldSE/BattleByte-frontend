@@ -74,8 +74,8 @@ const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender
 
 const initFriendsLoading = ref(true);
 const friendsLoading = ref(false);
-const friendsData = ref([]);
-const friendsList = ref([]);
+const friendsData = ref<Array<any>>([]);
+const friendsList = ref<Array<any>>([]);
 const customGapSize = ref(40);
 
 onMounted(() => {
@@ -90,7 +90,7 @@ onMounted(() => {
 
 const onLoadMoreFriends = () => {
     friendsLoading.value = true;
-    const xx = [...new Array(count)].map(() => ({ loading: true, name: {}, picture: {} }))
+    const xx = (new Array(count)).map(() => ({ loading: true, name: {}, picture: {} }))
     friendsList.value = friendsData.value.concat(xx);
   fetch(fakeDataUrl)
     .then(res => res.json())
@@ -110,7 +110,7 @@ const onLoadMoreFriends = () => {
 
 let friendsPage = ref(1); 
 
-const onLoadMoreFriends1 = (val) => {
+const onLoadMoreFriends1 = (val: any) => {
     friendsLoading.value = true;
     const xx = [...new Array(count)].map(() => ({ loading: true, name: {}, picture: {} }))
     friendsList.value = xx;
@@ -166,6 +166,8 @@ function getBase64(file: File) {
 // const dataSource = ref(data);
 // const editableData: UnwrapRef
 
+const todo_member = ref("")
+
 </script>
 
 
@@ -198,10 +200,10 @@ function getBase64(file: File) {
                     <TabPane key="2" tab="朋友">
 
                         <InputSearch
-                            v-model:value="value"
+                            v-model:value="todo_member"
                             placeholder="input search friend"
                             style="width: 100%; margin:auto;"
-                            @search="onSearch"
+                            @search="() => {/* TODO */}"
                             />
                             <List
                                 class="demo-loadmore-list"

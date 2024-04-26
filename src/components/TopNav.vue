@@ -11,11 +11,10 @@
     <!-- 中间部分内容 -->
     <div class="middle">
       <Menu
-          theme=""
           mode="horizontal"
           class="menu"
           :selectedKeys="current"
-          @select="onSelect"
+          @select="()=>{/* TODO */}"
       >
         <MenuItem key="/home" class="menu-item">
           <AppstoreOutlined />
