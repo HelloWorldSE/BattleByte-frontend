@@ -39,6 +39,7 @@ import { Form, Button, Input, FormItem, InputPassword } from "ant-design-vue";
 import {generatePost} from "@/utils/protocol";
 
 import { getUserId } from "@/utils/auth";
+import { useHallState } from "@/stores/hall";
 
 const formItem = Form.Item;
 const inputPassword = Input.Password;
@@ -80,6 +81,8 @@ const passWordCheck = async (_rule: Rule, value: string) => {
 }
 
 
+const hall = useHallState()
+
 const Login_Submit = async () => {
   const userName = formState.userName;
   const passWord = formState.passWord;
@@ -91,11 +94,10 @@ const Login_Submit = async () => {
       // 保存token
       localStorage.setItem('token', res.data.data.token);
       
+      hall.hall.login()
       
-      
-      let userId = getUserId();
-      // 跳转到个人主页
-      router.push('/user/profile/' + userId);
+      // let userId = getUserId();
+      router.push('/');
     } else {
       // 登录失败
       console.log('登录失败');

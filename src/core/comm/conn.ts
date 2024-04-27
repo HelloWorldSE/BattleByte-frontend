@@ -68,6 +68,10 @@ export class ConnectionClient {
         }
     }
 
+    close() {
+        this.socket.close()
+    }
+
     private reconnect() {
         this.retryDelay = Math.min(this.retryDelay * 2, 160)
         console.log(`[CC] Retry connecting in ${this.retryDelay} seconds.`)

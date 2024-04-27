@@ -2,8 +2,11 @@
 
 import type { LoginRequestData, LoginResultData } from "@/core/comm/interfaces"
 import { useConnector } from "@/stores/connector"
+import { message } from "ant-design-vue"
+import type { MessageType } from "ant-design-vue/es/message"
+import { useRouter } from "vue-router"
 
-enum HallStatus {
+export enum HallStatus {
     OFFLINE,
     LOGGING_IN,
     ONLINE,
@@ -17,16 +20,46 @@ export class Hall {
     status: HallStatus = HallStatus.OFFLINE
     conn: ReturnType<typeof useConnector>
 
-    constructor() {
+    router: ReturnType<typeof useRouter>
+
+    msgToClose: MessageType | undefined
+
+    constructor(private state_update_callback?: (new_value: HallStatus) => void) {
+
+        // use arrow function to avoid 'this'-bindings
+        const rcv_login_ack = (data: LoginResultData) => {
+            this.set_status(HallStatus.ONLINE)
+            message.success({content: "登录成功！", key: 'hall_login', duration: 1})
+        }
+        const rcv_match_start = () => {
+            this.set_status(HallStatus.MATCHING)
+            message.loading({content: "正在匹配...", key: 'hall_match', duration: 0})
+        }
+        const rcv_match_enter = () => {
+            this.set_status(HallStatus.IN_MATCH)
+            message.loading({content: "匹配成功！", key: 'hall_match', duration: 1})
+            this.router.push('/contest')
+        }
+        const rcv_match_end = () => {
+            this.set_status(HallStatus.SETTLING)
+            message.success('比赛已结束！', 1)
+        }
+
         this.conn = useConnector()
-        this.conn.conn.addListener('LOGIN_ACK', this.rcv_login_ack)
-        this.conn.conn.addListener('MATCH_START', this.rcv_match_start)
-        this.conn.conn.addListener('MATCH_ENTER', this.rcv_match_enter)
-        this.conn.conn.addListener('MATCH_END', this.rcv_match_end)
+        this.conn.conn.addListener('LOGIN_ACK', rcv_login_ack)
+        this.conn.conn.addListener('MATCH_START', rcv_match_start)
+        this.conn.conn.addListener('MATCH_ENTER', rcv_match_enter)
+        this.conn.conn.addListener('MATCH_END', rcv_match_end)
+
+        this.router = useRouter()
     }
 
-    private rcv_login_ack(data: LoginResultData) {
-        this.status = HallStatus.ONLINE
+    private set_status(new_status: HallStatus) {
+        this.status = new_status
+        console.log(`now status = ${this.status}`)
+        if (this.state_update_callback) {
+            this.state_update_callback(new_status)
+        }
     }
 
     login() {
@@ -37,12 +70,22 @@ export class Hall {
         }
 
         const login_req: LoginRequestData = {
-            token
+            token: token
         }
-
-        this.status = HallStatus.LOGGING_IN
+        
+        this.set_status(HallStatus.LOGGING_IN)
 
         this.conn.conn.send('LOGIN_REQ', login_req)
+
+        message.loading({content: "正在向服务器发送登录请求...", key: 'hall_login', duration: 0})
+
+    }
+
+    setMsgToClose(msg: MessageType) {
+        if (this.msgToClose) {
+            this.msgToClose()
+        }
+        this.msgToClose = msg
     }
 
     match_request() {
@@ -53,22 +96,9 @@ export class Hall {
 
     }
 
-    private rcv_match_start() {
-        this.status = HallStatus.MATCHING
-
-    }
-
-    private rcv_match_enter() {
-        this.status = HallStatus.IN_MATCH
-
-    }
-
-    private rcv_match_end() {
-       this.status = HallStatus.SETTLING
-    }
 
     quit_settlement() {
-        this.status = HallStatus.ONLINE
+        this.set_status(HallStatus.ONLINE)
     }
 
     send_submit_id(submit_id: string) {
@@ -76,5 +106,10 @@ export class Hall {
             task_no: 0,
             submit: submit_id
         })
+    }
+
+    logout() {
+        this.conn.conn.close()
+        this.set_status(HallStatus.OFFLINE)
     }
 }
