@@ -20,9 +20,8 @@ export default defineConfig({
     proxy: {
       '^/api': 'http://81.70.241.166/',
       '/socket': {
-        target: 'ws://localhost:5174',
-        ws: true,
-      rewrite: path => path.replace(/^\/socket.*/, '/server')
+        target: 'ws://81.70.241.166/', // 'ws://localhost:5174',
+        ws: true
       }
     }
   }

@@ -81,6 +81,8 @@
 <script>
 import {Modal, message} from 'ant-design-vue';
 import TopNav from "@/components/TopNav.vue";
+import { useHallState } from '@/stores/hall';
+import { mapStores } from 'pinia';
 
 export default {
   components: {
@@ -276,6 +278,11 @@ export default {
   // COMPUTED #########################################
   // ##################################################
   computed: {
+    // #########
+    // ## Global status import
+    // #########
+    ...mapStores(useHallState),
+
     selectedPlanet() {
       return this.planets[this.selectedPlanetId];
     },
@@ -358,6 +365,8 @@ export default {
           this.planetsFilteredLength--;
         }
       }, 9000);
+
+      this.hall_stateStore.hall.match_request()
     },
     zoomIn() {
       if (this.planetsFilteredLength > 4) {
