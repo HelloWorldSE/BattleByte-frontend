@@ -1,7 +1,8 @@
 // 大厅
 
-import type { LoginRequestData, LoginResultData } from "@/core/comm/interfaces"
+import type { LoginRequestData, LoginResultData, MatchEnterData } from "@/core/comm/interfaces"
 import { useConnector } from "@/stores/connector"
+import { useGameStore } from "@/stores/game"
 import { message } from "ant-design-vue"
 import type { MessageType } from "ant-design-vue/es/message"
 import { useRouter } from "vue-router"
@@ -19,6 +20,7 @@ export class Hall {
 
     status: HallStatus = HallStatus.OFFLINE
     conn: ReturnType<typeof useConnector>
+    game: ReturnType<typeof useGameStore>
 
     router: ReturnType<typeof useRouter>
 
@@ -33,10 +35,12 @@ export class Hall {
         }
         const rcv_match_start = () => {
             this.set_status(HallStatus.MATCHING)
+            this.game.match_info = undefined
             message.loading({content: "正在匹配...", key: 'hall_match', duration: 0})
         }
-        const rcv_match_enter = () => {
+        const rcv_match_enter = (data: MatchEnterData) => {
             this.set_status(HallStatus.IN_MATCH)
+            this.game.match_info = data
             message.loading({content: "匹配成功！", key: 'hall_match', duration: 1})
             this.router.push('/contest')
         }
@@ -50,6 +54,8 @@ export class Hall {
         this.conn.conn.addListener('MATCH_START', rcv_match_start)
         this.conn.conn.addListener('MATCH_ENTER', rcv_match_enter)
         this.conn.conn.addListener('MATCH_END', rcv_match_end)
+
+        this.game = useGameStore()
 
         this.router = useRouter()
     }
