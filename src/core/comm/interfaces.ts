@@ -13,6 +13,14 @@ export interface LoginResultData {
     message: string
 }
 
+export interface MatchEnterData {
+    opponents: number[],
+    info: {
+        questionId: number
+    },
+    team_side: number
+}
+
 
 export interface ErrorData {
     ack: number,
