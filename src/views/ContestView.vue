@@ -18,7 +18,7 @@ import TopNav from "@/components/TopNav.vue";
 <style scoped>
 .left,
 .right {
-  width: 48%;
+  width: 50%;
   height: 650px; /* 为左右两部分设置一个固定高度 */
   float: left;
   overflow-y: auto; /* 添加垂直滚动条 */

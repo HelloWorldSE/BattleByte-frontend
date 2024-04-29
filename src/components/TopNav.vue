@@ -3,7 +3,7 @@
     <div class="left">
       <img
           class="LOGO"
-          src=""
+          src="/logo.jpg"
           alt="LOGO"
       />
       <div class="title">BattleByte</div>

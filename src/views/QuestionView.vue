@@ -81,7 +81,9 @@ onMounted(() => {
 });
 
 const game = useGameStore();
+console.log(game.match_info?.info.questionId);
 const problemId = game.match_info?.info.questionId;
+console.log(problemId);
 
 async function fetchData() {
   try {
