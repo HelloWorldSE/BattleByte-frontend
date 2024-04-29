@@ -1,7 +1,3 @@
-export interface MatchInfo {
-    opponents: number[],
-    info: {
-        questionId: number
-    },
-    team_side: number
-}
+import type { MatchEnterData } from "../comm/interfaces";
+
+export type MatchInfo = MatchEnterData
