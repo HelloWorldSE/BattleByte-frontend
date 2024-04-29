@@ -12,7 +12,7 @@
     <div class="middle">
       <Menu
           mode="horizontal"
-          theme="dark"
+          theme="light"
           class="menu"
           v-model:selectedKeys="current"
           @click="handleClick"
@@ -76,7 +76,7 @@ const current = ref<Key[]>(['首页']); // 修改类型为 Key[]
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-  background-color: #000 ;
+  opacity: 100%;
   color: #000;
 }
 
