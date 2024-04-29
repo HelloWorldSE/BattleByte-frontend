@@ -26,7 +26,10 @@ export class Hall {
 
     msgToClose: MessageType | undefined
 
-    constructor(private state_update_callback?: (new_value: HallStatus) => void) {
+    constructor(private state_update_callback?: (new_value: HallStatus) => void,
+                private sync_callback: (
+                    type: 'POS_SYNC' | 'SCORE_SYNC' | 'ANSWER_RESULT' | 'CHAT_MSG',
+                    data: any) => void = () => {}) {
 
         // use arrow function to avoid 'this'-bindings
         const rcv_login_ack = (data: LoginResultData) => {
@@ -49,11 +52,30 @@ export class Hall {
             message.success('比赛已结束！', 1)
         }
 
+        const rcv_pos_sync = (data: any) => {
+            this.sync_callback('POS_SYNC', data)
+        }
+        const rcv_score_sync = (data: any) => {
+            this.sync_callback('SCORE_SYNC', data)
+        }
+        const rcv_answer_result = (data: any) => {
+            this.sync_callback('ANSWER_RESULT', data)
+        }
+        const rcv_chat_msg = (data: any) => {
+            this.sync_callback('CHAT_MSG', data)
+        }
+
         this.conn = useConnector()
         this.conn.conn.addListener('LOGIN_ACK', rcv_login_ack)
         this.conn.conn.addListener('MATCH_START', rcv_match_start)
         this.conn.conn.addListener('MATCH_ENTER', rcv_match_enter)
         this.conn.conn.addListener('MATCH_END', rcv_match_end)
+
+        // SYNC CALLBACK
+        this.conn.conn.addListener('POS_SYNC', rcv_pos_sync)
+        this.conn.conn.addListener('SCORE_SYNC', rcv_score_sync)
+        this.conn.conn.addListener('ANSWER_RESULT', rcv_answer_result)
+        this.conn.conn.addListener('CHAT_MSG', rcv_chat_msg)
 
         this.game = useGameStore()
 
@@ -117,5 +139,21 @@ export class Hall {
     logout() {
         this.conn.conn.close()
         this.set_status(HallStatus.OFFLINE)
+    }
+
+    pos_update(row: number, col: number, total_rows: number) {
+        this.conn.conn.send('POS_UPDATE', {
+            row: row,
+            col: col,
+            total_rows: total_rows
+        })
+    }
+
+    chat_req(type: 'global' | 'team', message: string, gameId: string = "NOT_SET") {
+        this.conn.conn.send('CHAT_REQ', {
+            type: type,
+            message: message,
+            gameId: gameId
+        })
     }
 }
