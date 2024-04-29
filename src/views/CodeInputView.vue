@@ -211,7 +211,7 @@ const handleChangeLineHeight = (event) => {
 .chat-box {
   position: absolute;
   bottom: 10px;
-  right: 10px;
+  right: 90px;
   width: 30%;
   z-index: 1000;
 }
