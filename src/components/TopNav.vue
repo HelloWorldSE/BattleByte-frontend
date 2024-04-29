@@ -14,6 +14,7 @@
           mode="horizontal"
           theme="light"
           class="menu"
+          style="background: #eaf3f8; font-size: large"
           v-model:selectedKeys="current"
           @click="handleClick"
       >
@@ -31,21 +32,13 @@
         </MenuItem>
       </Menu>
     </div>
-    <!-- 右侧部分内容 -->
+<!--     右侧部分内容-->
     <div class="right">
       <img
           class="headImg"
           src=""
           alt="头像"
       />
-      <div class="userName">用户名</div>
-      <div class="userLevel">等级</div>
-      <div class="musicBtn">
-        <i class="iconfont icon-yinle"></i>
-      </div>
-      <div class="soundBtn">
-        <i class="iconfont icon-yinxiao"></i>
-      </div>
     </div>
   </div>
 </template>
@@ -73,11 +66,18 @@ const current = ref<Key[]>(['首页']); // 修改类型为 Key[]
 <style scoped>
 .components-top-nav {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   padding: 10px;
-  opacity: 100%;
+  background: #eaf3f8;
   color: #000;
+  height: 100%; /* 让 TopNav 高度与父容器相同 */
+  width: 100%;
+  overflow: hidden; /* 隐藏超出部分 */
+  position: absolute; /* 绝对定位 */
+  top: 0; /* 定位在顶部 */
+  left: 0; /* 定位在左侧 */
+  right: 0; /* 宽度与 .top 相同 */
+  bottom: 0; /* 高度与 .top 相同 */
 }
 
 .left {
@@ -93,14 +93,14 @@ const current = ref<Key[]>(['首页']); // 修改类型为 Key[]
 
 .title {
   font-size: 20px;
-  font-color: #fff;
 }
 
 .middle {
   flex-grow: 1;
   display: flex;
   justify-content: center;
-  width: 200%;
+  margin-right: 35%;
+  width: 100%;
 }
 
 .right {

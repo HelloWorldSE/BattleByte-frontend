@@ -43,16 +43,19 @@
 
     <h2>标签</h2>
     <div class="tags">
-      <span v-for="(str, idx) in data.tags" :key="idx" class="tag">{{ str }}</span>
+      <Tag v-for="(str, idx) in data.tags" :key="idx" class="tag" color="blue" >{{ str }}</Tag>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {ref, onMounted, reactive} from 'vue';
+import {onMounted, reactive} from 'vue';
 import {CopyOutlined} from '@ant-design/icons-vue';
 import axios from 'axios';
-import {message} from "ant-design-vue";
+import {message,Tag} from "ant-design-vue";
+import {useGameStore} from "@/stores/game";
+
+
 
 const copyInput = (inputText: string) => {
   const el = document.createElement('textarea');
@@ -77,9 +80,12 @@ onMounted(() => {
   fetchData();
 });
 
+const game = useGameStore();
+const problemId = game.match_info?.info.questionId;
+
 async function fetchData() {
   try {
-    const response = await axios.get(' http://81.70.241.166/api/api/oj/problem?id=1'); // 替换成你的API地址
+    const response = await axios.get(`http://81.70.241.166/api/api/oj/problem?id=${problemId}`); // 替换成你的API地址
     console.log(response.data.data.data);
     const list = response.data.data.data;
     data.title = list.title;
@@ -101,12 +107,13 @@ async function fetchData() {
 .components-question-area {
   background-color: white; /* 设置背景为黑色 */
   color: #1E1E1E; /* 设置文字颜色为白色 */
+  min-height: 100vh;
+  overflow-y: auto; /* 添加垂直滚动条 */
 }
 
 /* 可以添加更多选择器来确保所有文字都是白色，如果需要的话 */
 h1, h2, h3, p, .tag {
   margin-left: 10px;
-  //color: white;
 }
 
 h1 {
@@ -118,15 +125,11 @@ h1 {
 
 /* 如果你想要代码块中的文本也是白色，可以添加以下样式 */
 .line {
-  background-color: #111; /* 或者其他深色调以便于阅读 */
-  color: white;
+  color: black;
   margin-left: 10px;
 }
 
-/* 如果你想要让整个组件的背景铺满整个屏幕，可以添加以下样式 */
-.components-question-area {
-  min-height: 100vh;
-}
+
 
 .sample {
   display: flex;
@@ -139,7 +142,7 @@ h1 {
 }
 
 .showArea {
-  background-color: #111; /* 或者其他深色调以便于阅读 */
+  background-color: #eaf3f8; /* 或者其他深色调以便于阅读 */
   height: 75%; /* 让showArea占据父容器的全部高度 */
   display: flex;
   flex-direction: column;
