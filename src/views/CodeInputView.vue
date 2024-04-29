@@ -3,7 +3,7 @@
     <div class="area1">
       <Select style="width: 80px" v-model:value="language" @change="changeLanguageHandle">
         <SelectOption value="c">c</SelectOption>
-        <SelectOption value="cpp">cpp</SelectOption>
+        <SelectOption value="cpp">c++</SelectOption>
         <SelectOption value="python">python</SelectOption>
         <SelectOption value="java">java</SelectOption>
         <SelectOption value="js">javascript</SelectOption>
@@ -53,7 +53,7 @@ import { useCookies } from "vue3-cookies";
 
 let monacoEditor = ref(null);
 const language = ref('cpp');
-const style = ref('vs-dark');
+const style = ref('vs-light');
 const font = ref('14');
 const height = ref('20');
 const selfDiv = ref(null);
@@ -80,7 +80,7 @@ const codeTemplates = {
 
 onMounted(() => {
   monacoEditor.value = monaco.editor.create(main.value, {
-    theme: 'vs-dark',
+    theme: 'vs-light',
     value: codeTemplates.cpp,
     language: 'cpp',
     folding: true,
