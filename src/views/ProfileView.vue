@@ -11,7 +11,8 @@ const route = useRoute();
 const router = useRouter();
 
 const pageUserId = route.params.id;
-const localUserId = localStorage.getItem("userInfo") ? JSON.parse((localStorage.getItem("userInfo")) || '').userId : NaN;
+const localUserId = localStorage.getItem("userId");
+const token = localStorage.getItem("token");
 // const localUserName = localStorage.getItem("userInfo") ? JSON.parse((localStorage.getItem("userInfo")) || '').username : NaN;
 // const localEmail = localStorage.getItem("userInfo") ? JSON.parse((localStorage.getItem("userInfo")) || '').email : NaN;
 let pageUserName = ref(NaN);
@@ -36,12 +37,12 @@ const getImageUrl = (name: any) => {
 
 
 const initProfile = async () => {
-    generateGet("user/profile", { userId: pageUserId }).then((res) => {
-        if (res.data.code === 200) {
+    generateGet("api/user/profile", { id: pageUserId }).then((res) => {
+        if (res.data.status === 0) {
             console.log(res);
-            pageUserName.value = res.data.username;
-            pageEmail.value = res.data.email;
-            pageAvatar.value = res.data.avatar;
+            pageUserName.value = res.data.data.userName;
+            pageEmail.value = res.data.data.userEmail;
+            pageAvatar.value = res.data.data.avatar;
             console.log(pageAvatar);
 
 
@@ -53,8 +54,8 @@ const initProfile = async () => {
 
     if (pageUserId === localUserId) {
         // get friends
-        generateGet("user/friend", { userId: pageUserId, pageNums: friendPageNums, onePageFriends: onePageFriends}).then((res) => {
-        if (res.data.code === 200) {
+        generateGet("user/friend", { pageSize: onePageFriends, page: 1}).then((res) => {
+        if (res.data.status === 0) {
             // pageUserName = res.data.username;
             // pageEmail = res.data.email;
             localFriends.value = res.data.friends;
@@ -72,6 +73,7 @@ initProfile();
 // 朋友页面 翻页逻辑
 const count = 5;
 const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat,picture&noinfo`;
+
 
 const initFriendsLoading = ref(true);
 const friendsLoading = ref(false);

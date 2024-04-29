@@ -14,6 +14,11 @@ Promise<AxiosResponse<T>> {
     return axios.post(backend + path, data, {headers: {'Content-Type': 'application/json'}})
 }
 
+export function generatePostAvatar<T = any>(path:string, data?:any):
+Promise<AxiosResponse<T>> {
+    return axios.post(backend + path, data, {headers: {'Content-Type': 'multipart/form-data', 'token': localStorage.getItem('token')}})
+}
+
 
 export const protocol = axios.create({
     baseURL: "http://81.70.241.166/submit/api/submission",

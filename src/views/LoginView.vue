@@ -96,8 +96,9 @@ const Login_Submit = async () => {
       
       hall.hall.login()
       
-      // let userId = getUserId();
-      router.push('/');
+      let userId = getUserId();
+      localStorage.setItem('userId', userId);
+      router.push('/user/profile/' + `${userId}`);
     } else {
       // 登录失败
       console.log('登录失败');
