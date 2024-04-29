@@ -157,4 +157,10 @@ export class Hall {
             gameId: gameId
         })
     }
+
+    answer_refresh(submit_id: string) {
+        this.conn.conn.send('ANSWER_REFRESH', {
+            submit_id: submit_id
+        })
+    }
 }
