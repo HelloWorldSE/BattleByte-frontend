@@ -44,6 +44,7 @@ export class Hall {
         const rcv_match_enter = (data: MatchEnterData) => {
             this.set_status(HallStatus.IN_MATCH)
             this.game.match_info = data
+            console.log(`STAGE A`, this.game.match_info)
             message.loading({content: "匹配成功！", key: 'hall_match', duration: 1})
             this.router.push('/contest')
         }

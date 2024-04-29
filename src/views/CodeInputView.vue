@@ -114,7 +114,6 @@ const fontSize = ref(14);
 const lineHeight = ref(20);
 
 const gameStore = useGameStore()
-const problem_id = () => gameStore.match_info.info.questionId
 
 const submit_id_to_refresh = ref()
 
@@ -136,11 +135,12 @@ const handleSubmit = async () => {
   const code = editor.getModels()[0]?.getValue();
   console.log(code);
 
-  protocol.post("http://81.70.241.166/api/api/oj/submit",{
-    problem_id: problem_id(),
+  console.log(`STAGE B`, gameStore.match_info, gameStore.match_info.info.questionId)
+  axios.post("/api/api/oj/submit",{
+    problem_id: gameStore.match_info.info.questionId,
     language: language.value,
     code: code
-  }).then(res => {
+  }, {headers: {"Content-Type": "application/json"}}).then(res => {
     if(res.data.status === 0){
       console.log("提交成功");
     }
