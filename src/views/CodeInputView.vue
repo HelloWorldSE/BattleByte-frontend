@@ -117,16 +117,17 @@ const gameStore = useGameStore()
 
 const submit_id_to_refresh = ref()
 
+const hall = useHallState()
+
 
 const refresh_submit_status = () => {
   console.log("Send refresh TODO")
+  hall.hall.answer_refresh(submit_id_to_refresh.value)
 }
 
 const refresh_submit_status_callback = () => {
   
 }
-
-const hall = useHallState()
 
 
 //处理提交事件
@@ -137,7 +138,7 @@ const handleSubmit = async () => {
 
   console.log(`STAGE B`, gameStore.match_info, gameStore.match_info.info.questionId)
   axios.post("/api/api/oj/submit",{
-    problem_id: gameStore.match_info.info.questionId,
+    problem_id: gameStore.match_info.info.questionId + 745,
     language: language.value,
     code: code
   }, {headers: {"Content-Type": "application/json"}}).then(res => {
