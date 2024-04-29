@@ -205,7 +205,7 @@ const handleChangeLineHeight = (event) => {
 .submit-button {
   position: absolute;
   bottom: 10px;
-  right: 70px;
+  right: 10px;
   z-index: 1000; /* Ensure the button is above the editor */
 }
 .chat-box {
