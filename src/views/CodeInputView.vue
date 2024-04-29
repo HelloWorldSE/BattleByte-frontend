@@ -2,11 +2,11 @@
   <div class="components-code-input" ref="selfDiv">
     <div class="area1">
       <Select style="width: 80px" v-model:value="language" @change="changeLanguageHandle">
-        <SelectOption value="c">c</SelectOption>
-        <SelectOption value="cpp">c++</SelectOption>
-        <SelectOption value="python">python</SelectOption>
-        <SelectOption value="java">java</SelectOption>
-        <SelectOption value="js">javascript</SelectOption>
+        <SelectOption value="C">C</SelectOption>
+        <SelectOption value="C++">C++</SelectOption>
+        <SelectOption value="Python3">Python 3</SelectOption>
+        <SelectOption value="Java">java</SelectOption>
+        <SelectOption value="JavaScript">javascript</SelectOption>
       </Select>
 
       <Select name="theme"  style="width: 150px" v-model:value="style" @change="handleChangeTheme">
@@ -67,11 +67,11 @@ const main = ref(null);
 
 
 const codeTemplates = {
-  cpp: `#include <iostream>\n\nint main() {\n\t// Your C++ code here\n\treturn 0;\n}`,
-  c: `#include <stdio.h>\n\nint main() {\n\t// Your C code here\n\treturn 0;\n}`,
-  python: `# Your Python code here`,
-  java: `public class Main {\n\tpublic static void main(String[] args) {\n\t\t// Your Java code here\n\t}\n}`,
-  javascript: `// Your JavaScript code here`,
+  'C++': `#include <iostream>\n\nint main() {\n\t// Your C++ code here\n\treturn 0;\n}`,
+  'C': `#include <stdio.h>\n\nint main() {\n\t// Your C code here\n\treturn 0;\n}`,
+  'Python3': `# Your Python code here`,
+  'Java': `public class Main {\n\tpublic static void main(String[] args) {\n\t\t// Your Java code here\n\t}\n}`,
+  'JavaScript': `// Your JavaScript code here`,
 };
 
 onMounted(() => {
@@ -144,6 +144,8 @@ const handleSubmit = async () => {
     if(res.data.status === 0){
       console.log("提交成功");
     }
+
+    console.log(res)
 
     submit_id_to_refresh.value = res.data.data.data.id
     setInterval(
