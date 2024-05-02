@@ -19,6 +19,8 @@ export const useHallState = defineStore('hall_state', () => {
         (type, data) => {
             if (type == 'CHAT_MSG') {
                 rcv_chat_msg.value(data)
+            } else if (type == 'ANSWER_RESULT') {
+                rcv_answer_result.value(data)
             }
         }
     )

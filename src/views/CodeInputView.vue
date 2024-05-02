@@ -45,7 +45,7 @@
 
 <script setup>
 import {ref, onMounted} from 'vue';
-import {Button,Select,SelectOption} from 'ant-design-vue';
+import {Button,Select,SelectOption, message} from 'ant-design-vue';
 import * as monaco from 'monaco-editor';
 import axios from 'axios';
 import {generateCompletionItems} from '@/components/generateCompletionItem'; // 注意路径是否正确
@@ -58,7 +58,7 @@ import ChatBox from '@/components/ChatBox.vue';
 import { useHallState } from '@/stores/hall';
 
 let monacoEditor = ref(null);
-const language = ref('cpp');
+const language = ref('C++');
 const style = ref('vs-light');
 const font = ref('14');
 const height = ref('20');
@@ -77,7 +77,7 @@ const codeTemplates = {
 onMounted(() => {
   monacoEditor.value = monaco.editor.create(main.value, {
     theme: 'vs-light',
-    value: codeTemplates.cpp,
+    value: codeTemplates['C++'],
     language: 'cpp',
     folding: true,
     foldingHighlight: true,
@@ -121,14 +121,51 @@ const hall = useHallState()
 
 
 const refresh_submit_status = () => {
-  console.log("Send refresh TODO")
   hall.hall.answer_refresh(submit_id_to_refresh.value)
 }
 
-const refresh_submit_status_callback = () => {
-  
+let refresh_timeout = null
+
+const status_name = {
+  '-2': 'Compile Error',
+  '-1': 'Wrong Answer',
+  '0': 'Accepted',
+  '1': 'Time Limit Exceeded',  
+  '2': 'Time Limit Exceeded',
+  '3': 'Memory Limit Exceeded',
+  '4': 'Runtime Error',
+  '5': 'System Error',
+  '6': 'Pending',
+  '7': 'Judging',
+  '8': 'Partial Accepted',
+  '9': 'Submitting'
 }
 
+const refresh_submit_status_callback = (data) => {
+  if (typeof data.result === 'string') {
+    // temporary MATCH_END pack
+    const match_res = data.result;
+    message.success(match_res, 2)
+
+  } else {
+    console.log(data)
+    console.log(data.result)
+    console.log(data.result.data)
+    console.log(data.result.data.result)
+    if (data.result.data.result !== undefined) {
+      if (data.result.data.result !== 6 && data.result.data.result !== 7 && data.result.data.result !== 9) {
+        if (data.result.data.result === 0) {
+          message.success({content: '通过！', duration: 2, key: 'oj-pending'})
+        } else {
+          message.warn({content: `未能通过，评测状态：${status_name[data.result.data.result.toString()]}`, duration: 2, key: 'oj-pending'})
+        }
+        clearInterval(refresh_timeout)
+      }
+    }
+  }
+}
+
+hall.answer_result_callback = refresh_submit_status_callback
 
 //处理提交事件
 const handleSubmit = async () => {
@@ -149,9 +186,14 @@ const handleSubmit = async () => {
     console.log(res)
 
     submit_id_to_refresh.value = res.data.data.data.id
-    setInterval(
+    if (refresh_timeout) {
+      clearInterval(refresh_timeout)
+    }
+    refresh_timeout = setInterval(
       refresh_submit_status
     , 3000);
+
+    message.loading({content: '正在评测...', duration: 0, key: 'oj-pending'})
 
   })
 
