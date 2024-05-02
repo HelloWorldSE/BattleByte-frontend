@@ -34,6 +34,9 @@
     </div>
 <!--     右侧部分内容-->
     <div class="right">
+      <div class="exit-button" @click="log_out">
+        退出登录
+      </div>
       <img
           class="headImg"
           src=""
@@ -49,6 +52,7 @@ import { useRouter } from 'vue-router';
 import { MailOutlined, AppstoreOutlined, SettingOutlined,SkinOutlined } from '@ant-design/icons-vue';
 import { Menu, MenuItem, SubMenu, MenuItemGroup } from 'ant-design-vue';
 import type {Key} from "ant-design-vue/es/_util/type";
+import { useHallState } from '@/stores/hall';
 
 const router = useRouter();
 const handleClick = (event: { key: string | number }) => {
@@ -60,6 +64,13 @@ const handleClick = (event: { key: string | number }) => {
 };
 const current = ref<Key[]>(['首页']); // 修改类型为 Key[]
 
+
+const hall = useHallState()
+const log_out = () => {
+  hall.hall.logout()
+  localStorage.removeItem('token')
+  router.push('/auth/login')
+}
 
 </script>
 
@@ -173,6 +184,15 @@ const current = ref<Key[]>(['首页']); // 修改类型为 Key[]
 .menu-item {
   margin: 0 10px;
   color: #fff;
+}
+
+.exit-button {
+}
+.exit-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.exit-button:active {
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 </style>
