@@ -83,6 +83,7 @@ import {Modal, message} from 'ant-design-vue';
 import TopNav from "@/components/TopNav.vue";
 import { useHallState } from '@/stores/hall';
 import { mapStores } from 'pinia';
+import { isLoggedIn } from '@/utils/auth'
 
 export default {
   components: {
@@ -91,6 +92,11 @@ export default {
   },
   created() {
     this.infoModalVisible = false;
+
+    // 如果没有登录，跳转 login
+    if (! isLoggedIn()) {
+      this.$router.push('/auth/login')
+    }
   },
   // ##################################################
   // DATA #############################################
