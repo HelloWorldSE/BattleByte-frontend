@@ -8,6 +8,8 @@ export const useHallState = defineStore('hall_state', () => {
     const hallStatus = ref<HallStatus>(HallStatus.OFFLINE)
 
     const rcv_chat_msg = ref<(data: ChatMsgData) => void>(()=>{})
+    const rcv_answer_result = ref<(data: any) => void>(()=>{})
+    
 
 
     const hall = new Hall(
@@ -26,6 +28,7 @@ export const useHallState = defineStore('hall_state', () => {
     return {
         hall,
         hallStatus,
-        chat_msg_callback: rcv_chat_msg
+        chat_msg_callback: rcv_chat_msg,
+        answer_result_callback: rcv_answer_result
     }
 })

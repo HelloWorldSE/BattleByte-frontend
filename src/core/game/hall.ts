@@ -1,8 +1,9 @@
 // 大厅
 
 import type { LoginRequestData, LoginResultData, MatchEnterData } from "@/core/comm/interfaces"
-import { useConnector } from "@/stores/connector"
+import { useConnector, type WSConnectState } from "@/stores/connector"
 import { useGameStore } from "@/stores/game"
+import { isLoggedIn } from "@/utils/auth"
 import { message } from "ant-design-vue"
 import type { MessageType } from "ant-design-vue/es/message"
 import { useRouter } from "vue-router"
@@ -66,6 +67,21 @@ export class Hall {
             this.sync_callback('CHAT_MSG', data)
         }
 
+
+        const conn_state_change = (state: WSConnectState) => {
+            switch (state) {
+                case "CONNECTED":
+                    if (isLoggedIn()) {
+                        this.login()
+                    }
+                    break
+                case "CLOSED":
+                    this.set_status(HallStatus.OFFLINE)
+                    break
+                case "CONNECTING":
+            }
+        }
+
         this.conn = useConnector()
         this.conn.conn.addListener('LOGIN_ACK', rcv_login_ack)
         this.conn.conn.addListener('MATCH_START', rcv_match_start)
@@ -77,6 +93,14 @@ export class Hall {
         this.conn.conn.addListener('SCORE_SYNC', rcv_score_sync)
         this.conn.conn.addListener('ANSWER_RESULT', rcv_answer_result)
         this.conn.conn.addListener('CHAT_MSG', rcv_chat_msg)
+
+        // OFFLINE EVENT
+        this.conn.registerStateChangeEvent(conn_state_change)
+        if (this.conn.state == 'CONNECTED') {
+            if (isLoggedIn()) {
+                this.login()
+            }
+        }
 
         this.game = useGameStore()
 
@@ -92,6 +116,11 @@ export class Hall {
     }
 
     login() {
+
+        if (this.status != HallStatus.OFFLINE) {
+            throw 'Not in OFFLINE status. The log in request has been cancelled.'
+        }
+
         const token = localStorage.getItem('token')
 
         if (!token) {
