@@ -148,10 +148,6 @@ const refresh_submit_status_callback = (data) => {
     message.success(match_res, 2)
 
   } else {
-    console.log(data)
-    console.log(data.result)
-    console.log(data.result.data)
-    console.log(data.result.data.result)
     if (data.result.data.result !== undefined) {
       if (data.result.data.result !== 6 && data.result.data.result !== 7 && data.result.data.result !== 9) {
         if (data.result.data.result === 0) {
