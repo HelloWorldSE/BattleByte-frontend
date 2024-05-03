@@ -32,8 +32,10 @@
     </div>
     <div class="area2">
       <div ref="main" class="editor">
-        <div class="curpos_my" :style="curpos_pos_my"></div>
-        <div class="maxpos_my" :style="maxpos_pos_my"></div>
+        <div v-for="pos, player in gameStore.posMap">
+          <div class="curpos" :class="(player == my_userid) ? 'me' : 'enermy'" :style="curPosStyles[player]"></div>
+          <div class="maxpos" :class="(player == my_userid) ? 'me' : 'enermy'" :style="maxLineStyles[player]"></div>
+        </div>
       </div>
       <!-- 提交按钮 -->
       <Button class="submit-button" @click="handleSubmit" type="primary" shape="round">
@@ -41,13 +43,18 @@
       </Button>
       <div class="chat-box">
         <ChatBox />
+        <!--
+          {{gameStore.posMap}}
+          {{ curPosStyles[15] }}
+          {{ maxLineStyles[15]}}
+        -->
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import {ref, onMounted} from 'vue';
+import {ref, onMounted, computed} from 'vue';
 import {Button,Select,SelectOption, message} from 'ant-design-vue';
 import * as monaco from 'monaco-editor';
 import axios from 'axios';
@@ -57,6 +64,7 @@ import { useGameStore } from '@/stores/game';
 
 import ChatBox from '@/components/ChatBox.vue';
 import { useHallState } from '@/stores/hall';
+import { getUserId } from '@/utils/auth';
 
 let monacoEditor = null;
 const language = ref('C++');
@@ -83,22 +91,34 @@ const languageIds = {
   'JavaScript': `javascript`,
 };
 
-const curpos_pos_my = ref({top: '0px', height: '19px'})
+const curpos_pos_my = ref({top: '0px', height: '20px'})
 const maxpos_pos_my = ref({top: '0px'})
 
 let curLineNumber = 1
-let scrollOffset = 0
+let curColumn = 1
+const scrollOffset = ref(0)
 
 const updateMaxLine = () => {
   const maxLine = monacoEditor?.getModel().getLineCount()
-  const lineHeight = monacoEditor?.getOption(monaco.editor.EditorOption.lineHeight)
-  maxpos_pos_my.value.top = `${maxLine * lineHeight + scrollOffset}px`
+  gameStore.posMap[my_userid.value].total_rows = maxLine
 }
 const updatePosShow = () => {
-  const lineHeight = monacoEditor.getOption(monaco.editor.EditorOption.lineHeight)
-  curpos_pos_my.value.top = `${(curLineNumber - 1) * lineHeight + scrollOffset}px`
+  gameStore.posMap[my_userid.value].row = curLineNumber
+  gameStore.posMap[my_userid.value].col = curColumn
+}
+const sendPosUpdate = () => {
+  hall.hall.pos_update(
+    gameStore.posMap[my_userid.value].row,
+    gameStore.posMap[my_userid.value].col,
+    gameStore.posMap[my_userid.value].total_rows
+  )
 }
 
+const hall = useHallState()
+hall.pos_sync_callback = (data) => {
+  const { player, ...rest } = data
+  gameStore.posMap[player] = rest
+}
 
 onMounted(() => {
   monacoEditor = monaco.editor.create(main.value, {
@@ -121,6 +141,7 @@ onMounted(() => {
     lineNumbersMinChars: 5,
     enableSplitViewResizing: false,
     readOnly: false,
+    lineHeight: 20,
   });
   // 注册 C++ 的代码补全提供器
   monaco.languages.registerCompletionItemProvider('cpp', {
@@ -138,10 +159,13 @@ onMounted(() => {
 
   monacoEditor.onDidChangeCursorPosition((e) => {
     curLineNumber = e.position.lineNumber
+    curColumn = e.position.column
     updatePosShow()
+
+    sendPosUpdate()
   })
   monacoEditor.onDidScrollChange((e) => {
-    scrollOffset = - e.scrollTop
+    scrollOffset.value = - e.scrollTop
     updateMaxLine()
     updatePosShow()
   })
@@ -152,12 +176,30 @@ const theme = ref('vs-dark');
 const fontSize = ref(14);
 const lineHeight = ref(20);
 
+const my_userid = ref(Number.parseInt(getUserId()))
+const curPosStyles = ref({})
+const maxLineStyles = ref({})
+
 const gameStore = useGameStore()
+gameStore.posMap = {}
+for (const player of Object.values(gameStore.match_info.playerMap)) {
+  gameStore.posMap[player] = {row: 1, col: 1, total_rows: 1}
+  curPosStyles.value[player] = computed(() => {
+    const curLineNumber = gameStore.posMap[player].row
+    return {
+      top: `${(curLineNumber - 1) * lineHeight.value + scrollOffset.value}px`,
+      height: `${lineHeight.value}px`
+    }
+  })
+  maxLineStyles.value[player] = computed(() => {
+    const maxLine = gameStore.posMap[player].total_rows
+    return {
+      top: `${maxLine * lineHeight.value + scrollOffset.value}px`
+    }
+  })
+}
 
 const submit_id_to_refresh = ref()
-
-const hall = useHallState()
-
 
 const refresh_submit_status = () => {
   hall.hall.answer_refresh(submit_id_to_refresh.value)
@@ -300,20 +342,33 @@ const handleChangeLineHeight = (event) => {
   z-index: 1000;
 }
 
-.maxpos_my {
+.maxpos {
   position: absolute;
   content: "";
   width: 100%;
   height: 1px;
-  background-color: green;
   z-index: 1000;
 }
-.curpos_my {
+
+.maxpos.me {
+  background-color: green;
+}
+.maxpos.enermy {
+  background-color: red;
+}
+
+.curpos {
   position: absolute;
   content: "";
   width: 3px;
   background-color: green;
   z-index: 1000;
+}
+.curpos.me {
+  background-color: green;
+}
+.curpos.enermy {
+  background-color: red;
 }
 
 </style>

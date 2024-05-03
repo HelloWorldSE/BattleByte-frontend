@@ -27,6 +27,12 @@ export interface ChatMsgData {
     message: string
 }
 
+export interface PosSyncData {
+    user_id: number,
+    row: number,
+    col: number,
+    total_row: number
+}
 
 export interface ErrorData {
     ack: number,
