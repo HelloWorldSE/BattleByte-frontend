@@ -31,7 +31,10 @@
 
     </div>
     <div class="area2">
-      <div ref="main" class="editor"/>
+      <div ref="main" class="editor">
+        <div class="curpos_my" :style="curpos_pos_my"></div>
+        <div class="maxpos_my" :style="maxpos_pos_my"></div>
+      </div>
       <!-- 提交按钮 -->
       <Button class="submit-button" @click="handleSubmit" type="primary" shape="round">
         提交
@@ -49,15 +52,13 @@ import {Button,Select,SelectOption, message} from 'ant-design-vue';
 import * as monaco from 'monaco-editor';
 import axios from 'axios';
 import {generateCompletionItems} from '@/components/generateCompletionItem'; // 注意路径是否正确
-import {editor} from "monaco-editor";
-import protocol from "@/utils/protocol.ts";
 
 import { useGameStore } from '@/stores/game';
 
 import ChatBox from '@/components/ChatBox.vue';
 import { useHallState } from '@/stores/hall';
 
-let monacoEditor = ref(null);
+let monacoEditor = null;
 const language = ref('C++');
 const style = ref('vs-light');
 const font = ref('14');
@@ -74,8 +75,33 @@ const codeTemplates = {
   'JavaScript': `// Your JavaScript code here`,
 };
 
+const languageIds = {
+  'C++': `cpp`,
+  'C': `c`,
+  'Python3': `python`,
+  'Java': `java`,
+  'JavaScript': `javascript`,
+};
+
+const curpos_pos_my = ref({top: '0px', height: '19px'})
+const maxpos_pos_my = ref({top: '0px'})
+
+let curLineNumber = 1
+let scrollOffset = 0
+
+const updateMaxLine = () => {
+  const maxLine = monacoEditor?.getModel().getLineCount()
+  const lineHeight = monacoEditor?.getOption(monaco.editor.EditorOption.lineHeight)
+  maxpos_pos_my.value.top = `${maxLine * lineHeight + scrollOffset}px`
+}
+const updatePosShow = () => {
+  const lineHeight = monacoEditor.getOption(monaco.editor.EditorOption.lineHeight)
+  curpos_pos_my.value.top = `${(curLineNumber - 1) * lineHeight + scrollOffset}px`
+}
+
+
 onMounted(() => {
-  monacoEditor.value = monaco.editor.create(main.value, {
+  monacoEditor = monaco.editor.create(main.value, {
     theme: 'vs-light',
     value: codeTemplates['C++'],
     language: 'cpp',
@@ -106,6 +132,19 @@ onMounted(() => {
       return {suggestions};
     },
   });
+
+  updateMaxLine()
+  monacoEditor.onDidChangeModelContent(updateMaxLine)
+
+  monacoEditor.onDidChangeCursorPosition((e) => {
+    curLineNumber = e.position.lineNumber
+    updatePosShow()
+  })
+  monacoEditor.onDidScrollChange((e) => {
+    scrollOffset = - e.scrollTop
+    updateMaxLine()
+    updatePosShow()
+  })
 
 });
 
@@ -166,7 +205,7 @@ hall.answer_result_callback = refresh_submit_status_callback
 //处理提交事件
 const handleSubmit = async () => {
   //获取编辑器中的代码
-  const code = editor.getModels()[0]?.getValue();
+  const code = monacoEditor.getModel().getValue();
   console.log(code);
 
   console.log(`STAGE B`, gameStore.match_info, gameStore.match_info.info.questionId)
@@ -200,31 +239,34 @@ const changeLanguageHandle = (event) => {
   console.log(selectedLanguage);
   const selectedTemplate = codeTemplates[selectedLanguage];
   console.log(selectedTemplate);
-  editor.getModels()[0]?.setValue(selectedTemplate);
+  monacoEditor?.getModel().setValue(selectedTemplate);
+  if (monacoEditor) {
+    monaco.editor.setModelLanguage(monacoEditor.getModel(), languageIds[selectedLanguage])
+  }
 };
 
 
 const handleChangeTheme = (event) => {
   const selectedTheme = event;
   theme.value = selectedTheme;
-  if (monacoEditor.value) {
-    monacoEditor.value.updateOptions({theme: selectedTheme});
-  }
+  monacoEditor?.updateOptions({theme: selectedTheme});
 };
 
 
 const handleChangeFontSize = (event) => {
   fontSize.value = parseInt(event);
-  if (monacoEditor.value) {
-    monacoEditor.value.updateOptions({fontSize: fontSize.value});
-  }
+  monacoEditor?.updateOptions({fontSize: fontSize.value});
+  updateMaxLine()
+  updatePosShow()
 };
 
 const handleChangeLineHeight = (event) => {
   lineHeight.value = parseInt(event);
-  if (monacoEditor.value) {
-    monacoEditor.value.updateOptions({lineHeight: lineHeight.value});
-  }
+  monacoEditor?.updateOptions({lineHeight: lineHeight.value});
+  
+  curpos_pos_my.value.height = `${lineHeight.value}px`
+  updateMaxLine()
+  updatePosShow()
 };
 
 </script>
@@ -239,8 +281,9 @@ const handleChangeLineHeight = (event) => {
 
 .editor {
   width: 100%;
-  height: 620px;
+  height: 617px;
   flex: 1;
+  position: relative;
 }
 
 .submit-button {
@@ -256,4 +299,21 @@ const handleChangeLineHeight = (event) => {
   width: 30%;
   z-index: 1000;
 }
+
+.maxpos_my {
+  position: absolute;
+  content: "";
+  width: 100%;
+  height: 1px;
+  background-color: green;
+  z-index: 1000;
+}
+.curpos_my {
+  position: absolute;
+  content: "";
+  width: 3px;
+  background-color: green;
+  z-index: 1000;
+}
+
 </style>
