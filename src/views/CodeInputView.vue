@@ -116,8 +116,8 @@ const sendPosUpdate = () => {
 
 const hall = useHallState()
 hall.pos_sync_callback = (data) => {
-  const { player, ...rest } = data
-  gameStore.posMap[player] = rest
+  const { user_id, ...rest } = data
+  gameStore.posMap[user_id] = rest
 }
 
 onMounted(() => {
