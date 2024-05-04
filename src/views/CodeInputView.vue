@@ -155,6 +155,7 @@ onMounted(() => {
   });
 
   updateMaxLine()
+  sendPosUpdate()
   monacoEditor.onDidChangeModelContent(updateMaxLine)
 
   monacoEditor.onDidChangeCursorPosition((e) => {
@@ -340,6 +341,7 @@ const handleChangeLineHeight = (event) => {
   right: 90px;
   width: 30%;
   z-index: 1000;
+  height: 28px;
 }
 
 .maxpos {
