@@ -6,10 +6,10 @@
         </template>
         <Form :model="formState" layout="vertical">
             <FormItem label="密码" :rules="[{validator: passWordCheck, trigger: 'blur'}]">
-                <Input v-model:value="formState.password" type="password" />
+                <InputPassword v-model:value="formState.password" type="password" />
             </FormItem>
             <FormItem label="确认新密码" :rules="[{validator: againPasswordCheck, trigger: 'blur'}]">
-                <Input v-model:value="formState.againPassword" type="password" />
+                <InputPassword v-model:value="formState.againPassword" type="password" />
             </FormItem>
         </Form>
     </Modal>
@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { Modal, Button, Form, FormItem, Input, Upload, message, type FormInstance } from 'ant-design-vue';
+    import { Modal, Button, Form, FormItem, Input, Upload, message, InputPassword, type FormInstance } from 'ant-design-vue';
     import { ref, reactive } from 'vue';
     import type { Rule } from 'ant-design-vue/es/form';
 

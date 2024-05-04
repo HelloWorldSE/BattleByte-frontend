@@ -27,7 +27,10 @@ let pageAvatar = ref('');
 let pageFriends = ref(NaN);
 let friendPageNums = 1;
 let onePageFriends = 5;
-let localFriends = ref(NaN);
+
+let localFriends = ref<Array<any>>([]);
+let curFriendPage = 1;
+let totalFriendsPages = 0;
 
 
 const getImageUrl = (name: any) => {
@@ -39,6 +42,8 @@ const getImageUrl = (name: any) => {
 //   current: current.value,
 //   pageSize: pageSize.value,
 // }));
+
+
 
 
 
@@ -60,11 +65,17 @@ const initProfile = async () => {
 
     if (pageUserId === localUserId) {
         // get friends
-        generateGet("user/friend", { pageSize: onePageFriends, page: 1}).then((res) => {
+        generateGet("api/user/friend", { pageSize: onePageFriends, page: 1}).then((res) => {
         if (res.data.status === 0) {
             // pageUserName = res.data.username;
             // pageEmail = res.data.email;
-            localFriends.value = res.data.friends;
+            localFriends.value = res.data.data.content;
+            console.log('localFriends', localFriends);
+            curFriendPage = res.data.data.pageable.pageNumber + 1;
+            console.log('curFriendPage', curFriendPage);
+            totalFriendsPages = res.data.data.totalPages;
+            console.log('totalFriendsPages', totalFriendsPages);
+
         } else {
             console.log(res);
         }
@@ -141,8 +152,9 @@ const onLoadMoreFriends1 = (val: any) => {
 };
 
 const getMoreFriends = async () => {
-    friendPageNums += 1;
-    generateGet("user/friend", { userId: pageUserId, pageNums: friendPageNums, onePageFriends: onePageFriends}).then((res) => {
+    // curFriendPage.value += 1;
+    curFriendPage += 1;
+    generateGet("user/friend", { userId: pageUserId, pageNums: curFriendPage, onePageFriends: onePageFriends}).then((res) => {
         if (res.data.code === 200) {
             // pageUserName = res.data.username;
             // pageEmail = res.data.email;
@@ -232,7 +244,7 @@ const todo_member = ref("")
                                 class="demo-loadmore-list"
                                 :loading="initFriendsLoading"
                                 item-layout="horizontal"
-                                :data-source="friendsList"
+                                :data-source="localFriends"
                                 id="FriendsList"
                             >
                                 <template #loadMore>
@@ -241,24 +253,24 @@ const todo_member = ref("")
                                     :style="{ textAlign: 'center', marginTop: '12px', height: '32px', lineHeight: '32px' }"
                                 >
                                     <!-- <Button @click="onLoadMoreFriends">loading more</Button> -->
-                                    <Pagination @change="onLoadMoreFriends1" :current="friendsPage" :total="200" :pageSize="5" simple/>
+                                    <Pagination @change="onLoadMoreFriends1" :current="curFriendPage" :total="totalFriendsPages" :pageSize="5" simple/>
                                 </div>
                                 </template>
                                 <template #renderItem="{ item }">
                                 <ListItem>
                                     <template #actions>
-                                    <a key="list-loadmore-edit">edit</a>
-                                    <a key="list-loadmore-more">more</a>
+                                    <a key="list-loadmore-edit">删除</a>
+                                    <a key="list-loadmore-more">聊天</a>
                                     </template>
                                     <Skeleton avatar :title="false" :loading="!!item.loading" active>
                                     <ListItemMeta
-                                        description="Ant Design"
+                                        :description="item.email"
                                     >
                                         <template #title>
-                                        <a href="https://www.antdv.com/">{{ item.name.last }}</a>
+                                        <a href="https://www.antdv.com/">{{ item.userName }}</a>
                                         </template>
                                         <template #avatar>
-                                        <Avatar :src="item.picture.large" />
+                                        <Avatar :src="item.avatar" />
                                         </template>
                                     </ListItemMeta>
                                     <div>content</div>

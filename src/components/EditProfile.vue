@@ -91,6 +91,9 @@
             if (res.data.status === 0) {
                 message.success('修改成功');
                 loading.value = false;
+                formState.userName = '';
+                formState.email = '';
+                formState.avatar = '';
                 emit('update:modelValue', false);
             } else {
                 message.error('修改失败');
