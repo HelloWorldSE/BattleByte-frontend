@@ -179,11 +179,10 @@ export class Hall {
         })
     }
 
-    chat_req(type: 'global' | 'team', message: string, gameId: string = "NOT_SET") {
+    chat_req(type: 'global' | 'team', message: string) {
         this.conn.conn.send('CHAT_REQ', {
             type: type,
-            message: message,
-            gameId: gameId
+            message: message
         })
     }
 
