@@ -4,13 +4,19 @@ import { generateGet } from "@/utils/protocol";
 import { useRoute, useRouter } from "vue-router";
 import { ref, computed, reactive, onMounted, nextTick } from "vue";
 import TopNav from "@/components/TopNav.vue";
+import EditProfile from "@/components/EditProfile.vue";
+import EditPassword from "@/components/EditPassword.vue";
 
 // import { defineComponent } from '@vue/composition-api';
 
 const route = useRoute();
 const router = useRouter();
 
-const pageUserId = route.params.id;
+function getPageUserId(params: string | string[]) {
+    return params ? (Array.isArray(params) ? params[0] as string : params as string) : '';
+}
+
+const pageUserId = getPageUserId(route.params.id);
 const localUserId = localStorage.getItem("userId");
 const token = localStorage.getItem("token");
 // const localUserName = localStorage.getItem("userInfo") ? JSON.parse((localStorage.getItem("userInfo")) || '').username : NaN;
@@ -20,7 +26,7 @@ let pageEmail = ref(NaN);
 let pageAvatar = ref('');
 let pageFriends = ref(NaN);
 let friendPageNums = 1;
-let onePageFriends = 10;
+let onePageFriends = 5;
 let localFriends = ref(NaN);
 
 
@@ -156,18 +162,29 @@ function getBase64(file: File) {
   });
 }
 
-// interface KVPair {
-//     key: string;
-//     val: string | number;
-// }
+const fieldData = ref({
+    openEditProfile: false,
+    openEditPassword: false,
+});
 
-// const data: KVPair[] = [
-//     { key: 'Username', val: pageUserName.value },
-//     { key: 'Email', val: pageEmail.value },
-// ]
 
-// const dataSource = ref(data);
-// const editableData: UnwrapRef
+const openEditProfile = () => {
+    console.log("openEditProfile");
+    fieldData.value.openEditProfile = true;
+    console.log('fieldData', fieldData);
+}
+
+const openEditPassword = () => {
+    console.log("openEditPassword");
+    fieldData.value.openEditPassword = true;
+    console.log('fieldData', fieldData);
+}
+
+const logOut = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    router.push("/auth/login");
+}
 
 const todo_member = ref("")
 
@@ -257,11 +274,13 @@ const todo_member = ref("")
         </Col>
     </Row>
     <Flex :gap="customGapSize" id="buttonGroup" justify="center" align="center">
-        <Button type="primary">修改个人信息</Button>
-        <Button type="primary">修改密码</Button>
+        <Button type="primary" @click="openEditProfile">修改个人信息</Button>
+        <Button type="primary" @click="openEditPassword">修改密码</Button>
         <Button type="primary">添加好友</Button>
-        <Button type="primary">退出登录</Button>
+        <Button type="primary" @click="logOut">退出登录</Button>
     </Flex>
+    <EditProfile :userId="pageUserId" v-model="fieldData.openEditProfile"/>
+    <EditPassword :userId="pageUserId" v-model="fieldData.openEditPassword"/>
 </template>
 
 <style scoped>
