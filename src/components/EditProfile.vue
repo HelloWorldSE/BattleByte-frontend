@@ -38,7 +38,7 @@
   </template>
 <script lang="ts" setup>
     import { ref, reactive } from 'vue';
-    import { Modal, Button, Form, FormItem, Input, Upload, UploadProps, UploadChangeParam, message, type FormInstance } from 'ant-design-vue';
+    import { Modal, Button, Form, FormItem, Input, Upload, message, type FormInstance } from 'ant-design-vue';
     import { PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue';
     import { generateGet, generatePost, generatePostAvatar } from '@/utils/protocol';
     import type {Rule} from "ant-design-vue/es/form";
@@ -132,7 +132,7 @@
         // modalOpen.value = false;
     };
 
-    function getBase64(file) {
+    function getBase64(file:any) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -149,7 +149,7 @@
         previewTitle.value = '';
     };
 
-    const handlePreview = async file => {
+    const handlePreview = async (file:any) => {
     if (!file.url && !file.preview) {
         file.preview = await getBase64(file.originFileObj);
     }
@@ -165,7 +165,7 @@
     //     formState.avatar = res.data.data;
     // };
 
-    const customUpload = async fileInfo => {
+    const customUpload = async (fileInfo:any) => {
             const { file } = fileInfo;
             const formData = new FormData();
             try {
@@ -184,7 +184,7 @@
                 });
                 // formState.avatar = res.data.data;
             } catch (err) {
-                message.info(err);
+                message.info(String(err));
             }
         }
 
