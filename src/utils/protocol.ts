@@ -6,12 +6,22 @@ import axios, { type AxiosResponse } from "axios";
 const backend = '/api/'
 export function generateGet<T = any>(path:string, params?:any): 
 Promise<AxiosResponse<T>> {
-    return axios.get(backend + path, { params })    
+    return axios.get(backend + path, { params, headers: {'token': localStorage.getItem('token')} })    
 }
 
 export function generatePost<T = any>(path:string, data?:any):
 Promise<AxiosResponse<T>> {
-    return axios.post(backend + path, data, {headers: {'Content-Type': 'application/json'}})
+    return axios.post(backend + path, data, {headers: {'Content-Type': 'application/json', 'token': localStorage.getItem('token')}})
+}
+
+export function generatePostAvatar<T = any>(path:string, data?:any):
+Promise<AxiosResponse<T>> {
+    return axios.post(backend + path, data, {headers: {'Content-Type': 'multipart/form-data', 'token': localStorage.getItem('token')}})
+}
+
+export function generateGetFriends<T = any>(path:string, params?:any): 
+Promise<AxiosResponse<T>> {
+    return axios.get(backend + path, { params, headers: {'token': localStorage.getItem('token')} })    
 }
 
 

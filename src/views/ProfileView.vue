@@ -4,14 +4,21 @@ import { generateGet } from "@/utils/protocol";
 import { useRoute, useRouter } from "vue-router";
 import { ref, computed, reactive, onMounted, nextTick } from "vue";
 import TopNav from "@/components/TopNav.vue";
+import EditProfile from "@/components/EditProfile.vue";
+import EditPassword from "@/components/EditPassword.vue";
 
 // import { defineComponent } from '@vue/composition-api';
 
 const route = useRoute();
 const router = useRouter();
 
-const pageUserId = route.params.id;
-const localUserId = localStorage.getItem("userInfo") ? JSON.parse((localStorage.getItem("userInfo")) || '').userId : NaN;
+function getPageUserId(params: string | string[]) {
+    return params ? (Array.isArray(params) ? params[0] as string : params as string) : '';
+}
+
+const pageUserId = getPageUserId(route.params.id);
+const localUserId = localStorage.getItem("userId");
+const token = localStorage.getItem("token");
 // const localUserName = localStorage.getItem("userInfo") ? JSON.parse((localStorage.getItem("userInfo")) || '').username : NaN;
 // const localEmail = localStorage.getItem("userInfo") ? JSON.parse((localStorage.getItem("userInfo")) || '').email : NaN;
 let pageUserName = ref(NaN);
@@ -19,8 +26,11 @@ let pageEmail = ref(NaN);
 let pageAvatar = ref('');
 let pageFriends = ref(NaN);
 let friendPageNums = 1;
-let onePageFriends = 10;
-let localFriends = ref(NaN);
+let onePageFriends = 5;
+
+let localFriends = ref<Array<any>>([]);
+let curFriendPage = 1;
+let totalFriendsPages = 0;
 
 
 const getImageUrl = (name: any) => {
@@ -35,13 +45,15 @@ const getImageUrl = (name: any) => {
 
 
 
+
+
 const initProfile = async () => {
-    generateGet("user/profile", { userId: pageUserId }).then((res) => {
-        if (res.data.code === 200) {
+    generateGet("api/user/profile", { id: pageUserId }).then((res) => {
+        if (res.data.status === 0) {
             console.log(res);
-            pageUserName.value = res.data.username;
-            pageEmail.value = res.data.email;
-            pageAvatar.value = res.data.avatar;
+            pageUserName.value = res.data.data.userName;
+            pageEmail.value = res.data.data.userEmail;
+            pageAvatar.value = res.data.data.avatar;
             console.log(pageAvatar);
 
 
@@ -53,11 +65,17 @@ const initProfile = async () => {
 
     if (pageUserId === localUserId) {
         // get friends
-        generateGet("user/friend", { userId: pageUserId, pageNums: friendPageNums, onePageFriends: onePageFriends}).then((res) => {
-        if (res.data.code === 200) {
+        generateGet("api/user/friend", { pageSize: onePageFriends, page: 1}).then((res) => {
+        if (res.data.status === 0) {
             // pageUserName = res.data.username;
             // pageEmail = res.data.email;
-            localFriends.value = res.data.friends;
+            localFriends.value = res.data.data.content;
+            console.log('localFriends', localFriends);
+            curFriendPage = res.data.data.pageable.pageNumber + 1;
+            console.log('curFriendPage', curFriendPage);
+            totalFriendsPages = res.data.data.totalPages;
+            console.log('totalFriendsPages', totalFriendsPages);
+
         } else {
             console.log(res);
         }
@@ -72,6 +90,7 @@ initProfile();
 // 朋友页面 翻页逻辑
 const count = 5;
 const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat,picture&noinfo`;
+
 
 const initFriendsLoading = ref(true);
 const friendsLoading = ref(false);
@@ -133,8 +152,9 @@ const onLoadMoreFriends1 = (val: any) => {
 };
 
 const getMoreFriends = async () => {
-    friendPageNums += 1;
-    generateGet("user/friend", { userId: pageUserId, pageNums: friendPageNums, onePageFriends: onePageFriends}).then((res) => {
+    // curFriendPage.value += 1;
+    curFriendPage += 1;
+    generateGet("user/friend", { userId: pageUserId, pageNums: curFriendPage, onePageFriends: onePageFriends}).then((res) => {
         if (res.data.code === 200) {
             // pageUserName = res.data.username;
             // pageEmail = res.data.email;
@@ -154,18 +174,29 @@ function getBase64(file: File) {
   });
 }
 
-// interface KVPair {
-//     key: string;
-//     val: string | number;
-// }
+const fieldData = ref({
+    openEditProfile: false,
+    openEditPassword: false,
+});
 
-// const data: KVPair[] = [
-//     { key: 'Username', val: pageUserName.value },
-//     { key: 'Email', val: pageEmail.value },
-// ]
 
-// const dataSource = ref(data);
-// const editableData: UnwrapRef
+const openEditProfile = () => {
+    console.log("openEditProfile");
+    fieldData.value.openEditProfile = true;
+    console.log('fieldData', fieldData);
+}
+
+const openEditPassword = () => {
+    console.log("openEditPassword");
+    fieldData.value.openEditPassword = true;
+    console.log('fieldData', fieldData);
+}
+
+const logOut = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    router.push("/auth/login");
+}
 
 const todo_member = ref("")
 
@@ -213,7 +244,7 @@ const todo_member = ref("")
                                 class="demo-loadmore-list"
                                 :loading="initFriendsLoading"
                                 item-layout="horizontal"
-                                :data-source="friendsList"
+                                :data-source="localFriends"
                                 id="FriendsList"
                             >
                                 <template #loadMore>
@@ -222,24 +253,24 @@ const todo_member = ref("")
                                     :style="{ textAlign: 'center', marginTop: '12px', height: '32px', lineHeight: '32px' }"
                                 >
                                     <!-- <Button @click="onLoadMoreFriends">loading more</Button> -->
-                                    <Pagination @change="onLoadMoreFriends1" :current="friendsPage" :total="200" :pageSize="5" simple/>
+                                    <Pagination @change="onLoadMoreFriends1" :current="curFriendPage" :total="totalFriendsPages" :pageSize="5" simple/>
                                 </div>
                                 </template>
                                 <template #renderItem="{ item }">
                                 <ListItem>
                                     <template #actions>
-                                    <a key="list-loadmore-edit">edit</a>
-                                    <a key="list-loadmore-more">more</a>
+                                    <a key="list-loadmore-edit">删除</a>
+                                    <a key="list-loadmore-more">聊天</a>
                                     </template>
                                     <Skeleton avatar :title="false" :loading="!!item.loading" active>
                                     <ListItemMeta
-                                        description="Ant Design"
+                                        :description="item.email"
                                     >
                                         <template #title>
-                                        <a href="https://www.antdv.com/">{{ item.name.last }}</a>
+                                        <a href="https://www.antdv.com/">{{ item.userName }}</a>
                                         </template>
                                         <template #avatar>
-                                        <Avatar :src="item.picture.large" />
+                                        <Avatar :src="item.avatar" />
                                         </template>
                                     </ListItemMeta>
                                     <div>content</div>
@@ -255,11 +286,13 @@ const todo_member = ref("")
         </Col>
     </Row>
     <Flex :gap="customGapSize" id="buttonGroup" justify="center" align="center">
-        <Button type="primary">修改个人信息</Button>
-        <Button type="primary">修改密码</Button>
+        <Button type="primary" @click="openEditProfile">修改个人信息</Button>
+        <Button type="primary" @click="openEditPassword">修改密码</Button>
         <Button type="primary">添加好友</Button>
-        <Button type="primary">退出登录</Button>
+        <Button type="primary" @click="logOut">退出登录</Button>
     </Flex>
+    <EditProfile :userId="pageUserId" v-model="fieldData.openEditProfile"/>
+    <EditPassword :userId="pageUserId" v-model="fieldData.openEditPassword"/>
 </template>
 
 <style scoped>
