@@ -46,7 +46,7 @@
   import { Form, Button, Input, FormItem, InputPassword, message } from "ant-design-vue";
   import {generatePost} from "@/utils/protocol";
 
-  import { getUserId } from "@/utils/auth";
+  import { getUserId, isLoggedIn } from "@/utils/auth";
   import { useHallState } from "@/stores/hall";
 
   
