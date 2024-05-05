@@ -200,6 +200,10 @@ const logOut = () => {
 
 const todo_member = ref("")
 
+const searchFriends = () => {
+    console.log(todo_member.value);
+}
+
 </script>
 
 
