@@ -31,3 +31,7 @@ export function getUserId(): string {
     }
     return extractJWT(token).payload.userId
 }
+
+export function isLoggedIn(): boolean {
+    return localStorage.getItem('token') != null
+}

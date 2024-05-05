@@ -38,7 +38,7 @@ import { Form, Button, Input, FormItem, InputPassword } from "ant-design-vue";
 // import { useCookies } from "vue3-cookies";
 import {generatePost} from "@/utils/protocol";
 
-import { getUserId } from "@/utils/auth";
+import { getUserId, isLoggedIn } from "@/utils/auth";
 import { useHallState } from "@/stores/hall";
 
 const formItem = Form.Item;
@@ -48,6 +48,12 @@ const inputPassword = Input.Password;
 
 // 定义路由器，负责路由跳转
 const router = useRouter();
+
+// 如果已经登录，跳转 home
+if (isLoggedIn()) {
+  router.push('/')
+}
+
 
 // 定义一个没用的玩意
 const formRef = ref<FormInstance>()

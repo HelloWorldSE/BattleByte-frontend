@@ -357,7 +357,9 @@ const searchFriends = () => {
 }
 .topBar {
   width: 100%;
-  height: 50px;
+  overflow: hidden; /* 隐藏超出部分 */
+  height: 60px;
+  position: relative; /* 确保 TopNav 绝对定位相对于 .top */
   z-index: 1005;
 }
 

@@ -14,13 +14,25 @@ export interface LoginResultData {
 }
 
 export interface MatchEnterData {
-    opponents: number[],
     info: {
         questionId: number
     },
-    team_side: number
+    playerMap: {
+        [team_id: string]: number
+    }
 }
 
+export interface ChatMsgData {
+    fromId: number,
+    message: string
+}
+
+export interface PosSyncData {
+    user_id: number,
+    row: number,
+    col: number,
+    total_row: number
+}
 
 export interface ErrorData {
     ack: number,
