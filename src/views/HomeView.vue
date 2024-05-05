@@ -28,11 +28,12 @@
       </div>
     </div>
 
-    <div class="match-button">
+    <div class="match-button" :class="(infoModalVisible)?'match-available':'match-disable'">
       <button @click="onClickMatch()">
         开始匹配
       </button>
     </div>
+
 
     <!-- INFORMATION  -->
     <div class="information-container">
@@ -145,46 +146,46 @@ export default {
         /* Mars has two moons, Phobos and Deimos. Both are thought to be captured asteroids, or debris from early in the formation of our solar system. */
         {
           name: "单人模式",
-          diameter: "120.0",
+          diameter: "60.0",
           rotationTime: "4332.6",
           ua: "5.2",
-          colors: ["#876f51", "#9c661f"],
-          satellites: [
+          colors: [], // "#876f51", "#9c661f"
+          /* satellites: [
             {
               name: "Io",
-              diameter: "3.6432",
+              diameter: "0.01",
               rotationTime: "1.769",
               distance: "421,8",
-              colors: ["green", "yellow"]
+              colors: [] // "green", "yellow"
             },
             {
               name: "europe",
-              diameter: "3.1216",
+              diameter: "0.01",
               rotationTime: "3.551",
               distance: "671,1",
-              colors: ["brown", "pink"]
+              colors: [] // "brown", "pink"
             },
             {
               name: "ganymede",
-              diameter: "5.2644",
+              diameter: "0.01",
               rotationTime: "7.15",
               distance: "1070,4",
-              colors: ["blue", "cyan"]
+              colors: [] // "blue", "cyan"
             },
             {
               name: "callisto",
-              diameter: "4.8206",
+              diameter: "0.01",
               rotationTime: "16.689",
               distance: "1882,7",
-              colors: ["orange", "grey"]
+              colors: [] // "orange", "grey"
             }
-          ]
+          ] */
         },
         {
-          name: "多人模式",
-          diameter: "120.0",
-          rotationTime: "10759.2",
-          ua: "9.5",
+          name: "单人模式",
+          diameter: "60.0",
+          rotationTime: "4332",
+          ua: "5.2",
           colors: ["#b09f74", "#b8902a"],
           satellites: [
             {
@@ -226,18 +227,18 @@ export default {
         },
         {
           name: "大逃杀模式",
-          diameter: "120.0",
+          diameter: "60.0",
           rotationTime: "30688.4",
           ua: "19.2",
-          colors: ["#a3bebf", "#387a7d"],
-          satellites: [
+          colors: [], // "#a3bebf", "#387a7d"
+          /* satellites: [
             {
               name: "titania",
-              diameter: "0.7884",
+              diameter: "0.01",
               rotationTime: "8.7",
               colors: ["#387a7d", "#a3bebf"]
             }
-          ]
+          ] */
         },
         {
           name: "mars",
@@ -264,7 +265,7 @@ export default {
               name: "néréide",
               diameter: "0.340",
               rotationTime: "360.14",
-              colors: ["#01146b", "#7f8dc7"]
+              colors: [] // "#01146b", "#7f8dc7"
             }
           ]
         }
@@ -370,13 +371,18 @@ export default {
       }
     },
     onClickPlanet(i) {
-      console.log("onClickPlanet", i);
-      this.selectedPlanetId = i;
-      this.infoModalVisible = true;
-      let shit = (this.infoModalVisible == true) ? 1 : 0;
-      message.success(shit);
+      if (i == 4) {
+        console.log("onClickPlanet", i);
+        this.selectedPlanetId = i;
+        this.infoModalVisible = true;
+        let shit = (this.infoModalVisible == true) ? 1 : 0;
+        message.success(shit);
+      }
     },
     onClickPlanetContainer(i) {
+      if(this.mode === "SPEED" || this.mode === "DISTANCE") {
+        return;
+      }
       if (this.mode !== "WIDTH") {
         console.log("onClickPlanetContainer", i);
         this.selectedPlanetId = i;
@@ -705,21 +711,21 @@ export default {
 .planet_container-DISTANCE {
   transition: all ease 2s, box-shadow ease 0.6s;
 
-  &:hover {
+  /* &:hover {
     box-shadow: 0 0 25px white !important;
 
     .planet {
       box-shadow: 0 0 25px white !important;
     }
-  }
+  } */
 }
 
 .planet-WIDTH {
   transition: all ease 2s, box-shadow ease 0.6s;
 
-  &:hover {
+  /* &:hover {
     box-shadow: 0 0 25px white !important;
-  }
+  } */
 }
 
 .action-container {
@@ -733,7 +739,7 @@ export default {
 
   button {
     padding: 10px 15px;
-    margin-left: 10px;
+    margin-left: 15px;
   }
 
   input {
@@ -770,8 +776,16 @@ export default {
   bottom: 20px; /* 调整底部边距 */
   left: 50%; /* 水平居中 */
   transform: translateX(-50%); /* 居中对齐 */
+  transition: all 0.5s ease
 }
 
+.match-available {
+  opacity: 100%;
+}
+
+.match-disable {
+  opacity: 0;
+}
 
 @keyframes gravitation {
   0% {
@@ -806,10 +820,51 @@ export default {
     letter-spacing: 2px;
     color: white;
   }
+
   .topBar {
     width: 100%;
     height: 50px;
     z-index: 1005;
   }
 }
+
+.container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pulse-center-item {
+  background-color: mediumvioletred;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 2px solid white;
+  position: relative;
+  z-index: 90;
+}
+
+.pulse-circle {
+  border-radius: 50%;
+  background-color: #e4aaac;
+  width: 150px;
+  height: 150px;
+  position: absolute;
+  opacity: 0;
+  animation: scaleIn 5s infinite cubic-bezier(0.36, 0.11, 0.89, 0.32);
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.5, 0.5);
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(2.5, 2.5);
+    opacity: 0;
+  }
+}
+
 </style>
