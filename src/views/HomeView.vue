@@ -820,6 +820,7 @@ export default {
     letter-spacing: 2px;
     color: white;
   }
+
   .topBar {
     width: 100%;
     height: 50px;
