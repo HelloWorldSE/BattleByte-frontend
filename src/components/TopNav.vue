@@ -3,7 +3,7 @@
     <div class="left">
       <img
           class="LOGO"
-          src=""
+          src="/logo.jpg"
           alt="LOGO"
       />
       <div class="title">BattleByte</div>
@@ -12,8 +12,9 @@
     <div class="middle">
       <Menu
           mode="horizontal"
-          theme="dark"
+          theme="light"
           class="menu"
+          style="background: #eaf3f8; font-size: large"
           v-model:selectedKeys="current"
           @click="handleClick"
       >
@@ -31,21 +32,16 @@
         </MenuItem>
       </Menu>
     </div>
-    <!-- 右侧部分内容 -->
+<!--     右侧部分内容-->
     <div class="right">
+      <div class="exit-button" @click="log_out">
+        退出登录
+      </div>
       <img
           class="headImg"
           src=""
           alt="头像"
       />
-      <div class="userName">用户名</div>
-      <div class="userLevel">等级</div>
-      <div class="musicBtn">
-        <i class="iconfont icon-yinle"></i>
-      </div>
-      <div class="soundBtn">
-        <i class="iconfont icon-yinxiao"></i>
-      </div>
     </div>
   </div>
 </template>
@@ -56,6 +52,7 @@ import { useRouter } from 'vue-router';
 import { MailOutlined, AppstoreOutlined, SettingOutlined,SkinOutlined } from '@ant-design/icons-vue';
 import { Menu, MenuItem, SubMenu, MenuItemGroup } from 'ant-design-vue';
 import type {Key} from "ant-design-vue/es/_util/type";
+import { useHallState } from '@/stores/hall';
 
 const router = useRouter();
 const handleClick = (event: { key: string | number }) => {
@@ -68,16 +65,30 @@ const handleClick = (event: { key: string | number }) => {
 const current = ref<Key[]>(['首页']); // 修改类型为 Key[]
 
 
+const hall = useHallState()
+const log_out = () => {
+  hall.hall.logout()
+  localStorage.removeItem('token')
+  router.push('/auth/login')
+}
+
 </script>
 
 <style scoped>
 .components-top-nav {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   padding: 10px;
-  background-color: #000 ;
+  background: #eaf3f8;
   color: #000;
+  height: 100%; /* 让 TopNav 高度与父容器相同 */
+  width: 100%;
+  overflow: hidden; /* 隐藏超出部分 */
+  position: absolute; /* 绝对定位 */
+  top: 0; /* 定位在顶部 */
+  left: 0; /* 定位在左侧 */
+  right: 0; /* 宽度与 .top 相同 */
+  bottom: 0; /* 高度与 .top 相同 */
 }
 
 .left {
@@ -93,14 +104,14 @@ const current = ref<Key[]>(['首页']); // 修改类型为 Key[]
 
 .title {
   font-size: 20px;
-  font-color: #fff;
 }
 
 .middle {
   flex-grow: 1;
   display: flex;
   justify-content: center;
-  width: 200%;
+  margin-right: 35%;
+  width: 100%;
 }
 
 .right {
@@ -173,6 +184,15 @@ const current = ref<Key[]>(['首页']); // 修改类型为 Key[]
 .menu-item {
   margin: 0 10px;
   color: #fff;
+}
+
+.exit-button {
+}
+.exit-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.exit-button:active {
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 </style>

@@ -83,6 +83,7 @@ import {Modal, message} from 'ant-design-vue';
 import TopNav from "@/components/TopNav.vue";
 import { useHallState } from '@/stores/hall';
 import { mapStores } from 'pinia';
+import { isLoggedIn } from '@/utils/auth'
 
 export default {
   components: {
@@ -91,6 +92,11 @@ export default {
   },
   created() {
     this.infoModalVisible = false;
+
+    // 如果没有登录，跳转 login
+    if (! isLoggedIn()) {
+      this.$router.push('/auth/login')
+    }
   },
   // ##################################################
   // DATA #############################################
@@ -662,6 +668,14 @@ export default {
 </script>
 
 <style scoped>
+
+.topBar {
+  z-index: 1005;
+  width: 100%;
+  overflow: hidden; /* 隐藏超出部分 */
+  height: 60px;
+  position: relative; /* 确保 TopNav 绝对定位相对于 .top */
+}
 #app {
   background-color: black; /* 设置背景为黑色 */
   min-height: 100vh; /* 至少为视口的100%高度 */
@@ -814,11 +828,6 @@ export default {
     font-size: 16px;
     letter-spacing: 2px;
     color: white;
-  }
-  .topBar {
-    width: 100%;
-    height: 50px;
-    z-index: 1005;
   }
 }
 </style>

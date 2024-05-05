@@ -2,11 +2,11 @@
   <div class="components-code-input" ref="selfDiv">
     <div class="area1">
       <Select style="width: 80px" v-model:value="language" @change="changeLanguageHandle">
-        <SelectOption value="c">c</SelectOption>
-        <SelectOption value="cpp">cpp</SelectOption>
-        <SelectOption value="python">python</SelectOption>
-        <SelectOption value="java">java</SelectOption>
-        <SelectOption value="js">javascript</SelectOption>
+        <SelectOption value="C">C</SelectOption>
+        <SelectOption value="C++">C++</SelectOption>
+        <SelectOption value="Python3">Python 3</SelectOption>
+        <SelectOption value="Java">java</SelectOption>
+        <SelectOption value="JavaScript">javascript</SelectOption>
       </Select>
 
       <Select name="theme"  style="width: 150px" v-model:value="style" @change="handleChangeTheme">
@@ -31,57 +31,99 @@
 
     </div>
     <div class="area2">
-      <div ref="main" class="editor"/>
+      <div ref="main" class="editor">
+        <div v-for="pos, player in gameStore.posMap">
+          <div class="curpos" :class="(player == my_userid) ? 'me' : 'enermy'" :style="curPosStyles[player]"></div>
+          <div class="maxpos" :class="(player == my_userid) ? 'me' : 'enermy'" :style="maxLineStyles[player]"></div>
+        </div>
+      </div>
       <!-- 提交按钮 -->
       <Button class="submit-button" @click="handleSubmit" type="primary" shape="round">
         提交
       </Button>
+      <div class="chat-box">
+        <ChatBox />
+        <!--
+          {{gameStore.posMap}}
+          {{ curPosStyles[15] }}
+          {{ maxLineStyles[15]}}
+        -->
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import {ref, onMounted} from 'vue';
-import {Button,Select,SelectOption} from 'ant-design-vue';
+import {ref, onMounted, computed} from 'vue';
+import {Button,Select,SelectOption, message} from 'ant-design-vue';
 import * as monaco from 'monaco-editor';
 import axios from 'axios';
 import {generateCompletionItems} from '@/components/generateCompletionItem'; // 注意路径是否正确
-import {editor} from "monaco-editor";
-import protocol from "@/utils/protocol.ts";
 
-import { useCookies } from "vue3-cookies";
+import { useGameStore } from '@/stores/game';
 
-let monacoEditor = ref(null);
-const language = ref('cpp');
-const style = ref('vs-dark');
+import ChatBox from '@/components/ChatBox.vue';
+import { useHallState } from '@/stores/hall';
+import { getUserId } from '@/utils/auth';
+
+let monacoEditor = null;
+const language = ref('C++');
+const style = ref('vs-light');
 const font = ref('14');
 const height = ref('20');
 const selfDiv = ref(null);
 const main = ref(null);
 
-const cookies = useCookies()
-
-const cookies_to_set = {    "_pk_id.1.7ebb":"d3c89c8c7f0158ca.1713614493.; Path=/; Expires=Mon, 21 Apr 2025 07:11:01 GMT;",
-  "csrftoken":"vLH0iNGPu4ufpc9Lk1ekq5VmshkEM6a2aw6FGvxFZxz29Lqat88S4vfiHjQnNoV2; Path=/; Expires=Mon, 21 Apr 2025 07:11:19 GMT;",
-  "sessionid":"fowtr0r4jrylvsyybkd963kso2cu97am; Path=/; HttpOnly; Expires=Tue, 07 May 2024 01:18:41 GMT;"
-}
-
-for (const key in cookies_to_set) {
-  cookies.cookies.set(key, cookies_to_set[key]);
-}
 
 const codeTemplates = {
-  cpp: `#include <iostream>\n\nint main() {\n\t// Your C++ code here\n\treturn 0;\n}`,
-  c: `#include <stdio.h>\n\nint main() {\n\t// Your C code here\n\treturn 0;\n}`,
-  python: `# Your Python code here`,
-  java: `public class Main {\n\tpublic static void main(String[] args) {\n\t\t// Your Java code here\n\t}\n}`,
-  javascript: `// Your JavaScript code here`,
+  'C++': `#include <iostream>\n\nint main() {\n\t// Your C++ code here\n\treturn 0;\n}`,
+  'C': `#include <stdio.h>\n\nint main() {\n\t// Your C code here\n\treturn 0;\n}`,
+  'Python3': `# Your Python code here`,
+  'Java': `public class Main {\n\tpublic static void main(String[] args) {\n\t\t// Your Java code here\n\t}\n}`,
+  'JavaScript': `// Your JavaScript code here`,
 };
 
+const languageIds = {
+  'C++': `cpp`,
+  'C': `c`,
+  'Python3': `python`,
+  'Java': `java`,
+  'JavaScript': `javascript`,
+};
+
+const curpos_pos_my = ref({top: '0px', height: '20px'})
+const maxpos_pos_my = ref({top: '0px'})
+
+let curLineNumber = 1
+let curColumn = 1
+const scrollOffset = ref(0)
+
+const updateMaxLine = () => {
+  const maxLine = monacoEditor?.getModel().getLineCount()
+  gameStore.posMap[my_userid.value].total_rows = maxLine
+}
+const updatePosShow = () => {
+  gameStore.posMap[my_userid.value].row = curLineNumber
+  gameStore.posMap[my_userid.value].col = curColumn
+}
+const sendPosUpdate = () => {
+  hall.hall.pos_update(
+    gameStore.posMap[my_userid.value].row,
+    gameStore.posMap[my_userid.value].col,
+    gameStore.posMap[my_userid.value].total_rows
+  )
+}
+
+const hall = useHallState()
+hall.pos_sync_callback = (data) => {
+  const { user_id, ...rest } = data
+  gameStore.posMap[user_id] = rest
+}
+
 onMounted(() => {
-  monacoEditor.value = monaco.editor.create(main.value, {
-    theme: 'vs-dark',
-    value: codeTemplates.cpp,
+  monacoEditor = monaco.editor.create(main.value, {
+    theme: 'vs-light',
+    value: codeTemplates['C++'],
     language: 'cpp',
     folding: true,
     foldingHighlight: true,
@@ -99,6 +141,7 @@ onMounted(() => {
     lineNumbersMinChars: 5,
     enableSplitViewResizing: false,
     readOnly: false,
+    lineHeight: 20,
   });
   // 注册 C++ 的代码补全提供器
   monaco.languages.registerCompletionItemProvider('cpp', {
@@ -111,28 +154,124 @@ onMounted(() => {
     },
   });
 
+  updateMaxLine()
+  sendPosUpdate()
+  monacoEditor.onDidChangeModelContent(updateMaxLine)
+
+  monacoEditor.onDidChangeCursorPosition((e) => {
+    curLineNumber = e.position.lineNumber
+    curColumn = e.position.column
+    updatePosShow()
+
+    sendPosUpdate()
+  })
+  monacoEditor.onDidScrollChange((e) => {
+    scrollOffset.value = - e.scrollTop
+    updateMaxLine()
+    updatePosShow()
+  })
+
 });
 
 const theme = ref('vs-dark');
 const fontSize = ref(14);
 const lineHeight = ref(20);
 
+const my_userid = ref(Number.parseInt(getUserId()))
+const curPosStyles = ref({})
+const maxLineStyles = ref({})
 
+const gameStore = useGameStore()
+gameStore.posMap = {}
+for (const player of Object.values(gameStore.match_info.playerMap)) {
+  gameStore.posMap[player] = {row: 1, col: 1, total_rows: 1}
+  curPosStyles.value[player] = computed(() => {
+    const curLineNumber = gameStore.posMap[player].row
+    return {
+      top: `${(curLineNumber - 1) * lineHeight.value + scrollOffset.value}px`,
+      height: `${lineHeight.value}px`
+    }
+  })
+  maxLineStyles.value[player] = computed(() => {
+    const maxLine = gameStore.posMap[player].total_rows
+    return {
+      top: `${maxLine * lineHeight.value + scrollOffset.value}px`
+    }
+  })
+}
+
+const submit_id_to_refresh = ref()
+
+const refresh_submit_status = () => {
+  hall.hall.answer_refresh(submit_id_to_refresh.value)
+}
+
+let refresh_timeout = null
+
+const status_name = {
+  '-2': 'Compile Error',
+  '-1': 'Wrong Answer',
+  '0': 'Accepted',
+  '1': 'Time Limit Exceeded',  
+  '2': 'Time Limit Exceeded',
+  '3': 'Memory Limit Exceeded',
+  '4': 'Runtime Error',
+  '5': 'System Error',
+  '6': 'Pending',
+  '7': 'Judging',
+  '8': 'Partial Accepted',
+  '9': 'Submitting'
+}
+
+const refresh_submit_status_callback = (data) => {
+  if (typeof data.result === 'string') {
+    // temporary MATCH_END pack
+    const match_res = data.result;
+    message.success(match_res, 2)
+
+  } else {
+    if (data.result.data.result !== undefined) {
+      if (data.result.data.result !== 6 && data.result.data.result !== 7 && data.result.data.result !== 9) {
+        if (data.result.data.result === 0) {
+          message.success({content: '通过！', duration: 2, key: 'oj-pending'})
+        } else {
+          message.warn({content: `未能通过，评测状态：${status_name[data.result.data.result.toString()]}`, duration: 2, key: 'oj-pending'})
+        }
+        clearInterval(refresh_timeout)
+      }
+    }
+  }
+}
+
+hall.answer_result_callback = refresh_submit_status_callback
 
 //处理提交事件
 const handleSubmit = async () => {
   //获取编辑器中的代码
-  const code = editor.getModels()[0]?.getValue();
+  const code = monacoEditor.getModel().getValue();
   console.log(code);
 
-  protocol.post("http://81.70.241.166/submit/api/submission",{
-    problem_id:"1",
+  console.log(`STAGE B`, gameStore.match_info, gameStore.match_info.info.questionId)
+  axios.post("/api/api/oj/submit",{
+    problem_id: gameStore.match_info.info.questionId + 745,
     language: language.value,
     code: code
-  }).then(res => {
-    if(res.data.code === 200){
+  }, {headers: {"Content-Type": "application/json"}}).then(res => {
+    if(res.data.status === 0){
       console.log("提交成功");
     }
+
+    console.log(res)
+
+    submit_id_to_refresh.value = res.data.data.data.id
+    if (refresh_timeout) {
+      clearInterval(refresh_timeout)
+    }
+    refresh_timeout = setInterval(
+      refresh_submit_status
+    , 3000);
+
+    message.loading({content: '正在评测...', duration: 0, key: 'oj-pending'})
 
   })
 
@@ -143,31 +282,34 @@ const changeLanguageHandle = (event) => {
   console.log(selectedLanguage);
   const selectedTemplate = codeTemplates[selectedLanguage];
   console.log(selectedTemplate);
-  editor.getModels()[0]?.setValue(selectedTemplate);
+  monacoEditor?.getModel().setValue(selectedTemplate);
+  if (monacoEditor) {
+    monaco.editor.setModelLanguage(monacoEditor.getModel(), languageIds[selectedLanguage])
+  }
 };
 
 
 const handleChangeTheme = (event) => {
   const selectedTheme = event;
   theme.value = selectedTheme;
-  if (monacoEditor.value) {
-    monacoEditor.value.updateOptions({theme: selectedTheme});
-  }
+  monacoEditor?.updateOptions({theme: selectedTheme});
 };
 
 
 const handleChangeFontSize = (event) => {
   fontSize.value = parseInt(event);
-  if (monacoEditor.value) {
-    monacoEditor.value.updateOptions({fontSize: fontSize.value});
-  }
+  monacoEditor?.updateOptions({fontSize: fontSize.value});
+  updateMaxLine()
+  updatePosShow()
 };
 
 const handleChangeLineHeight = (event) => {
   lineHeight.value = parseInt(event);
-  if (monacoEditor.value) {
-    monacoEditor.value.updateOptions({lineHeight: lineHeight.value});
-  }
+  monacoEditor?.updateOptions({lineHeight: lineHeight.value});
+  
+  curpos_pos_my.value.height = `${lineHeight.value}px`
+  updateMaxLine()
+  updatePosShow()
 };
 
 </script>
@@ -182,8 +324,9 @@ const handleChangeLineHeight = (event) => {
 
 .editor {
   width: 100%;
-  height: 620px;
+  height: 617px;
   flex: 1;
+  position: relative;
 }
 
 .submit-button {
@@ -192,4 +335,42 @@ const handleChangeLineHeight = (event) => {
   right: 10px;
   z-index: 1000; /* Ensure the button is above the editor */
 }
+.chat-box {
+  position: absolute;
+  bottom: 10px;
+  right: 90px;
+  width: 30%;
+  z-index: 1000;
+  height: 28px;
+}
+
+.maxpos {
+  position: absolute;
+  content: "";
+  width: 100%;
+  height: 1px;
+  z-index: 1000;
+}
+
+.maxpos.me {
+  background-color: green;
+}
+.maxpos.enermy {
+  background-color: red;
+}
+
+.curpos {
+  position: absolute;
+  content: "";
+  width: 3px;
+  background-color: green;
+  z-index: 1000;
+}
+.curpos.me {
+  background-color: green;
+}
+.curpos.enermy {
+  background-color: red;
+}
+
 </style>

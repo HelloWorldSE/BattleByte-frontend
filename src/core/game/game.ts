@@ -1,7 +1,13 @@
-export interface MatchInfo {
-    opponents: number[],
-    info: {
-        questionId: number
-    },
-    team_side: number
+import type { MatchEnterData } from "../comm/interfaces";
+
+export type MatchInfo = MatchEnterData
+
+export type PosData = {
+    row: number,
+    col: number,
+    total_rows: number
+}
+
+export type PosMap = {
+    [user_id: number]: PosData
 }

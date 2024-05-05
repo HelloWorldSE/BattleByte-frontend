@@ -11,6 +11,7 @@ export const useConnector = defineStore('connector', () => {
 
     const state = ref<WSConnectState>(conn.state)
     conn.onStateChange = (now_state: WSConnectState) => {
+        console.log(`State changed to ${now_state}`)
         state.value = now_state
         stateChangeListeners.forEach((f) => {
             f(state.value)
