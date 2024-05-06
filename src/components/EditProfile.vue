@@ -20,9 +20,11 @@
             v-model:file-list="fileList"
             action="#"
             list-type="picture-card"
-            @preview="handlePreview"
+
             :customRequest="customUpload"
+            :multiple=false
             >
+            <!-- @preview="handlePreview" -->
             <div v-if="fileList.length < 1">
                 <PlusOutlined />
                 <div style="margin-top: 8px">Upload</div>
@@ -52,6 +54,18 @@
         modelValue: {
             type: Boolean,
         },
+        userName: {
+            type: String,
+            required: true,
+        },
+        userEmail: {
+            type: String,
+            required: true,
+        },
+        avatar: {
+            type: String,
+            required: true,
+        }
     })
 
     const loading = ref<boolean>(false);
@@ -65,7 +79,7 @@
         avatar: ''
     })
 
-    const emit = defineEmits(['update:modelValue']);
+    const emit = defineEmits(['update:modelValue', 'update:userName', 'update:userEmail']);
 
     const modalVisible = computed({
         get: () => props.modelValue,
@@ -85,12 +99,24 @@
         loading.value = true;
         const userName = formState.userName;
         const email = formState.email;
-        const avatar = formState.avatar;
+        // const avatar = formState.avatar;
 
-        generatePost('api/user/update', {id:props.userId, userName:userName, userEmail:email, avatar}).then((res) => {
+        generatePost('api/user/update', {id:props.userId, userName:userName, userEmail:email}).then((res) => {
             if (res.data.status === 0) {
                 message.success('修改成功');
                 loading.value = false;
+                if (formState.userName != '') {
+                    emit('update:userName', formState.userName);
+                    formState.userName = '';
+                }
+                if (formState.email != '') {
+                    emit('update:userEmail', formState.email);
+                    formState.email = '';
+                }
+                // if (formState.avatar != '') {
+                //     emit('update:userEmail', formState.email);
+                //     formState.email = '';
+                // }
                 formState.userName = '';
                 formState.email = '';
                 formState.avatar = '';
@@ -150,12 +176,12 @@
     };
 
     const handlePreview = async (file:any) => {
-    if (!file.url && !file.preview) {
-        file.preview = await getBase64(file.originFileObj);
-    }
-    previewImage.value = file.url || file.preview;
-    previewVisible.value = true;
-    previewTitle.value = file.name || file.url.substring(file.url.lastIndexOf('/') + 1);
+        if (!file.url && !file.preview) {
+            file.preview = await getBase64(file.originFileObj);
+        }
+        previewImage.value = file.url || file.preview;
+        previewVisible.value = true;
+        previewTitle.value = file.name || file.url.substring(file.url.lastIndexOf('/') + 1);
     };
 
     // const handleUpload = async file => {
@@ -177,9 +203,42 @@
                     if (res.data.status === 0) {
                         message.success('上传成功');
                         formState.avatar = res.data.data;
+                        // file.onSuccess(res, file.file)
+                        file.status = 'done'
+                        console.log('file is', file)
+                        console.log('fileList is', fileList.value)
                         
                     } else {
                         message.error('上传失败');
+                        // file.onSuccess(res, file.file)
+                        file.status = 'error'
+                    }
+                });
+                // formState.avatar = res.data.data;
+            } catch (err) {
+                message.info(String(err));
+            }
+        }
+
+        const customUpload1 = async (file:any) => {
+            // const { file } = fileInfo;
+            const formData = new FormData();
+            try {
+                // const url = await getBase64(file); // 获取base64地址
+                formData.append('file', file.file);
+                generatePostAvatar('api/upload/avatar', formData).then((res) => {
+                    console.log('fileList.length is', fileList.value.length);
+                    console.log(res);
+                    if (res.data.status === 0) {
+                        message.success('上传成功');
+                        formState.avatar = res.data.data;
+                        file.onSuccess(res, file.file)
+                        file.status = 'done'
+                        
+                    } else {
+                        message.error('上传失败');
+                        // file.onSuccess(res, file.file)
+                        file.status = 'error'
                     }
                 });
                 // formState.avatar = res.data.data;

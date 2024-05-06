@@ -6,6 +6,7 @@ import { ref, computed, reactive, onMounted, nextTick } from "vue";
 import TopNav from "@/components/TopNav.vue";
 import EditProfile from "@/components/EditProfile.vue";
 import EditPassword from "@/components/EditPassword.vue";
+import { useHallState } from "@/stores/hall";
 
 // import { defineComponent } from '@vue/composition-api';
 
@@ -21,8 +22,8 @@ const localUserId = localStorage.getItem("userId");
 const token = localStorage.getItem("token");
 // const localUserName = localStorage.getItem("userInfo") ? JSON.parse((localStorage.getItem("userInfo")) || '').username : NaN;
 // const localEmail = localStorage.getItem("userInfo") ? JSON.parse((localStorage.getItem("userInfo")) || '').email : NaN;
-let pageUserName = ref(NaN);
-let pageEmail = ref(NaN);
+let pageUserName = ref('');
+let pageEmail = ref('');
 let pageAvatar = ref('');
 let pageFriends = ref(NaN);
 let friendPageNums = 1;
@@ -53,15 +54,29 @@ const initProfile = async () => {
             console.log(res);
             pageUserName.value = res.data.data.userName;
             pageEmail.value = res.data.data.userEmail;
-            pageAvatar.value = res.data.data.avatar;
-            console.log(pageAvatar);
+            pageAvatar.value = 'http://81.70.241.166/avatar/' + res.data.data.avatar;
+            console.log('pageAvatar:', pageAvatar);
 
 
             // friends = res.data.friends;
         } else {
             console.log(res);
         }
-    });
+
+    // generateGet("api/upload/getAvatar", { id: pageUserId }).then((res) => {
+    //     if (res.data.status === 0) {
+    //         console.log(res);
+    //         // decode Base64 to image
+    //         // pageAvatar.value = 'data:image/png;base64,' + res.data.data;
+    //         pageAvatar.value = 'http://81.70.241.166/avatar/' + res.data.data;
+    //         // pageAvatar.value = res.data.data;
+    //         console.log('pageAvatar:', pageAvatar);
+    //     } else {
+    //         console.log(res);
+    //     }
+    // });
+});
+
 
     if (pageUserId === localUserId) {
         // get friends
@@ -143,9 +158,6 @@ const onLoadMoreFriends1 = (val: any) => {
       friendsList.value = newData;
       friendsPage.value = val;
       nextTick(() => {
-        // Resetting window's offsetTop so as to display react-virtualized demo underfloor.
-        // In real scene, you can using public method of react-virtualized:
-        // https://stackoverflow.com/questions/46700726/how-to-use-public-method-updateposition-of-react-virtualized
         window.dispatchEvent(new Event('resize'));
       });
     });
@@ -184,6 +196,19 @@ const openEditProfile = () => {
     console.log("openEditProfile");
     fieldData.value.openEditProfile = true;
     console.log('fieldData', fieldData);
+
+    // Update personal information
+    // generateGet("api/user/profile", { id: pageUserId }).then((res) => {
+    //     if (res.data.status === 0) {
+    //         console.log(res);
+    //         pageUserName.value = res.data.data.userName;
+    //         pageEmail.value = res.data.data.userEmail;
+    //         // pageAvatar.value = res.data.data.avatar;
+    //         // console.log('pageAvatar:', pageAvatar);
+    //     } else {
+    //         console.log(res);
+    //     }
+    // });
 }
 
 const openEditPassword = () => {
@@ -192,7 +217,10 @@ const openEditPassword = () => {
     console.log('fieldData', fieldData);
 }
 
+
+const hall = useHallState();
 const logOut = () => {
+    hall.hall.logout();
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
     router.push("/auth/login");
@@ -217,7 +245,8 @@ const searchFriends = () => {
   </div>
     <Row :gutter="24" id="main">
         <Col :span="12"  class="colBox">
-            <Avatar id="avatar" src="https://i.pravatar.cc/700" />
+            <!-- src="https://i.pravatar.cc/700" -->
+            <Avatar id="avatar" :src="pageAvatar" />
         </Col>
         <Col :span="12" class="colBox">
             <Card id="rightCard" :hoverable="true" :elevation="4" :bordered="false">
@@ -236,7 +265,7 @@ const searchFriends = () => {
                             </ListItem>
                         </List>
                     </TabPane>
-                    <TabPane key="2" tab="朋友">
+                    <TabPane key="2" tab="朋友" v-if="pageUserId===localUserId">
 
                         <InputSearch
                             v-model:value="todo_member"
@@ -268,7 +297,7 @@ const searchFriends = () => {
                                     </template>
                                     <Skeleton avatar :title="false" :loading="!!item.loading" active>
                                     <ListItemMeta
-                                        :description="item.email"
+                                        :description="item.userEmail"
                                     >
                                         <template #title>
                                         <a href="https://www.antdv.com/">{{ item.userName }}</a>
@@ -289,13 +318,14 @@ const searchFriends = () => {
             </Card>
         </Col>
     </Row>
-    <Flex :gap="customGapSize" id="buttonGroup" justify="center" align="center">
+
+    <Flex v-if="pageUserId===localUserId" :gap="customGapSize" id="buttonGroup" justify="center" align="center">
         <Button type="primary" @click="openEditProfile">修改个人信息</Button>
         <Button type="primary" @click="openEditPassword">修改密码</Button>
         <Button type="primary">添加好友</Button>
         <Button type="primary" @click="logOut">退出登录</Button>
-    </Flex>
-    <EditProfile :userId="pageUserId" v-model="fieldData.openEditProfile"/>
+    </Flex > 
+    <EditProfile :userId="pageUserId" v-model="fieldData.openEditProfile" :userName="pageUserName" :userEmail="pageEmail" :avatar="pageAvatar"/>
     <EditPassword :userId="pageUserId" v-model="fieldData.openEditPassword"/>
 </template>
 
