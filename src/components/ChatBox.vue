@@ -6,7 +6,7 @@ const hall = useHallState()
 hall.chat_msg_callback = (data) => {
     console.log(`user ${data.fromId} says: ${data.message}`)
     messages.value.push({
-        speaker: data.fromId.toString(),
+        speaker: data.fromName ? data.fromName : data.fromId.toString(),
         msg: data.message,
         key: Date.now().toString()
     })
@@ -28,6 +28,11 @@ import OneMsg from '@/components/chat/OneMsg.vue';
 
 const msgToSend = ref<string>()
 const sendMsg = () => {
+    if (isSending.value) {
+        // 如果正在发送消息，取消发送
+        return
+    }
+
     if (msgToSend.value) {
         isSending.value = true
         hall.hall.chat_req('global', msgToSend.value)
@@ -54,7 +59,7 @@ const isSending = ref(false)
         </div>
         <Row>
             <Col :span="10">
-                <Input v-model:value="msgToSend"/>
+                <Input v-model:value="msgToSend" @press-enter="sendMsg"/>
             </Col>
             <Col :span="2">
                 <Button @click="sendMsg" :disabled="isSending">发送</Button>
