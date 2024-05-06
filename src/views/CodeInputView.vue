@@ -49,6 +49,9 @@
           {{ maxLineStyles[15]}}
         -->
       </div>
+      <div>
+        <Button class="surrender-button" @click="surrender">投降</Button>
+      </div>
     </div>
   </div>
 </template>
@@ -66,6 +69,11 @@ import ChatBox from '@/components/ChatBox.vue';
 import { useHallState } from '@/stores/hall';
 import { getUserId } from '@/utils/auth';
 import { generatePost } from '@/utils/protocol';
+
+const surrender = () => {
+  hall.hall.surrender()
+}
+
 
 let monacoEditor = null;
 const language = ref('C++');
@@ -336,6 +344,13 @@ const handleChangeLineHeight = (event) => {
   right: 10px;
   z-index: 1000; /* Ensure the button is above the editor */
 }
+.surrender-button {
+  position: absolute;
+  bottom: 10px;
+  right: 90px;
+  z-index: 1000; /* Ensure the button is above the editor */
+}
+
 .chat-box {
   position: absolute;
   bottom: 10px;
