@@ -78,7 +78,7 @@
     const userNameCheck = async (_rule: Rule, value: string) => {
         if (!value) {
         return Promise.reject('用户名不能为空')
-        } else if (value.length <= 2) {
+        } else if (value.length < 2) {
         return Promise.reject('用户名长度不能小于两个字符')
         } else {
         return Promise.resolve()

@@ -1,4 +1,10 @@
 <template>
+  <!-- <Row>
+    <Col span="6"></Col>
+    <Col span="12"></Col>
+    <Col span="6"></Col>
+  </Row> -->
+
   <div class="components-top-nav">
     <div class="left">
       <img
@@ -26,7 +32,7 @@
           <MailOutlined />
           规则介绍
         </MenuItem>
-        <MenuItem key="/user/profile/:id">
+        <MenuItem key="userProfile">
           <SettingOutlined />
           个人中心
         </MenuItem>
@@ -34,14 +40,12 @@
     </div>
 <!--     右侧部分内容-->
     <div class="right">
-      <div class="exit-button" @click="log_out">
-        退出登录
-      </div>
-      <img
-          class="headImg"
-          src=""
-          alt="头像"
-      />
+      <Tooltip title="打开设置">
+        <!-- <Button @click="log_out" shape="circle"> -->
+          <Avatar :src="pageAvatar" class="headImg" @click="log_out"/>
+        <!-- </Button> -->
+      </Tooltip>
+      
     </div>
   </div>
 </template>
@@ -50,15 +54,24 @@
 import {ref, watch} from 'vue';
 import { useRouter } from 'vue-router';
 import { MailOutlined, AppstoreOutlined, SettingOutlined,SkinOutlined } from '@ant-design/icons-vue';
-import { Menu, MenuItem, SubMenu, MenuItemGroup } from 'ant-design-vue';
+import { Menu, MenuItem, SubMenu, MenuItemGroup, Button, Tooltip, Row, Col, Avatar } from 'ant-design-vue';
 import type {Key} from "ant-design-vue/es/_util/type";
 import { useHallState } from '@/stores/hall';
+import { generateGet } from '@/utils/protocol';
+
+
+const thisId = localStorage.getItem('userId');
+let pageAvatar = ref('');
+
 
 const router = useRouter();
 const handleClick = (event: { key: string | number }) => {
   const {key} = event;
-  console.log(key);
-  if (typeof key == 'string') {
+  console.log('key:', key);
+  if (key === 'userProfile') {
+    router.push(`/user/profile/${thisId}`);
+  }
+  else if (typeof key == 'string') {
     router.push(key);
   }
 };
@@ -67,10 +80,48 @@ const current = ref<Key[]>(['首页']); // 修改类型为 Key[]
 
 const hall = useHallState()
 const log_out = () => {
+
   hall.hall.logout()
   localStorage.removeItem('token')
+  localStorage.removeItem('userId')
   router.push('/auth/login')
+
 }
+
+
+
+const avatar = ref<string>('');
+const initProfile = async () => {
+
+  // getAvatar
+
+  generateGet("api/user/profile", { id: thisId }).then((res) => {
+        if (res.data.status === 0) {
+            console.log(res);
+            // pageUserName.value = res.data.data.userName;
+            // pageEmail.value = res.data.data.userEmail;
+            pageAvatar.value = 'http://81.70.241.166/avatar/' + res.data.data.avatar;
+            console.log('pageAvatar:', pageAvatar);
+
+
+            // friends = res.data.friends;
+        } else {
+            console.log(res);
+        }});
+  // generateGet("api/upload/getAvatar", { id: thisId }).then((res) => {
+  //       if (res.data.status === 0) {
+  //           console.log(res);
+  //           // decode Base64 to image
+  //           pageAvatar.value = 'data:image/png;base64,' + res.data.data;
+  //           // pageAvatar.value = res.data.data;
+  //           console.log('pageAvatar:', pageAvatar);
+  //       } else {
+  //           console.log(res);
+  //       }
+  //   });
+};
+
+initProfile();
 
 </script>
 
@@ -78,7 +129,7 @@ const log_out = () => {
 .components-top-nav {
   display: flex;
   align-items: center;
-  padding: 10px;
+  /* padding: 10px; */
   background: #eaf3f8;
   color: #000;
   height: 100%; /* 让 TopNav 高度与父容器相同 */
@@ -94,6 +145,7 @@ const log_out = () => {
 .left {
   display: flex;
   align-items: center;
+  width: 10%;
 }
 
 .LOGO {
@@ -110,17 +162,17 @@ const log_out = () => {
   flex-grow: 1;
   display: flex;
   justify-content: center;
-  margin-right: 35%;
-  width: 100%;
+  /* margin-right: 35%; */
+  width: 80%;
 }
 
 .right {
   display: flex;
   align-items: center;
-  font-color: #ffffff;
+  /* font-color: #ffffff; */
 }
 
-.right img.headImg {
+.right .headImg {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -178,7 +230,7 @@ const log_out = () => {
 .menu {
   display: flex;
   justify-content: center;
-  width: 75%;
+  width: 100%;
 }
 
 .menu-item {
