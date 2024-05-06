@@ -191,4 +191,9 @@ export class Hall {
             submit_id: submit_id
         })
     }
+
+    surrender() {
+        this.conn.conn.send('SURRENDER', {})
+        message.info('已发起投降！', 2)
+    }
 }
