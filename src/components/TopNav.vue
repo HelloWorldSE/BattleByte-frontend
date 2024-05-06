@@ -13,10 +13,13 @@
           alt="LOGO"
       />
       <div class="title">BattleByte</div>
+      
     </div>
+    <div class="hide-middle" v-if="thisId===null">Pit your skills, against the best</div>
     <!-- 中间部分内容 -->
     <div class="middle" v-if="thisId!==null">
       <Menu
+
           mode="horizontal"
           theme="light"
           class="menu"
@@ -178,6 +181,7 @@ initProfile();
 
 .title {
   font-size: 20px;
+  font-family:"Times New Roman", Times, serif;
 }
 
 .middle {
@@ -270,6 +274,16 @@ initProfile();
 }
 .exit-button:active {
   background-color: rgba(0, 0, 0, 0.2);
+}
+
+.hide-middle {
+  /* 其他样式 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80%;
+  font: italic 2em Georgia, serif;
+  font-weight: 200;
 }
 
 </style>
