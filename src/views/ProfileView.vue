@@ -158,7 +158,7 @@ const onLoadMoreFriends1 = (val: any) => {
     friendsLoading.value = true;
     const xx = [...new Array(count)].map(() => ({ loading: true, name: {}, picture: {} }))
     localFriends.value = xx;
-    generateGet("api/user/friend", { pageSize: onePageFriends, page: curFriendPage}).then((res) => {
+    generateGet("api/user/friend", { pageSize: onePageFriends, page: curFriendPage.value}).then((res) => {
         if (res.data.status === 0) {
             // pageUserName = res.data.username;
             // pageEmail = res.data.email;
@@ -266,7 +266,7 @@ const clickUserName = (item:any) => {
     router.push(`/user/profile/${item.id}`);
 
     // 服务器使用需要修改
-    window.location.href = 'http://http://81.70.241.166/user/profile/' + item.id;
+    window.location.href = 'http://81.70.241.166/user/profile/' + item.id;
 
     // window.location.href = 'http://127.0.0.1:5173/user/profile/' + item.id;
     // location.reload();
