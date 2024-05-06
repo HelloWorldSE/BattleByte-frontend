@@ -56,6 +56,8 @@ import {message,Tag} from "ant-design-vue";
 import {useGameStore} from "@/stores/game";
 import { generateGet } from '@/utils/protocol';
 
+import MathJax from '@/utils/mathjax';
+
 
 
 const copyInput = (inputText: string) => {
@@ -78,7 +80,7 @@ const data = reactive({
 });
 
 onMounted(() => {
-  fetchData();
+  fetchData().then(() => {MathJax()})
 });
 
 const game = useGameStore();

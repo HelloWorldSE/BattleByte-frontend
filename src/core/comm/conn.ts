@@ -29,15 +29,11 @@ export class ConnectionClient {
         this.startNewWebSocketConnection()
     }
 
-    async startNewWebSocketConnection() {
+    startNewWebSocketConnection() {
         const server_addr = this.server_addr
 
         this.state = 'CONNECTING';
         (async () => {this.onStateChange(this.state)}) ();
-        
-        await (new Promise<void>((r) => {setTimeout(() => {
-            r()
-        }, 1000);}))
 
         this.socket = new WebSocket(server_addr)
         this.socket.onopen = (e: Event) => {
