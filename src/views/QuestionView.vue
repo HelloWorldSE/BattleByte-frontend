@@ -138,6 +138,7 @@ h1 {
 
 .sample {
   justify-content: space-between; /* 左右对齐 */
+  display: flex; /* 使用Flexbox布局 */
 
   .input, .output {
     flex-basis: 48%; /* 左右各占48%的宽度，留出一定的间距 */
@@ -147,7 +148,7 @@ h1 {
 
 .showArea {
   background-color: #eaf3f8; /* 或者其他深色调以便于阅读 */
-  height: 75%; /* 让showArea占据父容器的全部高度 */
+  height: 50%; /* 让showArea占据父容器的全部高度 */
   display: flex;
   flex-direction: column;
 }
