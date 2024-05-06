@@ -65,6 +65,7 @@ import { useGameStore } from '@/stores/game';
 import ChatBox from '@/components/ChatBox.vue';
 import { useHallState } from '@/stores/hall';
 import { getUserId } from '@/utils/auth';
+import { generatePost } from '@/utils/protocol';
 
 let monacoEditor = null;
 const language = ref('C++');
@@ -252,11 +253,11 @@ const handleSubmit = async () => {
   console.log(code);
 
   console.log(`STAGE B`, gameStore.match_info, gameStore.match_info.info.questionId)
-  axios.post("/api/api/oj/submit",{
+  generatePost("/api/oj/submit",{
     problem_id: gameStore.match_info.info.questionId + 745,
     language: language.value,
     code: code
-  }, {headers: {"Content-Type": "application/json"}}).then(res => {
+  }).then(res => {
     if(res.data.status === 0){
       console.log("提交成功");
     }
