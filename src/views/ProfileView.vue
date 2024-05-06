@@ -286,7 +286,7 @@ const clickUserName = (item:any) => {
     <Row :gutter="24" id="main">
         <Col :span="12"  class="colBox">
             <!-- src="https://i.pravatar.cc/700" -->
-            <Avatar id="avatar" :src="pageAvatar" />
+            <Avatar id="avatar" :src="pageAvatar"/>
         </Col>
         <Col :span="12" class="colBox">
             <Card id="rightCard" :hoverable="true" :elevation="4" :bordered="false">
@@ -326,7 +326,7 @@ const clickUserName = (item:any) => {
                                     :style="{ textAlign: 'center', marginTop: '12px', height: '32px', lineHeight: '32px' }"
                                 >
                                     <!-- <Button @click="onLoadMoreFriends">loading more</Button> -->
-                                    <Pagination @change="onLoadMoreFriends1" :current="curFriendPage" :total="totalFriendsPages * 5" :pageSize="5" simple/>
+                                    <Pagination @change="onLoadMoreFriends1" :current="curFriendPage" :total="totalFriendsPages * onePageFriends" :pageSize="onePageFriends" simple/>
                                 </div>
                                 </template>
                                 <template #renderItem="{ item }">
@@ -371,10 +371,11 @@ const clickUserName = (item:any) => {
 
 <style scoped>
 #main {
-    margin-top: 5vh;
-    margin-bottom: 10vh;
+    padding: 0%;
+    /* margin-top: 5vh;
+    margin-bottom: 10vh; */
     min-width: 100vw;
-    min-height: 100vh;
+    min-height: 90vh;
 }
 
 .colBox {
@@ -382,10 +383,20 @@ const clickUserName = (item:any) => {
     justify-content: center;
     align-items: center;
 }
+
 #avatar {
     width: 50%;
     height: 50%;
     object-fit: cover;
+    transition: box-shadow .3s;
+    
+    /* filter: brightness(0.5); */
+    
+}
+#avatar:hover {
+    /* filter: brightness(0.5); */
+    /* hover shade effect */
+    box-shadow: 0 0 11px rgba(33,33,33,.2); 
 }
 
 #rightCard {
@@ -393,7 +404,7 @@ const clickUserName = (item:any) => {
     height: 80%;
     object-fit: cover;
     margin: auto;
-    padding: 30px;
+    padding: 10px;
 }
 
 #cardDiv {
