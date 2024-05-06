@@ -3,6 +3,7 @@
     <TopNav/>
   </div>
   <div id="app">
+    <div class="star" v-for="n in 400"></div>
     <!-- MAIN CONTENT  -->
     <div class="sun" :style="sunStyle()"></div>
     <div
@@ -28,12 +29,15 @@
       </div>
     </div>
 
-    <div class="match-button" :class="(infoModalVisible)?'match-available':'match-disable'">
-      <button @click="onClickMatch()">
+    <div class="match-button">
+      <button @click="onClickMatch()" type="primary" ghost>
         开始匹配
       </button>
     </div>
 
+    <div v-if="matching" class="match-button" style="z-index: 999;">
+      <button @click="cancelMatch">取消匹配</button>
+    </div>
 
     <!-- INFORMATION  -->
     <div class="information-container">
@@ -48,6 +52,7 @@
     </div>
 
     <!-- ACTION  -->
+    <!--
     <div class="action-container">
       <div>
 				<span v-for="m in modes">
@@ -76,12 +81,16 @@
         </button>
       </div>
     </div>
+    -->
   </div>
 </template>
 
 <script>
 import {Modal, message} from 'ant-design-vue';
 import TopNav from "@/components/TopNav.vue";
+import {useHallState} from '@/stores/hall';
+import {mapStores} from 'pinia';
+import {isLoggedIn} from '@/utils/auth'
 
 export default {
   components: {
@@ -90,20 +99,26 @@ export default {
   },
   created() {
     this.infoModalVisible = false;
+
+    // 如果没有登录，跳转 login
+    if (!isLoggedIn()) {
+      this.$router.push('/auth/login')
+    }
   },
   // ##################################################
   // DATA #############################################
   // ##################################################
   data() {
     return {
+      matching: false,
       infoModalVisible: false,
       mode: null,
       modes: ["WIDTH", "SPEED", "DISTANCE"],
-      speedRatio: 50,
+      speedRatio: 1, // 初始为1，否则speed模式下转的太快
       speedReal: false,
       sun: {
         diameter: "1392",
-        colors: ["gold", "orange"]
+        colors: [] // "gold", "orange"
       },
       selectedPlanetId: 3,
       planetsFilteredLength: 0,
@@ -146,35 +161,35 @@ export default {
         /* Mars has two moons, Phobos and Deimos. Both are thought to be captured asteroids, or debris from early in the formation of our solar system. */
         {
           name: "单人模式",
-          diameter: "60.0",
+          diameter: "120.0",
           rotationTime: "4332.6",
           ua: "5.2",
           colors: [], // "#876f51", "#9c661f"
           /* satellites: [
             {
               name: "Io",
-              diameter: "0.01",
+              diameter: "3.6432",
               rotationTime: "1.769",
               distance: "421,8",
               colors: [] // "green", "yellow"
             },
             {
               name: "europe",
-              diameter: "0.01",
+              diameter: "3.1216",
               rotationTime: "3.551",
               distance: "671,1",
               colors: [] // "brown", "pink"
             },
             {
               name: "ganymede",
-              diameter: "0.01",
+              diameter: "5.2644",
               rotationTime: "7.15",
               distance: "1070,4",
               colors: [] // "blue", "cyan"
             },
             {
               name: "callisto",
-              diameter: "0.01",
+              diameter: "4.8206",
               rotationTime: "16.689",
               distance: "1882,7",
               colors: [] // "orange", "grey"
@@ -183,7 +198,7 @@ export default {
         },
         {
           name: "单人模式",
-          diameter: "60.0",
+          diameter: "120.0",
           rotationTime: "4332",
           ua: "5.2",
           colors: ["#b09f74", "#b8902a"],
@@ -227,14 +242,14 @@ export default {
         },
         {
           name: "大逃杀模式",
-          diameter: "60.0",
+          diameter: "120.0",
           rotationTime: "30688.4",
           ua: "19.2",
           colors: [], // "#a3bebf", "#387a7d"
           /* satellites: [
             {
               name: "titania",
-              diameter: "0.01",
+              diameter: "0.7884",
               rotationTime: "8.7",
               colors: ["#387a7d", "#a3bebf"]
             }
@@ -253,21 +268,21 @@ export default {
           rotationTime: "60181.3",
           ua: "30.1",
           colors: ["#7f8dc7", "#01146b"],
-          satellites: [
+          /* satellites: [
             {
               name: "triton",
               diameter: "2.7068",
               rotationTime: "5.877",
               colors: []
-              /* "forestgreen", "#7f8dc7" */
+              /* "forestgreen", "#7f8dc7"
             },
             {
               name: "néréide",
               diameter: "0.340",
               rotationTime: "360.14",
-              colors: [] // "#01146b", "#7f8dc7"
+              colors: ["#01146b", "#7f8dc7"]
             }
-          ]
+          ] */
         }
       ]
     };
@@ -277,6 +292,11 @@ export default {
   // COMPUTED #########################################
   // ##################################################
   computed: {
+    // #########
+    // ## Global status import
+    // #########
+    ...mapStores(useHallState),
+
     selectedPlanet() {
       return this.planets[this.selectedPlanetId];
     },
@@ -334,7 +354,12 @@ export default {
       this.mode = m;
       this.planetsFilteredLength = this.planets.length;
     },
+    cancelMatch() {
+      window.location.reload();
+      this.matching = false;
+    },
     onClickMatch() {
+      this.matching = true;
       this.mode = "SPEED";
       setTimeout(() => {
         this.mode = "DISTANCE";
@@ -359,6 +384,8 @@ export default {
           this.planetsFilteredLength--;
         }
       }, 9000);
+
+      this.hall_stateStore.hall.match_request()
     },
     zoomIn() {
       if (this.planetsFilteredLength > 4) {
@@ -375,12 +402,12 @@ export default {
         console.log("onClickPlanet", i);
         this.selectedPlanetId = i;
         this.infoModalVisible = true;
-        let shit = (this.infoModalVisible == true) ? 1 : 0;
-        message.success(shit);
+        // let signal = (this.infoModalVisible == true) ? 1 : 0;
+        // message.success(signal);
       }
     },
     onClickPlanetContainer(i) {
-      if(this.mode === "SPEED" || this.mode === "DISTANCE") {
+      if (this.mode === "WIDTH" || this.mode === "SPEED" || this.mode === "DISTANCE") {
         return;
       }
       if (this.mode !== "WIDTH") {
@@ -659,6 +686,15 @@ export default {
 </script>
 
 <style scoped>
+
+.topBar {
+  z-index: 1005;
+  width: 100%;
+  overflow: hidden; /* 隐藏超出部分 */
+  height: 60px;
+  position: relative; /* 确保 TopNav 绝对定位相对于 .top */
+}
+
 #app {
   background-color: black; /* 设置背景为黑色 */
   min-height: 100vh; /* 至少为视口的100%高度 */
@@ -739,7 +775,7 @@ export default {
 
   button {
     padding: 10px 15px;
-    margin-left: 15px;
+    margin-left: 10px;
   }
 
   input {
@@ -776,16 +812,8 @@ export default {
   bottom: 20px; /* 调整底部边距 */
   left: 50%; /* 水平居中 */
   transform: translateX(-50%); /* 居中对齐 */
-  transition: all 0.5s ease
 }
 
-.match-available {
-  opacity: 100%;
-}
-
-.match-disable {
-  opacity: 0;
-}
 
 @keyframes gravitation {
   0% {
@@ -820,51 +848,21 @@ export default {
     letter-spacing: 2px;
     color: white;
   }
-
-  .topBar {
-    width: 100%;
-    height: 50px;
-    z-index: 1005;
-  }
 }
-
-.container {
-  height: 100vh;
-  width: 100vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.pulse-center-item {
-  background-color: mediumvioletred;
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  border: 2px solid white;
-  position: relative;
-  z-index: 90;
-}
-
-.pulse-circle {
-  border-radius: 50%;
-  background-color: #e4aaac;
-  width: 150px;
-  height: 150px;
+.star {
   position: absolute;
-  opacity: 0;
-  animation: scaleIn 5s infinite cubic-bezier(0.36, 0.11, 0.89, 0.32);
-}
-
-@keyframes scaleIn {
-  from {
-    transform: scale(0.5, 0.5);
-    opacity: 0.5;
+  width: 1px;
+  height: 1px;
+  border-radius: 1px;
+  background: #fff;
+  @for $i from 1 through 400 {
+    &:nth-child(#{$i}) {
+      $randomOpacity: (random(95 + 1) + 5 - 1) / 100;
+      left: random(1000) / 10 * 1% - 1%;
+      bottom: random(1000) / 10 * 1% - 1%;
+      opacity: $randomOpacity;
+      box-shadow: 0 0 6px 1px rgba(255, 255, 255, $randomOpacity);
+    }
   }
-  to {
-    transform: scale(2.5, 2.5);
-    opacity: 0;
-  }
 }
-
 </style>
