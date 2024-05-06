@@ -1,5 +1,5 @@
 <template>
-    <Modal v-model:open="modalVisible" title="修改密码" @ok="handleOk" @cancel="cancel">
+    <Modal v-model:open="modalVisible" title="修改密码" @ok="handleOk" @cancel="cancel" centered>
         <template #footer>
             <Button key="back" @click="cancel">取消</Button>
             <Button key="submit" type="primary" @click="handleOk">确定</Button>

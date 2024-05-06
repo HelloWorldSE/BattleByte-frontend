@@ -1,4 +1,7 @@
 <template>
+    <div class="topBar">
+      <TopNav/>
+    </div>
     <div class="login">
       <div class="blurBox">
         <div id="backBox">
@@ -48,6 +51,7 @@
 
   import { getUserId, isLoggedIn } from "@/utils/auth";
   import { useHallState } from "@/stores/hall";
+  import TopNav from "@/components/TopNav.vue";
 
   
   const formItem = Form.Item;
@@ -231,5 +235,13 @@
     font-weight: bold;
     color: #190d11;
   }
+
+  .topBar {
+  z-index: 1005;
+  width: 100%;
+  overflow: hidden; /* 隐藏超出部分 */
+  height: 60px;
+  position: relative; /* 确保 TopNav 绝对定位相对于 .top */
+}
   </style>
   
