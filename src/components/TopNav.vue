@@ -40,7 +40,7 @@
     </div>
 <!--     右侧部分内容-->
     <div class="right">
-      <Tooltip title="打开设置">
+      <Tooltip title="退出登录">
         <!-- <Button @click="log_out" shape="circle"> -->
           <Avatar :src="pageAvatar" class="headImg" @click="log_out"/>
         <!-- </Button> -->

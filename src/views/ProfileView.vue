@@ -22,16 +22,16 @@ const localUserId = localStorage.getItem("userId");
 const token = localStorage.getItem("token");
 // const localUserName = localStorage.getItem("userInfo") ? JSON.parse((localStorage.getItem("userInfo")) || '').username : NaN;
 // const localEmail = localStorage.getItem("userInfo") ? JSON.parse((localStorage.getItem("userInfo")) || '').email : NaN;
-let pageUserName = ref('');
-let pageEmail = ref('');
-let pageAvatar = ref('');
+const pageUserName = ref('');
+const pageEmail = ref('');
+const pageAvatar = ref('');
 let pageFriends = ref(NaN);
 let friendPageNums = 1;
 let onePageFriends = 5;
 
-let localFriends = ref<Array<any>>([]);
-let curFriendPage = 1;
-let totalFriendsPages = 0;
+const localFriends = ref<Array<any>>([]);
+const curFriendPage = ref(1);
+const totalFriendsPages = ref(0);
 
 
 const getImageUrl = (name: any) => {
@@ -47,7 +47,7 @@ const getImageUrl = (name: any) => {
 
 
 
-
+const initFriendsLoading = ref(true);
 const initProfile = async () => {
     generateGet("api/user/profile", { id: pageUserId }).then((res) => {
         if (res.data.status === 0) {
@@ -82,13 +82,14 @@ const initProfile = async () => {
         // get friends
         generateGet("api/user/friend", { pageSize: onePageFriends, page: 1}).then((res) => {
         if (res.data.status === 0) {
+            initFriendsLoading.value = false;
             // pageUserName = res.data.username;
             // pageEmail = res.data.email;
             localFriends.value = res.data.data.content;
             console.log('localFriends', localFriends);
-            curFriendPage = res.data.data.pageable.pageNumber + 1;
+            curFriendPage.value = res.data.data.pageable.pageNumber + 1;
             console.log('curFriendPage', curFriendPage);
-            totalFriendsPages = res.data.data.totalPages;
+            totalFriendsPages.value = res.data.data.totalPages;
             console.log('totalFriendsPages', totalFriendsPages);
 
         } else {
@@ -113,21 +114,21 @@ const count = 5;
 const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat,picture&noinfo`;
 
 
-const initFriendsLoading = ref(true);
+
 const friendsLoading = ref(false);
 const friendsData = ref<Array<any>>([]);
 const friendsList = ref<Array<any>>([]);
 const customGapSize = ref(40);
 
-onMounted(() => {
-  fetch(fakeDataUrl)
-    .then(res => res.json())
-    .then(res => {
-        initFriendsLoading.value = false;
-        friendsData.value = res.results;
-        friendsList.value = res.results;
-    });
-});
+// onMounted(() => {
+//   fetch(fakeDataUrl)
+//     .then(res => res.json())
+//     .then(res => {
+//         initFriendsLoading.value = false;
+//         friendsData.value = res.results;
+//         friendsList.value = res.results;
+//     });
+// });
 
 const onLoadMoreFriends = () => {
     friendsLoading.value = true;
@@ -152,36 +153,42 @@ const onLoadMoreFriends = () => {
 let friendsPage = ref(1);
 
 const onLoadMoreFriends1 = (val: any) => {
+    console.log("curFriendPage:", curFriendPage);
+    curFriendPage.value = val;
     friendsLoading.value = true;
     const xx = [...new Array(count)].map(() => ({ loading: true, name: {}, picture: {} }))
-    friendsList.value = xx;
-  fetch(fakeDataUrl)
-    .then(res => res.json())
-    .then(res => {
-      const newData = res.results;
-      friendsLoading.value = false;
-      friendsData.value = newData;
-      friendsList.value = newData;
-      friendsPage.value = val;
-      nextTick(() => {
-        window.dispatchEvent(new Event('resize'));
-      });
-    });
-};
-
-const getMoreFriends = async () => {
-    // curFriendPage.value += 1;
-    curFriendPage += 1;
-    generateGet("user/friend", { userId: pageUserId, pageNums: curFriendPage, onePageFriends: onePageFriends}).then((res) => {
-        if (res.data.code === 200) {
+    localFriends.value = xx;
+    generateGet("api/user/friend", { pageSize: onePageFriends, page: curFriendPage}).then((res) => {
+        if (res.data.status === 0) {
             // pageUserName = res.data.username;
             // pageEmail = res.data.email;
-            localFriends = res.data.friends;
+            friendsLoading.value = false;
+            localFriends.value = res.data.data.content;
+            console.log('localFriends', localFriends);
+            curFriendPage.value = res.data.data.pageable.pageNumber + 1;
+            console.log('curFriendPage', curFriendPage);
+            totalFriendsPages.value = res.data.data.totalPages;
+            console.log('totalFriendsPages', totalFriendsPages);
+
         } else {
             console.log(res);
-        }
-    });
-}
+        }});
+
+    // friendsList.value = xx;
+//   fetch(fakeDataUrl)
+//     .then(res => res.json())
+//     .then(res => {
+//       const newData = res.results;
+//       friendsLoading.value = false;
+//       friendsData.value = newData;
+//       friendsList.value = newData;
+//       friendsPage.value = val;
+//       nextTick(() => {
+//         window.dispatchEvent(new Event('resize'));
+//       });
+//     });
+};
+
 
 function getBase64(file: File) {
   return new Promise((resolve, reject) => {
@@ -235,19 +242,36 @@ const logOut = () => {
 const todo_member = ref("")
 
 const searchFriends = () => {
-    console.log(todo_member.value);
+    console.log("todo_member is", todo_member.value);
+    // curFriendPage = val;
+
+    friendsLoading.value = true;
+    generateGet("api/user/friend", {name: todo_member.value, onePageFriends: onePageFriends}).then((res) => {
+        if (res.data.status === 0) {
+            friendsLoading.value = false;
+            localFriends.value = res.data.data.content;
+            console.log('localFriends', localFriends);
+            curFriendPage.value = res.data.data.pageable.pageNumber + 1;
+            console.log('curFriendPage', curFriendPage);
+            totalFriendsPages.value = res.data.data.totalPages;
+            console.log('totalFriendsPages', totalFriendsPages);
+        } else {
+            console.log(res);
+        }
+    });
 }
 
 const clickUserName = (item:any) => {
     console.log("this user id is", item.id);
     router.push(`/user/profile/${item.id}`);
-    
+
     // 服务器使用需要修改
     window.location.href = 'http://http://81.70.241.166/user/profile/' + item.id;
 
     // window.location.href = 'http://127.0.0.1:5173/user/profile/' + item.id;
     // location.reload();
 }
+
 </script>
 
 
@@ -287,7 +311,7 @@ const clickUserName = (item:any) => {
                             v-model:value="todo_member"
                             placeholder="input search friend"
                             style="width: 100%; margin:auto;"
-                            @search="() => {/* TODO */}"
+                            @search="searchFriends"
                             />
                             <List
                                 class="demo-loadmore-list"
@@ -302,7 +326,7 @@ const clickUserName = (item:any) => {
                                     :style="{ textAlign: 'center', marginTop: '12px', height: '32px', lineHeight: '32px' }"
                                 >
                                     <!-- <Button @click="onLoadMoreFriends">loading more</Button> -->
-                                    <Pagination @change="onLoadMoreFriends1" :current="curFriendPage" :total="totalFriendsPages" :pageSize="5" simple/>
+                                    <Pagination @change="onLoadMoreFriends1" :current="curFriendPage" :total="totalFriendsPages * 5" :pageSize="5" simple/>
                                 </div>
                                 </template>
                                 <template #renderItem="{ item }">

@@ -99,24 +99,24 @@
         loading.value = true;
         const userName = formState.userName;
         const email = formState.email;
-        // const avatar = formState.avatar;
+        const avatar = formState.avatar;
 
-        generatePost('api/user/update', {id:props.userId, userName:userName, userEmail:email}).then((res) => {
+        generatePost('api/user/update', {id:props.userId, userName:userName, userEmail:email, avatar:avatar}).then((res) => {
             if (res.data.status === 0) {
                 message.success('修改成功');
                 loading.value = false;
-                if (formState.userName != '') {
+                if (userName != '') {
                     // emit('update:userName', formState.userName);
                     formState.userName = '';
                 }
-                if (formState.email != '') {
+                if (email != '') {
                     // emit('update:userEmail', formState.email);
                     formState.email = '';
                 }
-                // if (formState.avatar != '') {
+                if (avatar != '') {
                 //     emit('update:userEmail', formState.email);
-                //     formState.email = '';
-                // }
+                    formState.avatar = '';
+                }
                 formState.userName = '';
                 formState.email = '';
                 formState.avatar = '';
@@ -203,7 +203,7 @@
                     console.log(res);
                     if (res.data.status === 0) {
                         message.success('上传成功');
-                        fileInfo.onSuccess(res, file)
+                        fileInfo.onSuccess(res, file);
                         formState.avatar = res.data.data;
                         // file.onSuccess(res, file.file)
                         file.status = 'done'
