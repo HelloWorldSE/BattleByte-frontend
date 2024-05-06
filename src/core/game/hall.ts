@@ -150,6 +150,10 @@ export class Hall {
 
         this.conn.conn.send('MATCH_REQ', {
             type: 1
+        }, (data) => {
+            message.error(data.msg, 2).then(() => {
+                this.router.go(0)
+            })
         })
 
     }
