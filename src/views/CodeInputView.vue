@@ -69,6 +69,7 @@ import ChatBox from '@/components/ChatBox.vue';
 import { useHallState } from '@/stores/hall';
 import { getUserId } from '@/utils/auth';
 import { generatePost } from '@/utils/protocol';
+import router from '@/router';
 
 const surrender = () => {
   hall.hall.surrender()
@@ -233,26 +234,27 @@ const status_name = {
 }
 
 const refresh_submit_status_callback = (data) => {
-  if (typeof data.result === 'string') {
-    // temporary MATCH_END pack
-    const match_res = data.result;
-    message.success(match_res, 2)
-
-  } else {
-    if (data.result.data.result !== undefined) {
-      if (data.result.data.result !== 6 && data.result.data.result !== 7 && data.result.data.result !== 9) {
-        if (data.result.data.result === 0) {
-          message.success({content: '通过！', duration: 2, key: 'oj-pending'})
-        } else {
-          message.warn({content: `未能通过，评测状态：${status_name[data.result.data.result.toString()]}`, duration: 2, key: 'oj-pending'})
-        }
-        clearInterval(refresh_timeout)
+  if (data.result.data.result !== undefined) {
+    if (data.result.data.result !== 6 && data.result.data.result !== 7 && data.result.data.result !== 9) {
+      if (data.result.data.result === 0) {
+        message.success({content: '通过！', duration: 2, key: 'oj-pending'})
+      } else {
+        message.warn({content: `未能通过，评测状态：${status_name[data.result.data.result.toString()]}`, duration: 2, key: 'oj-pending'})
       }
+      clearInterval(refresh_timeout)
     }
   }
 }
 
+const game_end_callback = (data) => {
+  const match_res = data.result;
+  message.success(match_res, 2).then(()=> {
+    router.push('/')
+  })
+}
+
 hall.answer_result_callback = refresh_submit_status_callback
+hall.game_end_callback = game_end_callback
 
 //处理提交事件
 const handleSubmit = async () => {

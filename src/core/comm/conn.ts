@@ -121,7 +121,7 @@ export class ConnectionClient {
         this.listeners[title] = listener
     }
 
-    addErrListener(wrapped_data: WSProtocol<any>, listener: (data: any) => any): void {
+    addErrListener(wrapped_data: WSProtocol<any>, listener: (data: ErrorData) => void): void {
         this.errListeners[wrapped_data.id] = listener
     }
 

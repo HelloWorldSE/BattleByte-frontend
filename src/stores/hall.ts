@@ -9,6 +9,7 @@ export const useHallState = defineStore('hall_state', () => {
 
     const rcv_chat_msg = ref<(data: ChatMsgData) => void>(()=>{})
     const rcv_answer_result = ref<(data: any) => void>(()=>{})
+    const rcv_game_end = ref<(data: {result: 'win'|'lose'}) => void>(()=>{})
     const rcv_pos_sync = ref<(data: PosSyncData) => void>(()=>{})
     
 
@@ -24,6 +25,8 @@ export const useHallState = defineStore('hall_state', () => {
                 rcv_answer_result.value(data)
             } else if (type == 'POS_SYNC') {
                 rcv_pos_sync.value(data)
+            } else if (type == 'GAME_END') {
+                rcv_game_end.value(data)
             }
         }
     )
@@ -35,6 +38,7 @@ export const useHallState = defineStore('hall_state', () => {
         hallStatus,
         chat_msg_callback: rcv_chat_msg,
         answer_result_callback: rcv_answer_result,
-        pos_sync_callback: rcv_pos_sync
+        pos_sync_callback: rcv_pos_sync,
+        game_end_callback: rcv_game_end
     }
 })

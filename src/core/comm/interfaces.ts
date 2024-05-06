@@ -36,5 +36,5 @@ export interface PosSyncData {
 
 export interface ErrorData {
     ack: number,
-    code: number
+    msg: string
 }
