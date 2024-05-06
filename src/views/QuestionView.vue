@@ -54,6 +54,7 @@ import {CopyOutlined} from '@ant-design/icons-vue';
 import axios from 'axios';
 import {message,Tag} from "ant-design-vue";
 import {useGameStore} from "@/stores/game";
+import { generateGet } from '@/utils/protocol';
 
 
 
@@ -87,7 +88,7 @@ console.log(problemId);
 
 async function fetchData() {
   try {
-    const response = await axios.get(`http://81.70.241.166/api/api/oj/problem?id=${problemId}`); // 替换成你的API地址
+    const response = await generateGet(`/api/oj/problem?id=${problemId}`); // 替换成你的API地址
     console.log(response.data.data.data);
     const list = response.data.data.data;
     data.title = list.title;
