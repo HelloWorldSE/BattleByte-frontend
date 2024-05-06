@@ -24,6 +24,7 @@ export interface MatchEnterData {
 
 export interface ChatMsgData {
     fromId: number,
+    fromName?: string,
     message: string
 }
 
