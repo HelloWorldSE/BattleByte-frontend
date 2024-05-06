@@ -20,11 +20,11 @@
             v-model:file-list="fileList"
             action="#"
             list-type="picture-card"
-
+            @preview="handlePreview"
             :customRequest="customUpload"
             :multiple=false
             >
-            <!-- @preview="handlePreview" -->
+            <!--  -->
             <div v-if="fileList.length < 1">
                 <PlusOutlined />
                 <div style="margin-top: 8px">Upload</div>
@@ -79,7 +79,7 @@
         avatar: ''
     })
 
-    const emit = defineEmits(['update:modelValue', 'update:userName', 'update:userEmail']);
+    const emit = defineEmits(['update:modelValue']);
 
     const modalVisible = computed({
         get: () => props.modelValue,
@@ -106,11 +106,11 @@
                 message.success('修改成功');
                 loading.value = false;
                 if (formState.userName != '') {
-                    emit('update:userName', formState.userName);
+                    // emit('update:userName', formState.userName);
                     formState.userName = '';
                 }
                 if (formState.email != '') {
-                    emit('update:userEmail', formState.email);
+                    // emit('update:userEmail', formState.email);
                     formState.email = '';
                 }
                 // if (formState.avatar != '') {
@@ -121,6 +121,7 @@
                 formState.email = '';
                 formState.avatar = '';
                 emit('update:modelValue', false);
+                location.reload();
             } else {
                 message.error('修改失败');
                 loading.value = false;
@@ -202,6 +203,7 @@
                     console.log(res);
                     if (res.data.status === 0) {
                         message.success('上传成功');
+                        fileInfo.onSuccess(res, file)
                         formState.avatar = res.data.data;
                         // file.onSuccess(res, file.file)
                         file.status = 'done'

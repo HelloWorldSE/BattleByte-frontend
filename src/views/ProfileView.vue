@@ -2,7 +2,7 @@
 import { Grid, Row, Col, Avatar, Card, TabPane, Table, Tabs, List, ListItem, ListItemMeta, Pagination, Button, Skeleton, Flex, InputSearch } from "ant-design-vue";
 import { generateGet } from "@/utils/protocol";
 import { useRoute, useRouter } from "vue-router";
-import { ref, computed, reactive, onMounted, nextTick } from "vue";
+import { ref, computed, reactive, onMounted, nextTick, onUpdated } from "vue";
 import TopNav from "@/components/TopNav.vue";
 import EditProfile from "@/components/EditProfile.vue";
 import EditPassword from "@/components/EditPassword.vue";
@@ -101,7 +101,13 @@ const initProfile = async () => {
 }
 
 initProfile();
+// onMounted(() => {
+//     initProfile();
+// });
 
+// onUpdated(() => {
+//     initProfile();
+// });
 // 朋友页面 翻页逻辑
 const count = 5;
 const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat,picture&noinfo`;
@@ -232,6 +238,16 @@ const searchFriends = () => {
     console.log(todo_member.value);
 }
 
+const clickUserName = (item:any) => {
+    console.log("this user id is", item.id);
+    router.push(`/user/profile/${item.id}`);
+    
+    // 服务器使用需要修改
+    window.location.href = 'http://http://81.70.241.166/user/profile/' + item.id;
+
+    // window.location.href = 'http://127.0.0.1:5173/user/profile/' + item.id;
+    // location.reload();
+}
 </script>
 
 
@@ -300,10 +316,10 @@ const searchFriends = () => {
                                         :description="item.userEmail"
                                     >
                                         <template #title>
-                                        <a href="https://www.antdv.com/">{{ item.userName }}</a>
+                                        <a @click="clickUserName(item)">{{ item.userName }}</a>
                                         </template>
                                         <template #avatar>
-                                        <Avatar :src="item.avatar" />
+                                        <Avatar :src="'http://81.70.241.166/avatar/' + item.avatar" />
                                         </template>
                                     </ListItemMeta>
                                     <div>content</div>

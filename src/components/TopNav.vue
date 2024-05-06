@@ -1,9 +1,9 @@
 <template>
-  <Row>
+  <!-- <Row>
     <Col span="6"></Col>
     <Col span="12"></Col>
     <Col span="6"></Col>
-  </Row>
+  </Row> -->
 
   <div class="components-top-nav">
     <div class="left">
@@ -41,9 +41,9 @@
 <!--     右侧部分内容-->
     <div class="right">
       <Tooltip title="打开设置">
-        <Button type="primary" @click="log_out" shape="circle">
-          <Avatar :src="pageAvatar" class="headImg"/>
-        </Button>
+        <!-- <Button @click="log_out" shape="circle"> -->
+          <Avatar :src="pageAvatar" class="headImg" @click="log_out"/>
+        <!-- </Button> -->
       </Tooltip>
       
     </div>
@@ -54,7 +54,7 @@
 import {ref, watch} from 'vue';
 import { useRouter } from 'vue-router';
 import { MailOutlined, AppstoreOutlined, SettingOutlined,SkinOutlined } from '@ant-design/icons-vue';
-import { Menu, MenuItem, SubMenu, MenuItemGroup, Button, Tooltip, Row, Col } from 'ant-design-vue';
+import { Menu, MenuItem, SubMenu, MenuItemGroup, Button, Tooltip, Row, Col, Avatar } from 'ant-design-vue';
 import type {Key} from "ant-design-vue/es/_util/type";
 import { useHallState } from '@/stores/hall';
 import { generateGet } from '@/utils/protocol';
@@ -69,7 +69,7 @@ const handleClick = (event: { key: string | number }) => {
   const {key} = event;
   console.log('key:', key);
   if (key === 'userProfile') {
-    router.push(`/userProfile/${thisId}`);
+    router.push(`/user/profile/${thisId}`);
   }
   else if (typeof key == 'string') {
     router.push(key);
@@ -92,18 +92,33 @@ const log_out = () => {
 
 const avatar = ref<string>('');
 const initProfile = async () => {
+
   // getAvatar
-  generateGet("api/upload/getAvatar", { id: thisId }).then((res) => {
+
+  generateGet("api/user/profile", { id: thisId }).then((res) => {
         if (res.data.status === 0) {
             console.log(res);
-            // decode Base64 to image
-            pageAvatar.value = 'data:image/png;base64,' + res.data.data;
-            // pageAvatar.value = res.data.data;
+            // pageUserName.value = res.data.data.userName;
+            // pageEmail.value = res.data.data.userEmail;
+            pageAvatar.value = 'http://81.70.241.166/avatar/' + res.data.data.avatar;
             console.log('pageAvatar:', pageAvatar);
+
+
+            // friends = res.data.friends;
         } else {
             console.log(res);
-        }
-    });
+        }});
+  // generateGet("api/upload/getAvatar", { id: thisId }).then((res) => {
+  //       if (res.data.status === 0) {
+  //           console.log(res);
+  //           // decode Base64 to image
+  //           pageAvatar.value = 'data:image/png;base64,' + res.data.data;
+  //           // pageAvatar.value = res.data.data;
+  //           console.log('pageAvatar:', pageAvatar);
+  //       } else {
+  //           console.log(res);
+  //       }
+  //   });
 };
 
 initProfile();
@@ -114,7 +129,7 @@ initProfile();
 .components-top-nav {
   display: flex;
   align-items: center;
-  padding: 10px;
+  /* padding: 10px; */
   background: #eaf3f8;
   color: #000;
   height: 100%; /* 让 TopNav 高度与父容器相同 */
