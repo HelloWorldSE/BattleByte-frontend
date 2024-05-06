@@ -135,7 +135,6 @@ h1 {
 
 
 .sample {
-  display: flex;
   justify-content: space-between; /* 左右对齐 */
 
   .input, .output {
