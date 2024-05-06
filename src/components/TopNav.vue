@@ -15,7 +15,7 @@
       <div class="title">BattleByte</div>
     </div>
     <!-- 中间部分内容 -->
-    <div class="middle">
+    <div class="middle" v-if="thisId!==null">
       <Menu
           mode="horizontal"
           theme="light"
@@ -39,22 +39,37 @@
       </Menu>
     </div>
 <!--     右侧部分内容-->
-    <div class="right">
-      <Tooltip title="退出登录">
-        <!-- <Button @click="log_out" shape="circle"> -->
-          <Avatar :src="pageAvatar" class="headImg" @click="log_out"/>
-        <!-- </Button> -->
-      </Tooltip>
-      
+    <div class="right" v-if="thisId!==null">
+  
+        <Dropdown>
+        <Avatar :src="pageAvatar" class="headImg"/>
+        <template #overlay>
+          <Menu>
+            <MenuItem key="1" @click="pushProfile">
+              <ProfileOutlined />
+              个人中心
+            </MenuItem>
+            <MenuItem key="2">
+              <MessageOutlined />
+              消息
+            </MenuItem>
+            <MenuItem key="3" @click="log_out">
+              <LogoutOutlined />
+              退出登录
+            </MenuItem>
+          </Menu>
+        </template>
+        </Dropdown>
+  
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {ref, watch} from 'vue';
+import {reactive, ref, watch, h} from 'vue';
 import { useRouter } from 'vue-router';
-import { MailOutlined, AppstoreOutlined, SettingOutlined,SkinOutlined } from '@ant-design/icons-vue';
-import { Menu, MenuItem, SubMenu, MenuItemGroup, Button, Tooltip, Row, Col, Avatar } from 'ant-design-vue';
+import { MailOutlined, AppstoreOutlined, SettingOutlined,SkinOutlined,LogoutOutlined,MessageOutlined,ProfileOutlined } from '@ant-design/icons-vue';
+import { Menu, MenuItem, SubMenu, MenuItemGroup, Button, Tooltip, Row, Col, Avatar, Dropdown } from 'ant-design-vue';
 import type {Key} from "ant-design-vue/es/_util/type";
 import { useHallState } from '@/stores/hall';
 import { generateGet } from '@/utils/protocol';
@@ -70,6 +85,7 @@ const handleClick = (event: { key: string | number }) => {
   console.log('key:', key);
   if (key === 'userProfile') {
     router.push(`/user/profile/${thisId}`);
+    window.location.href = `http://81.70.241.166/user/profile/${thisId}`;
   }
   else if (typeof key == 'string') {
     router.push(key);
@@ -88,6 +104,12 @@ const log_out = () => {
 
 }
 
+const pushProfile = () => {
+
+  router.push(`/user/profile/${thisId}`);
+  window.location.href = `http://81.70.241.166/user/profile/${thisId}`;
+
+}
 
 
 const avatar = ref<string>('');
@@ -169,14 +191,17 @@ initProfile();
 .right {
   display: flex;
   align-items: center;
+  width: 8%;
   /* font-color: #ffffff; */
 }
 
-.right .headImg {
+.headImg {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  margin-right: 5px;
+  margin-right: 5px; 
+  cursor: pointer;
+  z-index: 999;
 }
 
 .right .userName {

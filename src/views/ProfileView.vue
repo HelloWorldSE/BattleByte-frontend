@@ -119,6 +119,7 @@ const friendsLoading = ref(false);
 const friendsData = ref<Array<any>>([]);
 const friendsList = ref<Array<any>>([]);
 const customGapSize = ref(40);
+const todo_member = ref("")
 
 // onMounted(() => {
 //   fetch(fakeDataUrl)
@@ -158,7 +159,7 @@ const onLoadMoreFriends1 = (val: any) => {
     friendsLoading.value = true;
     const xx = [...new Array(count)].map(() => ({ loading: true, name: {}, picture: {} }))
     localFriends.value = xx;
-    generateGet("api/user/friend", { pageSize: onePageFriends, page: curFriendPage.value}).then((res) => {
+    generateGet("api/user/friend", {name: todo_member.value, pageSize: onePageFriends, page: curFriendPage.value}).then((res) => {
         if (res.data.status === 0) {
             // pageUserName = res.data.username;
             // pageEmail = res.data.email;
@@ -239,14 +240,14 @@ const logOut = () => {
     router.push("/auth/login");
 }
 
-const todo_member = ref("")
+
 
 const searchFriends = () => {
     console.log("todo_member is", todo_member.value);
     // curFriendPage = val;
 
     friendsLoading.value = true;
-    generateGet("api/user/friend", {name: todo_member.value, onePageFriends: onePageFriends}).then((res) => {
+    generateGet("api/user/friend", {name: todo_member.value, pageSize: onePageFriends}).then((res) => {
         if (res.data.status === 0) {
             friendsLoading.value = false;
             localFriends.value = res.data.data.content;
@@ -309,7 +310,7 @@ const clickUserName = (item:any) => {
 
                         <InputSearch
                             v-model:value="todo_member"
-                            placeholder="input search friend"
+                            placeholder="输入好友的名字"
                             style="width: 100%; margin:auto;"
                             @search="searchFriends"
                             />
