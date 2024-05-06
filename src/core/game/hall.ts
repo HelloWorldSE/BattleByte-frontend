@@ -29,7 +29,7 @@ export class Hall {
 
     constructor(private state_update_callback?: (new_value: HallStatus) => void,
                 private sync_callback: (
-                    type: 'POS_SYNC' | 'SCORE_SYNC' | 'ANSWER_RESULT' | 'CHAT_MSG',
+                    type: 'POS_SYNC' | 'SCORE_SYNC' | 'ANSWER_RESULT' | 'CHAT_MSG' | 'GAME_END',
                     data: any) => void = () => {}) {
 
         // use arrow function to avoid 'this'-bindings
@@ -66,6 +66,9 @@ export class Hall {
         const rcv_chat_msg = (data: any) => {
             this.sync_callback('CHAT_MSG', data)
         }
+        const rcv_game_end = (data: any) => {
+            this.sync_callback('GAME_END', data)
+        }
 
 
         const conn_state_change = (state: WSConnectState) => {
@@ -93,6 +96,7 @@ export class Hall {
         this.conn.conn.addListener('SCORE_SYNC', rcv_score_sync)
         this.conn.conn.addListener('ANSWER_RESULT', rcv_answer_result)
         this.conn.conn.addListener('CHAT_MSG', rcv_chat_msg)
+        this.conn.conn.addListener('GAME_END', rcv_game_end)
 
         // OFFLINE EVENT
         this.conn.registerStateChangeEvent(conn_state_change)
