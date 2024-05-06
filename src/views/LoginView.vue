@@ -145,7 +145,8 @@ function jump() {
 .login {
   min-width: 100vw;
   min-height: 100vh;
-  background-image: url("https://source.unsplash.com/featured/1600x900");
+  /* background-image: url("https://source.unsplash.com/featured/1600x900"); */
+  background-image: url("../assets/background1.jpg");
   background-size: cover;
   background-position: center;
   background-attachment: fixed; /* 这个属性可以使子元素的背景与当前背景重合 */
@@ -165,7 +166,7 @@ function jump() {
         /* top: 50%;
         left: 50%; */
         border-radius: 10%;
-        box-shadow: 10px 25px 50px -20px rgb(0 0 0 / 0.26);
+        box-shadow: 10px 25px 50px -20px rgb(0 0 0 / 0.35);
         display: flex;
 
         flex-direction: column;
@@ -181,7 +182,7 @@ function jump() {
     background: inherit;
     position: relative;
     border-radius: .05rem;
-    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.26);
+    box-shadow: 10px 25px 50px -20px rgb(0 0 0 / 0.35);
     /* z-index: -10; */
     /* filter: blur(10px); */
 
