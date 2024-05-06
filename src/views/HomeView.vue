@@ -42,6 +42,7 @@
     <!-- INFORMATION  -->
     <div class="information-container">
       <p class="name">{{ selectedPlanet.name }}</p>
+      <!--
       <p>
         题库题数 : {{ parseNumeriqueSpace(selectedPlanet.diameter * 1000) }}
       </p>
@@ -49,6 +50,7 @@
         平均完成时间 : {{ parseNumeriqueSpace(selectedPlanet.rotationTime) }} s
       </p>
       <p>历史最高排名 : {{ parseNumeriqueSpace(selectedPlanet.ua * 150) }} </p>
+      -->
     </div>
 
     <!-- ACTION  -->
