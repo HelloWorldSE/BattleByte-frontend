@@ -38,6 +38,9 @@ import { Form, Button, Input, FormItem, InputPassword } from "ant-design-vue";
 // import { useCookies } from "vue3-cookies";
 import {generatePost} from "@/utils/protocol";
 
+import { getUserId, isLoggedIn } from "@/utils/auth";
+import { useHallState } from "@/stores/hall";
+
 const formItem = Form.Item;
 const inputPassword = Input.Password;
 
@@ -45,6 +48,12 @@ const inputPassword = Input.Password;
 
 // 定义路由器，负责路由跳转
 const router = useRouter();
+
+// 如果已经登录，跳转 home
+if (isLoggedIn()) {
+  router.push('/')
+}
+
 
 // 定义一个没用的玩意
 const formRef = ref<FormInstance>()
@@ -78,23 +87,24 @@ const passWordCheck = async (_rule: Rule, value: string) => {
 }
 
 
+const hall = useHallState()
+
 const Login_Submit = async () => {
   const userName = formState.userName;
   const passWord = formState.passWord;
 
-  generatePost('auth/login', {userName:userName, passWord:passWord}).then((res) => {
+  generatePost('auth/login', {userName:userName, password:passWord}).then((res) => {
     console.log(res);
-    if (res.data.code === 200) {
+    if (res.data.status === 0) {
       // 登录成功
       // 保存token
-      localStorage.setItem('token', res.data.token);
-
-      // 保存所有
-      localStorage.setItem('userInfo', JSON.stringify(res.data));
-
-      let userId = res.data.userId;
-      // 跳转到个人主页
-      router.push('/user/profile/' + userId);
+      localStorage.setItem('token', res.data.data.token);
+      
+      hall.hall.login()
+      
+      let userId = getUserId();
+      localStorage.setItem('userId', userId);
+      router.push('/user/profile/' + `${userId}`);
     } else {
       // 登录失败
       console.log('登录失败');

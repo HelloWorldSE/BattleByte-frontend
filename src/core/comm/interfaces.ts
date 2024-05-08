@@ -13,6 +13,26 @@ export interface LoginResultData {
     message: string
 }
 
+export interface MatchEnterData {
+    info: {
+        questionId: number
+    },
+    playerMap: {
+        [team_id: string]: number
+    }
+}
+
+export interface ChatMsgData {
+    fromId: number,
+    message: string
+}
+
+export interface PosSyncData {
+    user_id: number,
+    row: number,
+    col: number,
+    total_row: number
+}
 
 export interface ErrorData {
     ack: number,

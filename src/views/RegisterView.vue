@@ -43,8 +43,12 @@
   import {reactive, ref, defineComponent} from "vue";
   import type {Rule} from "ant-design-vue/es/form";
   import {useRouter} from 'vue-router';
-  import { Form, Button, Input, FormItem, InputPassword } from "ant-design-vue";
+  import { Form, Button, Input, FormItem, InputPassword, message } from "ant-design-vue";
   import {generatePost} from "@/utils/protocol";
+
+  import { getUserId } from "@/utils/auth";
+  import { useHallState } from "@/stores/hall";
+
   
   const formItem = Form.Item;
   const inputPassword = Input.Password;
@@ -53,6 +57,11 @@
   
   // 定义路由器，负责路由跳转
   const router = useRouter();
+  
+  // 如果已经登录，跳转 home
+  if (isLoggedIn()) {
+    router.push('/')
+  }
   
   // 定义一个没用的玩意
   const formRef = ref<FormInstance>()
@@ -109,25 +118,33 @@
     }
   }
   
+  const hall = useHallState()
+
   // 登录按钮：路由跳转
   const Login_Submit = async () => {
     const userName = formState.userName;
     const passWord = formState.passWord;
     const email = formState.email;
 
-    generatePost('auth/register', {userName:userName, passWord:passWord, email:email}).then((res) => {
+    generatePost('auth/register', {userName:userName, password:passWord, userEmail:email}).then((res) => {
       console.log(res);
-      if (res.data.code === 200) {
-        // 登录成功
-        // 保存token
-        localStorage.setItem('token', res.data.token);
-        localStorage.setItem('userInfo', JSON.stringify(res.data));
-        // 跳转到首页
-        router.push('/');
+      if (res.data.status === 0) {
+        // localStorage.setItem('token', res.data.token);
+        // hall.hall.login();
+        // let userId = getUserId();
+        // localStorage.setItem('userId', userId);
+        message.info('注册成功')
+        router.push('/auth/login');
+        
+        // 跳转到主页
+        // router.push('/');
       } else {
         // 登录失败
+      
         console.log('注册失败');
-        alert('注册失败');
+        alert('注册失败, 错误信息：' + res.data.msg);
+
+
       }
     }).catch((err) => {
       console.log(err);

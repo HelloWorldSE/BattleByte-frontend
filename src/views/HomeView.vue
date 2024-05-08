@@ -1,5 +1,9 @@
 <template>
+  <div class="topBar">
+    <TopNav/>
+  </div>
   <div id="app">
+    <div class="star" v-for="n in 400"></div>
     <!-- MAIN CONTENT  -->
     <div class="sun" :style="sunStyle()"></div>
     <div
@@ -26,14 +30,22 @@
     </div>
 
     <div class="match-button">
-      <button @click="onClickMatch()">
+      <button @click="onClickMatch()" type="primary" ghost>
         开始匹配
       </button>
+    </div>
+
+    <div v-if="matching" class="match-button" style="z-index: 999;">
+      <button @click="cancelMatch">取消匹配</button>
     </div>
 
     <!-- INFORMATION  -->
     <div class="information-container">
       <p class="name">{{ selectedPlanet.name }}</p>
+      <p>
+        当前在线人数 :    {{ peopleNum }}
+      </p>
+      <!--
       <p>
         题库题数 : {{ parseNumeriqueSpace(selectedPlanet.diameter * 1000) }}
       </p>
@@ -41,9 +53,11 @@
         平均完成时间 : {{ parseNumeriqueSpace(selectedPlanet.rotationTime) }} s
       </p>
       <p>历史最高排名 : {{ parseNumeriqueSpace(selectedPlanet.ua * 150) }} </p>
+      -->
     </div>
 
     <!-- ACTION  -->
+    <!--
     <div class="action-container">
       <div>
 				<span v-for="m in modes">
@@ -72,32 +86,47 @@
         </button>
       </div>
     </div>
+    -->
   </div>
 </template>
 
 <script>
 import {Modal, message} from 'ant-design-vue';
+import TopNav from "@/components/TopNav.vue";
+import {useHallState} from '@/stores/hall';
+import {mapStores} from 'pinia';
+import {isLoggedIn} from '@/utils/auth'
+import {generateGet} from "@/utils/protocol";
 
 export default {
   components: {
+    TopNav,
     'a-modal': Modal
   },
   created() {
     this.infoModalVisible = false;
+
+    // 如果没有登录，跳转 login
+    if (!isLoggedIn()) {
+      this.$router.push('/auth/login')
+    }
   },
   // ##################################################
   // DATA #############################################
   // ##################################################
   data() {
     return {
+      peopleNum: 1,
+      timer: null,
+      matching: false,
       infoModalVisible: false,
       mode: null,
       modes: ["WIDTH", "SPEED", "DISTANCE"],
-      speedRatio: 50,
+      speedRatio: 1, // 初始为1，否则speed模式下转的太快
       speedReal: false,
       sun: {
-        diameter: "1392",
-        colors: ["gold", "orange"]
+        diameter: "0.01",
+        colors: [] // "gold", "orange"
       },
       selectedPlanetId: 3,
       planetsFilteredLength: 0,
@@ -143,43 +172,43 @@ export default {
           diameter: "120.0",
           rotationTime: "4332.6",
           ua: "5.2",
-          colors: ["#876f51", "#9c661f"],
-          satellites: [
+          colors: [], // "#876f51", "#9c661f"
+          /* satellites: [
             {
               name: "Io",
               diameter: "3.6432",
               rotationTime: "1.769",
               distance: "421,8",
-              colors: ["green", "yellow"]
+              colors: [] // "green", "yellow"
             },
             {
               name: "europe",
               diameter: "3.1216",
               rotationTime: "3.551",
               distance: "671,1",
-              colors: ["brown", "pink"]
+              colors: [] // "brown", "pink"
             },
             {
               name: "ganymede",
               diameter: "5.2644",
               rotationTime: "7.15",
               distance: "1070,4",
-              colors: ["blue", "cyan"]
+              colors: [] // "blue", "cyan"
             },
             {
               name: "callisto",
               diameter: "4.8206",
               rotationTime: "16.689",
               distance: "1882,7",
-              colors: ["orange", "grey"]
+              colors: [] // "orange", "grey"
             }
-          ]
+          ] */
         },
         {
-          name: "多人模式",
+          name: "单人模式",
           diameter: "120.0",
-          rotationTime: "10759.2",
-          ua: "9.5",
+          rotationTime: "4332",
+          ua: "5.2",
           colors: ["#b09f74", "#b8902a"],
           satellites: [
             {
@@ -224,15 +253,15 @@ export default {
           diameter: "120.0",
           rotationTime: "30688.4",
           ua: "19.2",
-          colors: ["#a3bebf", "#387a7d"],
-          satellites: [
+          colors: [], // "#a3bebf", "#387a7d"
+          /* satellites: [
             {
               name: "titania",
               diameter: "0.7884",
               rotationTime: "8.7",
               colors: ["#387a7d", "#a3bebf"]
             }
-          ]
+          ] */
         },
         {
           name: "mars",
@@ -247,13 +276,13 @@ export default {
           rotationTime: "60181.3",
           ua: "30.1",
           colors: ["#7f8dc7", "#01146b"],
-          satellites: [
+          /* satellites: [
             {
               name: "triton",
               diameter: "2.7068",
               rotationTime: "5.877",
               colors: []
-              /* "forestgreen", "#7f8dc7" */
+              /* "forestgreen", "#7f8dc7"
             },
             {
               name: "néréide",
@@ -261,7 +290,7 @@ export default {
               rotationTime: "360.14",
               colors: ["#01146b", "#7f8dc7"]
             }
-          ]
+          ] */
         }
       ]
     };
@@ -271,6 +300,11 @@ export default {
   // COMPUTED #########################################
   // ##################################################
   computed: {
+    // #########
+    // ## Global status import
+    // #########
+    ...mapStores(useHallState),
+
     selectedPlanet() {
       return this.planets[this.selectedPlanetId];
     },
@@ -317,18 +351,48 @@ export default {
   mounted() {
     this.mode = this.modes[0];
     this.planetsFilteredLength = this.planets.length;
+    this.startTimer();
+  },
+  destroyed() {
+    // 组件销毁前清除定时器，防止内存泄漏
+    this.stopTimer();
   },
 
   // ##################################################
   // METHODS ##########################################
   // ##################################################
   methods: {
+    startTimer() {
+
+      this.timer = setInterval(() => {
+        this.updatePeopleNum();
+      }, 500); // 500毫秒 = 0.5秒
+    },
+    // 停止定时器
+    stopTimer() {
+      clearInterval(this.timer); // 清除定时器
+    },
+    updatePeopleNum() {
+      generateGet('/onlineCount').then((res) => {
+        res=res.data
+        if (res.status === 0) {
+          this.peopleNum = res.data;
+        } else {
+          console.log("error:", res.msg);
+        }
+      })
+    },
     // ACTION ##################################################
     switchMode(m) {
       this.mode = m;
       this.planetsFilteredLength = this.planets.length;
     },
+    cancelMatch() {
+      window.location.reload();
+      this.matching = false;
+    },
     onClickMatch() {
+      this.matching = true;
       this.mode = "SPEED";
       setTimeout(() => {
         this.mode = "DISTANCE";
@@ -353,6 +417,8 @@ export default {
           this.planetsFilteredLength--;
         }
       }, 9000);
+
+      this.hall_stateStore.hall.match_request()
     },
     zoomIn() {
       if (this.planetsFilteredLength > 4) {
@@ -365,13 +431,18 @@ export default {
       }
     },
     onClickPlanet(i) {
-      console.log("onClickPlanet", i);
-      this.selectedPlanetId = i;
-      this.infoModalVisible = true;
-      let shit = (this.infoModalVisible == true) ? 1 : 0;
-      message.success(shit);
+      if (i == 4) {
+        console.log("onClickPlanet", i);
+        this.selectedPlanetId = i;
+        this.infoModalVisible = true;
+        // let signal = (this.infoModalVisible == true) ? 1 : 0;
+        // message.success(signal);
+      }
     },
     onClickPlanetContainer(i) {
+      if (this.mode === "WIDTH" || this.mode === "SPEED" || this.mode === "DISTANCE") {
+        return;
+      }
       if (this.mode !== "WIDTH") {
         console.log("onClickPlanetContainer", i);
         this.selectedPlanetId = i;
@@ -646,11 +717,27 @@ export default {
   }
 };
 </script>
-<style lang="scss">
-body {
-  overflow: hidden;
-  background: black;
+
+<style scoped>
+
+.topBar {
+  z-index: 1005;
+  width: 100%;
+  overflow: hidden; /* 隐藏超出部分 */
+  height: 60px;
+  position: relative; /* 确保 TopNav 绝对定位相对于 .top */
 }
+
+#app {
+  background-color: black; /* 设置背景为黑色 */
+  min-height: 100vh; /* 至少为视口的100%高度 */
+  display: flex;
+  flex-direction: column; /* 如果你需要垂直布局 */
+  align-items: stretch; /* 使子元素填满容器宽度 */
+}
+</style>
+
+<style lang="scss">
 
 .planet_container,
 .planet,
@@ -693,21 +780,21 @@ body {
 .planet_container-DISTANCE {
   transition: all ease 2s, box-shadow ease 0.6s;
 
-  &:hover {
+  /* &:hover {
     box-shadow: 0 0 25px white !important;
 
     .planet {
       box-shadow: 0 0 25px white !important;
     }
-  }
+  } */
 }
 
 .planet-WIDTH {
   transition: all ease 2s, box-shadow ease 0.6s;
 
-  &:hover {
+  /* &:hover {
     box-shadow: 0 0 25px white !important;
-  }
+  } */
 }
 
 .action-container {
@@ -793,6 +880,23 @@ body {
     font-size: 16px;
     letter-spacing: 2px;
     color: white;
+  }
+}
+
+.star {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  border-radius: 1px;
+  background: #fff;
+  @for $i from 1 through 400 {
+    &:nth-child(#{$i}) {
+      $randomOpacity: (random(95 + 1) + 5 - 1) / 100;
+      left: random(1000) / 10 * 1% - 1%;
+      bottom: random(1000) / 10 * 1% - 1%;
+      opacity: $randomOpacity;
+      box-shadow: 0 0 6px 1px rgba(255, 255, 255, $randomOpacity);
+    }
   }
 }
 </style>

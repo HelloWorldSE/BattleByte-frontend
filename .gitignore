@@ -30,5 +30,8 @@ coverage
 *.tsbuildinfo
 
 src/views/TestView.vue
+src/views/ParentView.vue
+src/components/Test1.vue
+src/components/ChildComponent.vue
 src/assets/1.jpg
 mock/api.mock.ts

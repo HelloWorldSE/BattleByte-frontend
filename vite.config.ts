@@ -9,7 +9,7 @@ import mockDevServerPlugin from 'vite-plugin-mock-dev-server'
 export default defineConfig({
   plugins: [
     vue(),
-    // mockDevServerPlugin()
+    // mockDevServerPlugin()  // 如果要使用 mock，取消该注释；否则直接向后端发送请求
   ],
   resolve: {
     alias: {
@@ -18,9 +18,9 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '^/api': 'http://example.com',
+      '^/api': 'http://81.70.241.166/',
       '/socket': {
-        target: 'ws://localhost:5174',
+        target: 'ws://81.70.241.166/', // 'ws://localhost:5174',
         ws: true
       }
     }
