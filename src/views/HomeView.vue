@@ -43,7 +43,7 @@
     <div class="information-container">
       <p class="name">{{ selectedPlanet.name }}</p>
       <p>
-        当前在线人数 :
+        当前在线人数 :    {{ peopleNum }}
       </p>
       <!--
       <p>
@@ -96,6 +96,7 @@ import TopNav from "@/components/TopNav.vue";
 import {useHallState} from '@/stores/hall';
 import {mapStores} from 'pinia';
 import {isLoggedIn} from '@/utils/auth'
+import {generateGet} from "@/utils/protocol";
 
 export default {
   components: {
@@ -115,6 +116,8 @@ export default {
   // ##################################################
   data() {
     return {
+      peopleNum: 1,
+      timer: null,
       matching: false,
       infoModalVisible: false,
       mode: null,
@@ -348,12 +351,37 @@ export default {
   mounted() {
     this.mode = this.modes[0];
     this.planetsFilteredLength = this.planets.length;
+    this.startTimer();
+  },
+  destroyed() {
+    // 组件销毁前清除定时器，防止内存泄漏
+    this.stopTimer();
   },
 
   // ##################################################
   // METHODS ##########################################
   // ##################################################
   methods: {
+    startTimer() {
+
+      this.timer = setInterval(() => {
+        this.updatePeopleNum();
+      }, 500); // 500毫秒 = 0.5秒
+    },
+    // 停止定时器
+    stopTimer() {
+      clearInterval(this.timer); // 清除定时器
+    },
+    updatePeopleNum() {
+      generateGet('/onlineCount').then((res) => {
+        res=res.data
+        if (res.status === 0) {
+          this.peopleNum = res.data;
+        } else {
+          console.log("error:", res.msg);
+        }
+      })
+    },
     // ACTION ##################################################
     switchMode(m) {
       this.mode = m;
@@ -854,6 +882,7 @@ export default {
     color: white;
   }
 }
+
 .star {
   position: absolute;
   width: 1px;
