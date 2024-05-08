@@ -147,6 +147,8 @@ onMounted(() => {
     scrollBeyondLastLine: false,
     colorDecorators: true,
     accessibilitySupport: 'off',
+    copyAndPasteEnabled: false,
+    contextmenu: false,
     lineNumbers: 'on',
     lineNumbersMinChars: 5,
     enableSplitViewResizing: false,
@@ -162,6 +164,13 @@ onMounted(() => {
       const suggestions = generateCompletionItems(lineText);
       return {suggestions};
     },
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'v')) {
+      e.preventDefault();
+      console.log('不可以CV哦！');
+    }
   });
 
   updateMaxLine()
@@ -222,7 +231,7 @@ const status_name = {
   '-2': 'Compile Error',
   '-1': 'Wrong Answer',
   '0': 'Accepted',
-  '1': 'Time Limit Exceeded',  
+  '1': 'Time Limit Exceeded',
   '2': 'Time Limit Exceeded',
   '3': 'Memory Limit Exceeded',
   '4': 'Runtime Error',
@@ -317,7 +326,7 @@ const handleChangeFontSize = (event) => {
 const handleChangeLineHeight = (event) => {
   lineHeight.value = parseInt(event);
   monacoEditor?.updateOptions({lineHeight: lineHeight.value});
-  
+
   curpos_pos_my.value.height = `${lineHeight.value}px`
   updateMaxLine()
   updatePosShow()
