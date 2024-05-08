@@ -42,6 +42,9 @@
     <!-- INFORMATION  -->
     <div class="information-container">
       <p class="name">{{ selectedPlanet.name }}</p>
+      <p>
+        当前在线人数 :
+      </p>
       <!--
       <p>
         题库题数 : {{ parseNumeriqueSpace(selectedPlanet.diameter * 1000) }}
@@ -119,7 +122,7 @@ export default {
       speedRatio: 1, // 初始为1，否则speed模式下转的太快
       speedReal: false,
       sun: {
-        diameter: "1392",
+        diameter: "0.01",
         colors: [] // "gold", "orange"
       },
       selectedPlanetId: 3,
