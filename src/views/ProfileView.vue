@@ -6,6 +6,9 @@ import { ref, computed, reactive, onMounted, nextTick, onUpdated } from "vue";
 import TopNav from "@/components/TopNav.vue";
 import EditProfile from "@/components/EditProfile.vue";
 import EditPassword from "@/components/EditPassword.vue";
+import DeleteFriend from "@/components/profile/DeleteFriend.vue";
+import AddFriend from "@/components/profile/AddFriend.vue";
+
 import { useHallState } from "@/stores/hall";
 
 // import { defineComponent } from '@vue/composition-api';
@@ -27,16 +30,11 @@ const pageEmail = ref('');
 const pageAvatar = ref('');
 let pageFriends = ref(NaN);
 let friendPageNums = 1;
-let onePageFriends = 5;
+const onePageFriends = 5;
 
 const localFriends = ref<Array<any>>([]);
 const curFriendPage = ref(1);
 const totalFriendsPages = ref(0);
-
-
-const getImageUrl = (name: any) => {
-    return new URL(`${name}`, import.meta.url).href
-}
 
 // const pagination = computed(() => ({
 //   total: 200,
@@ -133,7 +131,7 @@ const todo_member = ref("")
 
 const onLoadMoreFriends = () => {
     friendsLoading.value = true;
-    const xx = (new Array(count)).map(() => ({ loading: true, name: {}, picture: {} }))
+    const xx = (new Array(count)).map(() => ({ loading: true, name: {}, avatar: {} }))
     friendsList.value = friendsData.value.concat(xx);
   fetch(fakeDataUrl)
     .then(res => res.json())
@@ -157,7 +155,7 @@ const onLoadMoreFriends1 = (val: any) => {
     console.log("curFriendPage:", curFriendPage);
     curFriendPage.value = val;
     friendsLoading.value = true;
-    const xx = [...new Array(count)].map(() => ({ loading: true, name: {}, picture: {} }))
+    const xx = [...new Array(onePageFriends)].map(() => ({ loading: true, name: {}, picture: {} }))
     localFriends.value = xx;
     generateGet("api/user/friend", {name: todo_member.value, pageSize: onePageFriends, page: curFriendPage.value}).then((res) => {
         if (res.data.status === 0) {
@@ -174,35 +172,19 @@ const onLoadMoreFriends1 = (val: any) => {
         } else {
             console.log(res);
         }});
-
-    // friendsList.value = xx;
-//   fetch(fakeDataUrl)
-//     .then(res => res.json())
-//     .then(res => {
-//       const newData = res.results;
-//       friendsLoading.value = false;
-//       friendsData.value = newData;
-//       friendsList.value = newData;
-//       friendsPage.value = val;
-//       nextTick(() => {
-//         window.dispatchEvent(new Event('resize'));
-//       });
-//     });
 };
-
-
-function getBase64(file: File) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
-  });
-}
 
 const fieldData = ref({
     openEditProfile: false,
     openEditPassword: false,
+    openDeleteFriend: false,
+    openAddFriend: false,
+});
+
+const deleteItem = ref({
+    userId: -1,
+    userName: '',
+    friendId: -1,
 });
 
 
@@ -230,7 +212,6 @@ const openEditPassword = () => {
     fieldData.value.openEditPassword = true;
     console.log('fieldData', fieldData);
 }
-
 
 const hall = useHallState();
 const logOut = () => {
@@ -272,6 +253,25 @@ const clickUserName = (item:any) => {
     // window.location.href = 'http://127.0.0.1:5173/user/profile/' + item.id;
     // location.reload();
 }
+
+const deleteOneFriend = (item:any) => {
+    console.log("this friend id is", item.id);
+    deleteItem.value.userId = item.id;
+    deleteItem.value.userName = item.userName;
+    deleteItem.value.friendId = item.friendId;
+    console.log("deleteItem is", deleteItem);
+    console.log("openDeleteFriend");
+    fieldData.value.openDeleteFriend = true;
+    console.log('fieldData', fieldData);
+}
+
+const openAddFriend = () => {
+    console.log("openAddFriend");
+    fieldData.value.openAddFriend = true;
+    console.log('fieldData', fieldData);
+}
+
+
 
 </script>
 
@@ -332,8 +332,9 @@ const clickUserName = (item:any) => {
                                 </template>
                                 <template #renderItem="{ item }">
                                 <ListItem>
+                                    
                                     <template #actions>
-                                    <a key="list-loadmore-edit">删除</a>
+                                    <a key="list-loadmore-edit" @click="deleteOneFriend(item)">删除</a>
                                     <a key="list-loadmore-more">聊天</a>
                                     </template>
                                     <Skeleton avatar :title="false" :loading="!!item.loading" active>
@@ -363,11 +364,15 @@ const clickUserName = (item:any) => {
     <Flex v-if="pageUserId===localUserId" :gap="customGapSize" id="buttonGroup" justify="center" align="center">
         <Button type="primary" @click="openEditProfile">修改个人信息</Button>
         <Button type="primary" @click="openEditPassword">修改密码</Button>
-        <Button type="primary">添加好友</Button>
+        <Button type="primary" @click="openAddFriend">添加好友</Button>
         <Button type="primary" @click="logOut">退出登录</Button>
     </Flex > 
     <EditProfile :userId="pageUserId" v-model="fieldData.openEditProfile" :userName="pageUserName" :userEmail="pageEmail" :avatar="pageAvatar"/>
     <EditPassword :userId="pageUserId" v-model="fieldData.openEditPassword"/>
+
+    <DeleteFriend :userId="deleteItem.userId" :userName="deleteItem.userName" :friendId="deleteItem.friendId" v-model="fieldData.openDeleteFriend"></DeleteFriend>
+    
+    <AddFriend :userId="pageUserId" v-model="fieldData.openAddFriend"></AddFriend>
 </template>
 
 <style scoped>

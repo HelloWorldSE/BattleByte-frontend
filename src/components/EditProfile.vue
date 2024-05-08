@@ -23,6 +23,7 @@
             @preview="handlePreview"
             :customRequest="customUpload"
             :multiple=false
+            :beforeUpload="beforeUpload"
             >
             <!--  -->
             <div v-if="fileList.length < 1">
@@ -222,36 +223,15 @@
             }
         }
 
-        const customUpload1 = async (file:any) => {
-            // const { file } = fileInfo;
-            const formData = new FormData();
-            try {
-                // const url = await getBase64(file); // 获取base64地址
-                formData.append('file', file.file);
-                generatePostAvatar('api/upload/avatar', formData).then((res) => {
-                    console.log('fileList.length is', fileList.value.length);
-                    console.log(res);
-                    if (res.data.status === 0) {
-                        message.success('上传成功');
-                        formState.avatar = res.data.data;
-                        file.onSuccess(res, file.file)
-                        file.status = 'done'
-                        
-                    } else {
-                        message.error('上传失败');
-                        // file.onSuccess(res, file.file)
-                        file.status = 'error'
-                    }
-                });
-                // formState.avatar = res.data.data;
-            } catch (err) {
-                message.info(String(err));
-            }
-        }
-
-   
-
-
-    
-    
+const beforeUpload = (file:any) => {
+    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+    if (!isJpgOrPng) {
+        message.error('请上传jpg或png文件!');
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+        message.error('图片必须小于2M!');
+    }
+    return isJpgOrPng && isLt2M;
+};
 </script>
