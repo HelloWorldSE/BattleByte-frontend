@@ -36,6 +36,9 @@
           <div class="curpos" :class="(player == my_userid) ? 'me' : 'enermy'" :style="curPosStyles[player]"></div>
           <div class="maxpos" :class="(player == my_userid) ? 'me' : 'enermy'" :style="maxLineStyles[player]"></div>
         </div>
+        <TransitionGroup>
+          <Tomato v-for="item in tomatoes" :show="item.show" :style="item.pos" :key="item.key"/>
+        </TransitionGroup>
       </div>
       <!-- 提交按钮 -->
       <Button class="submit-button" @click="handleSubmit" type="primary" shape="round">
@@ -51,6 +54,10 @@
       </div>
       <div>
         <Button class="surrender-button" @click="surrender">投降</Button>
+      </div>
+      <div>
+        <Button class="tomato-button" @click="tomato(1)" shape="circle">🍅</Button>
+        <Button class="tomato-3-button" @click="tomato(3)">🍅x3</Button>
       </div>
     </div>
   </div>
@@ -70,10 +77,50 @@ import { useHallState } from '@/stores/hall';
 import { getUserId } from '@/utils/auth';
 import { generatePost } from '@/utils/protocol';
 import router from '@/router';
+import Tomato from '@/components/items/tomato.vue';
 
 const surrender = () => {
   hall.hall.surrender()
 }
+
+const tomato = (number) => {
+  if (number == 1) {
+    hall.hall.use_item('tomato')
+  } else if (number == 3) {
+    hall.hall.use_item('tomato3')
+  }
+}
+
+const create_tomato = () => {
+  if (main) {
+    const editorContainer = main.value
+    const x = Math.random() * editorContainer.offsetWidth
+    const y = Math.random() * editorContainer.offsetHeight / 2
+    
+    tomatoes.value.push({
+      show: true,
+      pos: {left: `${x}px`, top: `${y}px`},
+      key: performance.now().toString()
+    })
+    setTimeout(() => {
+      tomatoes.value.shift()
+    }, 5000)
+  }
+}
+
+const tomatoes = ref([])
+const item_used_callback = (data) => {
+  if (data.type == 'tomato') {
+    create_tomato()
+  } else if (data.type == 'tomato3') {
+    create_tomato()
+    create_tomato()
+    create_tomato()
+  }
+}
+
+const hall = useHallState()
+hall.item_used_callback = item_used_callback
 
 
 let monacoEditor = null;
@@ -124,7 +171,6 @@ const sendPosUpdate = () => {
   )
 }
 
-const hall = useHallState()
 hall.pos_sync_callback = (data) => {
   const { user_id, ...rest } = data
   gameStore.posMap[user_id] = rest
@@ -352,6 +398,18 @@ const handleChangeLineHeight = (event) => {
   right: 90px;
   z-index: 1000; /* Ensure the button is above the editor */
 }
+.tomato-button {
+  position: absolute;
+  bottom: 10px;
+  right: 170px;
+  z-index: 1000; /* Ensure the button is above the editor */
+}
+.tomato-3-button {
+  position: absolute;
+  bottom: 10px;
+  right: 210px;
+  z-index: 1000; /* Ensure the button is above the editor */
+}
 
 .chat-box {
   position: absolute;
@@ -389,6 +447,16 @@ const handleChangeLineHeight = (event) => {
 }
 .curpos.enermy {
   background-color: red;
+}
+
+
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.v-leave-to {
+  opacity: 0;
 }
 
 </style>

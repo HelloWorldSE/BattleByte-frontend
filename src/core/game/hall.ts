@@ -29,7 +29,7 @@ export class Hall {
 
     constructor(private state_update_callback?: (new_value: HallStatus) => void,
                 private sync_callback: (
-                    type: 'POS_SYNC' | 'SCORE_SYNC' | 'ANSWER_RESULT' | 'CHAT_MSG' | 'GAME_END',
+                    type: 'POS_SYNC' | 'SCORE_SYNC' | 'ANSWER_RESULT' | 'CHAT_MSG' | 'GAME_END' | 'ITEM_USED',
                     data: any) => void = () => {}) {
 
         // use arrow function to avoid 'this'-bindings
@@ -69,6 +69,9 @@ export class Hall {
         const rcv_game_end = (data: any) => {
             this.sync_callback('GAME_END', data)
         }
+        const rcv_item_used = (data: any) => {
+            this.sync_callback('ITEM_USED', data)
+        }
 
 
         const conn_state_change = (state: WSConnectState) => {
@@ -97,6 +100,7 @@ export class Hall {
         this.conn.conn.addListener('ANSWER_RESULT', rcv_answer_result)
         this.conn.conn.addListener('CHAT_MSG', rcv_chat_msg)
         this.conn.conn.addListener('GAME_END', rcv_game_end)
+        this.conn.conn.addListener('ITEM_USED', rcv_item_used)
 
         // OFFLINE EVENT
         this.conn.registerStateChangeEvent(conn_state_change)
@@ -203,5 +207,11 @@ export class Hall {
     surrender() {
         this.conn.conn.send('SURRENDER', {})
         message.info('已发起投降！', 2)
+    }
+
+    use_item(type: string = 'ink') {
+        this.conn.conn.send('ITEM_SEND', {
+            type: type
+        })
     }
 }

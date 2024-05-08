@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { useConnector } from "./connector";
 import { Hall, HallStatus } from "@/core/game/hall";
 import { ref, watch } from "vue";
-import type { ChatMsgData, PosSyncData } from "@/core/comm/interfaces";
+import type { ChatMsgData, ItemUsedData, PosSyncData } from "@/core/comm/interfaces";
 
 export const useHallState = defineStore('hall_state', () => {
     const hallStatus = ref<HallStatus>(HallStatus.OFFLINE)
@@ -11,6 +11,7 @@ export const useHallState = defineStore('hall_state', () => {
     const rcv_answer_result = ref<(data: any) => void>(()=>{})
     const rcv_game_end = ref<(data: {result: 'win'|'lose'}) => void>(()=>{})
     const rcv_pos_sync = ref<(data: PosSyncData) => void>(()=>{})
+    const rcv_item_used = ref<(data: ItemUsedData) => void>(()=>{})
     
 
 
@@ -27,6 +28,8 @@ export const useHallState = defineStore('hall_state', () => {
                 rcv_pos_sync.value(data)
             } else if (type == 'GAME_END') {
                 rcv_game_end.value(data)
+            } else if (type == 'ITEM_USED') {
+                rcv_item_used.value(data)
             }
         }
     )
@@ -39,6 +42,7 @@ export const useHallState = defineStore('hall_state', () => {
         chat_msg_callback: rcv_chat_msg,
         answer_result_callback: rcv_answer_result,
         pos_sync_callback: rcv_pos_sync,
-        game_end_callback: rcv_game_end
+        game_end_callback: rcv_game_end,
+        item_used_callback: rcv_item_used,
     }
 })

@@ -26,7 +26,7 @@ import TopNav from "@/components/TopNav.vue";
   width: 50%;
   height: 650px; /* 为左右两部分设置一个固定高度 */
   float: left;
-  overflow-y: hidden; /* 取消垂直滚动条 */
+  overflow: hidden; /* 取消垂直滚动条 */
 }
 
 .top {

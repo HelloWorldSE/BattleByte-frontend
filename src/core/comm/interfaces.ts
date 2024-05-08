@@ -35,6 +35,11 @@ export interface PosSyncData {
     total_row: number
 }
 
+export interface ItemUsedData {
+    sender_id: number,
+    type: string
+}
+
 export interface ErrorData {
     ack: number,
     msg: string
