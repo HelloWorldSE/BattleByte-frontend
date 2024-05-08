@@ -56,7 +56,11 @@
               <MessageOutlined />
               消息
             </MenuItem>
-            <MenuItem key="3" @click="log_out">
+            <MenuItem key="3">
+              <BellOutlined />
+              新的朋友
+            </MenuItem>
+            <MenuItem key="4" @click="log_out">
               <LogoutOutlined />
               退出登录
             </MenuItem>
@@ -71,7 +75,7 @@
 <script lang="ts" setup>
 import {reactive, ref, watch, h} from 'vue';
 import { useRouter } from 'vue-router';
-import { MailOutlined, AppstoreOutlined, SettingOutlined,SkinOutlined,LogoutOutlined,MessageOutlined,ProfileOutlined } from '@ant-design/icons-vue';
+import { MailOutlined, AppstoreOutlined, SettingOutlined,SkinOutlined,LogoutOutlined,MessageOutlined,ProfileOutlined, BellOutlined } from '@ant-design/icons-vue';
 import { Menu, MenuItem, SubMenu, MenuItemGroup, Button, Tooltip, Row, Col, Avatar, Dropdown } from 'ant-design-vue';
 import type {Key} from "ant-design-vue/es/_util/type";
 import { useHallState } from '@/stores/hall';

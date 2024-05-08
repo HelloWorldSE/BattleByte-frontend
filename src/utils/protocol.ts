@@ -14,6 +14,11 @@ Promise<AxiosResponse<T>> {
     return axios.post(backend + path, data, {headers: {'Content-Type': 'application/json', 'token': localStorage.getItem('token')}})
 }
 
+export function generateDelete<T = any>(path:string, data?:any):
+Promise<AxiosResponse<T>> {
+    return axios.delete(backend + path, {data, headers: {'Content-Type': 'application/json', 'token': localStorage.getItem('token')}})
+}
+
 export function generatePostAvatar<T = any>(path:string, data?:any):
 Promise<AxiosResponse<T>> {
     return axios.post(backend + path, data, {headers: {'Content-Type': 'multipart/form-data', 'token': localStorage.getItem('token')}})
