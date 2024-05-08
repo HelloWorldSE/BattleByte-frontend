@@ -3,7 +3,7 @@
         <template #footer>
             <Button key="back" @click="cancel">关闭</Button>
         </template>
-    <InputSearch v-model:value="searchValue" @search="searchUser" placeholder="请输入用户名" style="width: 100%"></InputSearch>
+    <InputSearch v-model:value="searchValue" @search="searchUser" placeholder="请输入用户名" style="width: 100%" id="search"></InputSearch>
     <List class="loadMoreList" :loading="initLoading"
     item-layout="horizontal"
     :data-source="localUsers"
@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Modal, Button, Form, FormItem, Input, Upload, message, InputPassword, type FormInstance, InputSearch, List } from 'ant-design-vue';
+import { Modal, Button, Form, FormItem, Input, Upload, message, InputPassword, type FormInstance, InputSearch, List, ListItem, ListItemMeta, Skeleton, Avatar, Pagination } from 'ant-design-vue';
 import { ref, reactive } from 'vue';
 import type { Rule } from 'ant-design-vue/es/form';
 
@@ -158,3 +158,14 @@ const addApplication = (item:any) => {
 }
 
 </script>
+<style scoped>
+
+:deep(.ant-list-item-meta-content h4) {
+    margin-top: 0;
+}
+
+#search {
+    margin-bottom: 10px;
+    margin-top: 20px;
+}
+</style>
