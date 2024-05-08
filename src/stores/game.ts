@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 
 export const useGameStore = defineStore('game', () => {
-    const match_info = ref<MatchInfo>()
+    const match_info = ref<MatchInfo>({"playerMap":{"0":14,"1":15},"info":{"questionId":26}})
     
     const submit_list = ref<string[]>([])
 
