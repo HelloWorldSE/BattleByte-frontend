@@ -428,7 +428,7 @@ const openAddFriend = () => {
 
 #tabs {
     width: 100%;
-    margin-top: 20px;
+    margin-top: 0;
 }
 
 .demo-loadmore-list {

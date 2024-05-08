@@ -37,14 +37,18 @@
         <TypographyParagraph class="paragraph">
             如图为首页，点击页面下方的<TypographyText mark class="text">开始匹配</TypographyText>按钮即可进入单人模式的匹配。
         </TypographyParagraph>
-        <img src="../assets/rules/matching.png" alt="初始界面" style="width: 100%;"/>
+        <img src="../assets/rules/matching.png" alt="匹配界面" style="width: 100%;"/>
         <TypographyParagraph class="paragraph">
             如图为匹配界面，等待匹配成功后即可进入对战界面。
         </TypographyParagraph>
             
-        <img src="../assets/rules/problem.png" alt="初始界面" style="width: 100%;"/>
+        <img src="../assets/rules/problem.png" alt="对战界面" style="width: 100%;"/>
         <TypographyParagraph class="paragraph">
             如图为对战界面，左侧为题目描述，右侧为代码编辑器，右下角有聊天框，可以在聊天框内发送消息。同时右下角有头像和提交两个按钮，点击可以进行头像或提交评测的操作。代码编辑器支持多种语言，包括C++、Java、Python等，并在左上角可以选择语言，颜色主题，字体大小，行高等选项。
+        </TypographyParagraph>
+        <img src="../assets/rules/problem1.png" alt="对战界面1" style="width: 100%;"/>
+        <TypographyParagraph class="paragraph">
+            如图对战界面的右下角可以点击番茄道具向对手屏幕扔番茄阻挡视线。
         </TypographyParagraph>
         <TypographyTitle :level="2" id="Part4">项目地址</TypographyTitle>
         <!-- <TypographyParagraph class="paragraph"> -->
@@ -52,7 +56,12 @@
             <br/>
             <TypographyLink href="https://github.com/HelloWorldSE/BattleByte-backend" class="text">后端仓库</TypographyLink>
         <!-- </TypographyParagraph> -->
-        
+        <TypographyTitle :level="2" id="Part5">内测群二维码</TypographyTitle>
+        <img src="../assets/rules/QRcode.jpg" alt="二维码" style="width: 100%;"/>
+        <TypographyParagraph class="paragraph">
+            欢迎大家加入我们的内测群试玩BattleByte！
+        </TypographyParagraph>
+
     </Typography>
     </Col>
     <Col span="6">
@@ -97,6 +106,10 @@ const anchorItems = ref<Array<any>>( [
             {
                 title: '项目地址',
                 href: '#Part4',
+            },
+            {
+                title: '内测群二维码',
+                href: '#Part5',
             },
         ]
     }
