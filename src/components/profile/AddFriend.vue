@@ -1,5 +1,5 @@
 <template>
-    <Modal v-model:open="modalVisible" title="添加新朋友" @ok="handleOk" @cancel="cancel">
+    <Modal v-model:open="modalVisible" title="添加新朋友" @ok="handleOk" @cancel="cancel" centered>
         <template #footer>
             <Button key="back" @click="cancel">关闭</Button>
         </template>
