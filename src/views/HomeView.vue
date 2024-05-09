@@ -42,10 +42,10 @@
     <!-- INFORMATION  -->
     <div class="information-container">
       <p class="name">{{ selectedPlanet.name }}</p>
+      <!--
       <p>
         当前在线人数 :    {{ peopleNum ? peopleNum : "" }}
       </p>
-      <!--
       <p>
         题库题数 : {{ parseNumeriqueSpace(selectedPlanet.diameter * 1000) }}
       </p>
@@ -351,12 +351,12 @@ export default {
   mounted() {
     this.mode = this.modes[0];
     this.planetsFilteredLength = this.planets.length;
-    this.startTimer();
+    //this.startTimer();
   },
-  destroyed() {
+  /*destroyed() {
     // 组件销毁前清除定时器，防止内存泄漏
     this.stopTimer();
-  },
+  },*/
 
   // ##################################################
   // METHODS ##########################################
