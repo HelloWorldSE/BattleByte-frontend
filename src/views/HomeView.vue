@@ -43,7 +43,7 @@
     <div class="information-container">
       <p class="name">{{ selectedPlanet.name }}</p>
       <p>
-        当前在线人数 :    {{ peopleNum }}
+        当前在线人数 :    {{ peopleNum ? peopleNum : "" }}
       </p>
       <!--
       <p>
@@ -116,7 +116,7 @@ export default {
   // ##################################################
   data() {
     return {
-      peopleNum: 1,
+      peopleNum: null,
       timer: null,
       matching: false,
       infoModalVisible: false,
@@ -366,7 +366,7 @@ export default {
 
       this.timer = setInterval(() => {
         this.updatePeopleNum();
-      }, 500); // 500毫秒 = 0.5秒
+      }, 5); // 500毫秒 = 0.005秒
     },
     // 停止定时器
     stopTimer() {
