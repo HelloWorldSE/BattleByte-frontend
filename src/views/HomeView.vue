@@ -116,7 +116,7 @@ export default {
   // ##################################################
   data() {
     return {
-      peopleNum: null,
+      // peopleNum: null,
       timer: null,
       matching: false,
       infoModalVisible: false,
@@ -362,7 +362,7 @@ export default {
   // METHODS ##########################################
   // ##################################################
   methods: {
-    startTimer() {
+    /* startTimer() {
 
       this.timer = setInterval(() => {
         this.updatePeopleNum();
@@ -382,6 +382,7 @@ export default {
         }
       })
     },
+     */
     // ACTION ##################################################
     switchMode(m) {
       this.mode = m;
