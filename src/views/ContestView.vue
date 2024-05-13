@@ -6,13 +6,14 @@
     <QuestionView/>
   </div>
   <div class="right">
-    <CodeInputView />
+      <CodeInputView />
   </div>
 </template>
 <script setup lang="ts">
 import CodeInputView from "@/views/CodeInputView.vue";
 import QuestionView from "@/views/QuestionView.vue";
 import TopNav from "@/components/TopNav.vue";
+import ContestTable from "@/components/ContestTable.vue";
 </script>
 
 <style scoped>

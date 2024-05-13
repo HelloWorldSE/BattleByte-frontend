@@ -9,7 +9,7 @@
         <SelectOption value="JavaScript">javascript</SelectOption>
       </Select>
 
-      <Select name="theme"  style="width: 150px" v-model:value="style" @change="handleChangeTheme">
+      <Select name="theme" style="width: 150px" v-model:value="style" @change="handleChangeTheme">
         <SelectOption value="vs-dark">vsCode暗色主题</SelectOption>
         <SelectOption value="vs-light">vsCode亮色主题</SelectOption>
         <SelectOption value="hc-black">高对比度黑色主题</SelectOption>
@@ -40,24 +40,32 @@
           <Tomato v-for="item in tomatoes" :show="item.show" :style="item.pos" :key="item.key"/>
         </TransitionGroup>
       </div>
-      <!-- 提交按钮 -->
-      <Button class="submit-button" @click="handleSubmit" type="primary" shape="round">
-        提交
-      </Button>
-      <div class="chat-box">
-        <ChatBox />
-        <!--
-          {{gameStore.posMap}}
-          {{ curPosStyles[15] }}
-          {{ maxLineStyles[15]}}
-        -->
-      </div>
-      <div>
-        <Button class="surrender-button" @click="surrender">投降</Button>
-      </div>
-      <div>
-        <Button class="tomato-button" @click="tomato(1)" shape="circle">🍅</Button>
-        <Button class="tomato-3-button" @click="tomato(3)">🍅x3</Button>
+
+      <div class="bottom">
+        <div class="table">
+          <ContestTable/>
+        </div>
+        <div class="other">
+
+          <div class="chat-box">
+          <ChatBox/>
+          </div>
+          <!-- 提交按钮 -->
+          <Button class="submit-button" @click="handleSubmit" type="primary" shape="round">
+            提交
+          </Button>
+
+          <div>
+            <Button class="surrender-button" @click="surrender">
+              投降
+              <template #icon><FlagOutlined /> </template>
+            </Button>
+          </div>
+          <div>
+            <Button class="tomato-button" @click="tomato(1)">🍅</Button>
+            <Button class="tomato-3-button" @click="tomato(3)">🍅x3</Button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -65,19 +73,21 @@
 
 <script setup>
 import {ref, onMounted, computed} from 'vue';
-import {Button,Select,SelectOption, message} from 'ant-design-vue';
+import {Button, Select, SelectOption, message} from 'ant-design-vue';
+import {FlagOutlined} from '@ant-design/icons-vue';
 import * as monaco from 'monaco-editor';
 import axios from 'axios';
 import {generateCompletionItems} from '@/components/generateCompletionItem'; // 注意路径是否正确
 
-import { useGameStore } from '@/stores/game';
+import {useGameStore} from '@/stores/game';
 
 import ChatBox from '@/components/ChatBox.vue';
-import { useHallState } from '@/stores/hall';
-import { getUserId } from '@/utils/auth';
-import { generatePost } from '@/utils/protocol';
+import {useHallState} from '@/stores/hall';
+import {getUserId} from '@/utils/auth';
+import {generatePost} from '@/utils/protocol';
 import router from '@/router';
 import Tomato from '@/components/items/tomato.vue';
+import ContestTable from "@/components/ContestTable.vue";
 
 const surrender = () => {
   hall.hall.surrender()
@@ -96,7 +106,7 @@ const create_tomato = () => {
     const editorContainer = main.value
     const x = Math.random() * editorContainer.offsetWidth
     const y = Math.random() * editorContainer.offsetHeight / 2
-    
+
     tomatoes.value.push({
       show: true,
       pos: {left: `${x}px`, top: `${y}px`},
@@ -165,14 +175,14 @@ const updatePosShow = () => {
 }
 const sendPosUpdate = () => {
   hall.hall.pos_update(
-    gameStore.posMap[my_userid.value].row,
-    gameStore.posMap[my_userid.value].col,
-    gameStore.posMap[my_userid.value].total_rows
+      gameStore.posMap[my_userid.value].row,
+      gameStore.posMap[my_userid.value].col,
+      gameStore.posMap[my_userid.value].total_rows
   )
 }
 
 hall.pos_sync_callback = (data) => {
-  const { user_id, ...rest } = data
+  const {user_id, ...rest} = data
   gameStore.posMap[user_id] = rest
 }
 
@@ -222,7 +232,7 @@ onMounted(() => {
     sendPosUpdate()
   })
   monacoEditor.onDidScrollChange((e) => {
-    scrollOffset.value = - e.scrollTop
+    scrollOffset.value = -e.scrollTop
     updateMaxLine()
     updatePosShow()
   })
@@ -268,7 +278,7 @@ const status_name = {
   '-2': 'Compile Error',
   '-1': 'Wrong Answer',
   '0': 'Accepted',
-  '1': 'Time Limit Exceeded',  
+  '1': 'Time Limit Exceeded',
   '2': 'Time Limit Exceeded',
   '3': 'Memory Limit Exceeded',
   '4': 'Runtime Error',
@@ -285,7 +295,11 @@ const refresh_submit_status_callback = (data) => {
       if (data.result.data.result === 0) {
         message.success({content: '通过！', duration: 2, key: 'oj-pending'})
       } else {
-        message.warn({content: `未能通过，评测状态：${status_name[data.result.data.result.toString()]}`, duration: 2, key: 'oj-pending'})
+        message.warn({
+          content: `未能通过，评测状态：${status_name[data.result.data.result.toString()]}`,
+          duration: 2,
+          key: 'oj-pending'
+        })
       }
       clearInterval(refresh_timeout)
     }
@@ -294,7 +308,7 @@ const refresh_submit_status_callback = (data) => {
 
 const game_end_callback = (data) => {
   const match_res = data.result;
-  message.success(match_res, 2).then(()=> {
+  message.success(match_res, 2).then(() => {
     router.push('/')
   })
 }
@@ -309,12 +323,12 @@ const handleSubmit = async () => {
   console.log(code);
 
   console.log(`STAGE B`, gameStore.match_info, gameStore.match_info.info.questionId)
-  generatePost("/api/oj/submit",{
+  generatePost("/api/oj/submit", {
     problem_id: gameStore.match_info.info.questionId + 745,
     language: language.value,
     code: code
   }).then(res => {
-    if(res.data.status === 0){
+    if (res.data.status === 0) {
       console.log("提交成功");
     }
 
@@ -325,8 +339,8 @@ const handleSubmit = async () => {
       clearInterval(refresh_timeout)
     }
     refresh_timeout = setInterval(
-      refresh_submit_status
-    , 3000);
+        refresh_submit_status
+        , 3000);
 
     message.loading({content: '正在评测...', duration: 0, key: 'oj-pending'})
 
@@ -363,7 +377,7 @@ const handleChangeFontSize = (event) => {
 const handleChangeLineHeight = (event) => {
   lineHeight.value = parseInt(event);
   monacoEditor?.updateOptions({lineHeight: lineHeight.value});
-  
+
   curpos_pos_my.value.height = `${lineHeight.value}px`
   updateMaxLine()
   updatePosShow()
@@ -381,41 +395,59 @@ const handleChangeLineHeight = (event) => {
 
 .editor {
   width: 100%;
-  height: 617px;
+  height: 400px;
   flex: 1;
   position: relative;
 }
 
+.bottom {
+  width: 100%;
+  height: 200px;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.table {
+  width: 80%;
+  height: 100%;
+  float: left;
+  overflow-y: scroll;
+}
+
+.other {
+  width: 20%;
+  height: 100%;
+  float: left;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .submit-button {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
+  width: 50%;
+  margin: 5px;
   z-index: 1000; /* Ensure the button is above the editor */
 }
+
 .surrender-button {
-  position: absolute;
-  bottom: 10px;
-  right: 90px;
+  width: 50%;
+  margin: 5px;
   z-index: 1000; /* Ensure the button is above the editor */
 }
+
 .tomato-button {
-  position: absolute;
-  bottom: 10px;
-  right: 170px;
+  width: 48%;
   z-index: 1000; /* Ensure the button is above the editor */
 }
+
 .tomato-3-button {
-  position: absolute;
-  bottom: 10px;
-  right: 210px;
+  width: 48%;
   z-index: 1000; /* Ensure the button is above the editor */
 }
 
 .chat-box {
-  position: absolute;
-  bottom: 10px;
-  right: 90px;
-  width: 30%;
+  width: 100%;
   z-index: 1000;
   height: 28px;
 }
@@ -431,6 +463,7 @@ const handleChangeLineHeight = (event) => {
 .maxpos.me {
   background-color: green;
 }
+
 .maxpos.enermy {
   background-color: red;
 }
@@ -442,9 +475,11 @@ const handleChangeLineHeight = (event) => {
   background-color: green;
   z-index: 1000;
 }
+
 .curpos.me {
   background-color: green;
 }
+
 .curpos.enermy {
   background-color: red;
 }
