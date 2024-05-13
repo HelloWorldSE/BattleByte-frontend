@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useHallState } from '@/stores/hall';
 import { getUserId } from '@/utils/auth';
+import {SendOutlined} from '@ant-design/icons-vue';
 
 const hall = useHallState()
 hall.chat_msg_callback = (data) => {
@@ -58,11 +59,14 @@ const isSending = ref(false)
             </div>
         </div>
         <Row>
-            <Col :span="10">
-                <Input v-model:value="msgToSend" @press-enter="sendMsg"/>
+            <Col :span="18">
+              <Input v-model:value="msgToSend" @press-enter="sendMsg">
+              </Input>
             </Col>
             <Col :span="2">
-                <Button @click="sendMsg" :disabled="isSending">发送</Button>
+              <Button @click="sendMsg" :disabled="isSending">
+                  <template #icon><SendOutlined /></template>
+                </Button>
             </Col>
         </Row>
     </div>
