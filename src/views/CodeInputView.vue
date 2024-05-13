@@ -49,17 +49,20 @@
 
           <div class="chat-box">
           <ChatBox/>
-        </div>
+          </div>
           <!-- 提交按钮 -->
           <Button class="submit-button" @click="handleSubmit" type="primary" shape="round">
             提交
           </Button>
 
           <div>
-            <Button class="surrender-button" @click="surrender">投降</Button>
+            <Button class="surrender-button" @click="surrender">
+              投降
+              <template #icon><FlagOutlined /> </template>
+            </Button>
           </div>
           <div>
-            <Button class="tomato-button" @click="tomato(1)" shape="circle">🍅</Button>
+            <Button class="tomato-button" @click="tomato(1)">🍅</Button>
             <Button class="tomato-3-button" @click="tomato(3)">🍅x3</Button>
           </div>
         </div>
@@ -71,6 +74,7 @@
 <script setup>
 import {ref, onMounted, computed} from 'vue';
 import {Button, Select, SelectOption, message} from 'ant-design-vue';
+import {FlagOutlined} from '@ant-design/icons-vue';
 import * as monaco from 'monaco-editor';
 import axios from 'axios';
 import {generateCompletionItems} from '@/components/generateCompletionItem'; // 注意路径是否正确
@@ -401,13 +405,14 @@ const handleChangeLineHeight = (event) => {
   height: 200px;
   flex: 1;
   position: relative;
-  overflow: scroll;
+  overflow: hidden;
 }
 
 .table {
   width: 80%;
   height: 100%;
   float: left;
+  overflow-y: scroll;
 }
 
 .other {
@@ -416,23 +421,28 @@ const handleChangeLineHeight = (event) => {
   float: left;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .submit-button {
+  width: 50%;
+  margin: 5px;
   z-index: 1000; /* Ensure the button is above the editor */
 }
 
 .surrender-button {
-
+  width: 50%;
+  margin: 5px;
   z-index: 1000; /* Ensure the button is above the editor */
 }
 
 .tomato-button {
-
+  width: 48%;
   z-index: 1000; /* Ensure the button is above the editor */
 }
 
 .tomato-3-button {
+  width: 48%;
   z-index: 1000; /* Ensure the button is above the editor */
 }
 

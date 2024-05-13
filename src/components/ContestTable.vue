@@ -68,6 +68,30 @@ const data = ref<DataItem[]>([
     quantity: 2,
     ac: 15,
   },
+  {
+    key: '3',
+    name: 'Potion',
+    rank: 3,
+    hp: 1,
+    quantity: 5,
+    ac: 20,
+  },
+  {
+    key: '4',
+    name: 'Bow',
+    rank: 4,
+    hp: 2,
+    quantity: 1,
+    ac: 25,
+  },
+  {
+    key: '5',
+    name: 'Arrow',
+    rank: 5,
+    hp: 1,
+    quantity: 10,
+    ac: 30,
+  },
 ]);
 
 interface DataItem {
