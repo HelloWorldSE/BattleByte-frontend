@@ -52,11 +52,22 @@
   import { getUserId, isLoggedIn } from "@/utils/auth";
   import { useHallState } from "@/stores/hall";
   import TopNav from "@/components/TopNav.vue";
+  import JSEncrypt from "jsencrypt";
+  import { encryptPassword } from "@/utils/auth";
 
   
   const formItem = Form.Item;
   const inputPassword = Input.Password;
   
+  // const publicKey = process.env.VUE_APP_PUBLIC_KEY;
+
+
+  // 解密
+  // const decrypt = (txt:any) => {
+  //   const encryptor = new JSEncrypt();
+  //   encryptor.setPrivateKey(privateKey); // 设置私钥
+  //   return encryptor.decrypt(txt); // 对需要解密的数据进行解密
+  // }
   
   
   // 定义路由器，负责路由跳转
@@ -127,9 +138,10 @@
   // 登录按钮：路由跳转
   const Login_Submit = async () => {
     const userName = formState.userName;
-    const passWord = formState.passWord;
+    const passWord = encryptPassword(formState.passWord);
     const email = formState.email;
 
+    console.log(userName, passWord, email);
     generatePost('auth/register', {userName:userName, password:passWord, userEmail:email}).then((res) => {
       console.log(res);
       if (res.data.status === 0) {

@@ -44,6 +44,8 @@ import {generatePost} from "@/utils/protocol";
 import { getUserId, isLoggedIn } from "@/utils/auth";
 import { useHallState } from "@/stores/hall";
 import TopNav from "@/components/TopNav.vue";
+import JSEncrypt from "jsencrypt";
+import { encryptPassword } from "@/utils/auth";
 
 const formItem = Form.Item;
 const inputPassword = Input.Password;
@@ -95,7 +97,7 @@ const hall = useHallState()
 
 const Login_Submit = async () => {
   const userName = formState.userName;
-  const passWord = formState.passWord;
+  const passWord = encryptPassword(formState.passWord);
 
   generatePost('auth/login', {userName:userName, password:passWord}).then((res) => {
     console.log(res);

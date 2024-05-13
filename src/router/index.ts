@@ -42,12 +42,12 @@ const router = createRouter({
       path: '/rule',
       name: 'rule',
       component: () => import('@/views/RuleView.vue')
+    }, 
+    {
+      path: '/test',
+      name: 'test',
+      component: () => import('@/views/TestView.vue')
     }
-    // {
-    //   path: '/test',
-    //   name: 'test',
-    //   component: () => import('@/views/TestView.vue')
-    // }
   ]
 })
 
