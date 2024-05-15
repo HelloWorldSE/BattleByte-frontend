@@ -154,10 +154,10 @@ export class Hall {
         this.msgToClose = msg
     }
 
-    match_request() {
+    match_request(type: number) {
 
         this.conn.conn.send('MATCH_REQ', {
-            type: 1
+            type: type
         }, (data) => {
             message.error(data.msg, 2).then(() => {
                 this.router.go(0)

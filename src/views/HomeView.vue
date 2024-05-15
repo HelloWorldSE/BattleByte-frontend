@@ -117,6 +117,7 @@ export default {
   data() {
     return {
       // peopleNum: null,
+      type: 1,
       timer: null,
       matching: false,
       infoModalVisible: false,
@@ -168,41 +169,41 @@ export default {
         },
         /* Mars has two moons, Phobos and Deimos. Both are thought to be captured asteroids, or debris from early in the formation of our solar system. */
         {
-          name: "单人模式",
-          diameter: "120.0",
+          name: "大逃杀模式",
+          diameter: "40.0",
           rotationTime: "4332.6",
           ua: "5.2",
           colors: [], // "#876f51", "#9c661f"
           /* satellites: [
-            {
-              name: "Io",
-              diameter: "3.6432",
-              rotationTime: "1.769",
-              distance: "421,8",
-              colors: [] // "green", "yellow"
-            },
-            {
-              name: "europe",
-              diameter: "3.1216",
-              rotationTime: "3.551",
-              distance: "671,1",
-              colors: [] // "brown", "pink"
-            },
-            {
-              name: "ganymede",
-              diameter: "5.2644",
-              rotationTime: "7.15",
-              distance: "1070,4",
-              colors: [] // "blue", "cyan"
-            },
-            {
-              name: "callisto",
-              diameter: "4.8206",
-              rotationTime: "16.689",
-              distance: "1882,7",
-              colors: [] // "orange", "grey"
-            }
-          ] */
+           {
+             name: "Io",
+             diameter: "3.6432",
+             rotationTime: "1.769",
+             distance: "421,8",
+             colors: ["green", "yellow"] // "green", "yellow"
+           },
+           {
+             name: "europe",
+             diameter: "3.1216",
+             rotationTime: "3.551",
+             distance: "671,1",
+             colors: ["brown", "pink"] // "brown", "pink"
+           },
+           {
+             name: "ganymede",
+             diameter: "5.2644",
+             rotationTime: "7.15",
+             distance: "1070,4",
+             colors: ["blue", "cyan"] // "blue", "cyan"
+           },
+           {
+             name: "callisto",
+             diameter: "4.8206",
+             rotationTime: "16.689",
+             distance: "1882,7",
+             colors: ["orange", "grey"] // "orange", "grey"
+           }
+         ] */
         },
         {
           name: "单人模式",
@@ -250,18 +251,77 @@ export default {
         },
         {
           name: "大逃杀模式",
-          diameter: "120.0",
+          diameter: "10.0",
           rotationTime: "30688.4",
           ua: "19.2",
           colors: [], // "#a3bebf", "#387a7d"
           /* satellites: [
+           {
+             name: "titania",
+             diameter: "0.7884",
+             rotationTime: "8.7",
+             colors: ["#387a7d", "#a3bebf"]
+           }
+         ] */
+        },
+        {
+          name: "大逃杀模式",
+          diameter: "120.0",
+          rotationTime: "4332",
+          ua: "5.2",
+          colors: ["#a3bebf", "#387a7d"],
+          satellites: [
             {
-              name: "titania",
-              diameter: "0.7884",
-              rotationTime: "8.7",
-              colors: ["#387a7d", "#a3bebf"]
+              name: "Thétys",
+              diameter: "1.066",
+              rotationTime: "1.89",
+              distance: "294,66",
+              colors: ["white", "grey"]
+            },
+            {
+              name: "Dioné",
+              diameter: "1.1234",
+              rotationTime: "2.74",
+              distance: "377,4",
+              colors: ["white", "white"]
+            },
+            {
+              name: "Rhéa",
+              diameter: "1.5286",
+              rotationTime: "4.52",
+              distance: "527,04",
+              colors: ["white", "grey"]
+            },
+            {
+              name: "Titan",
+              diameter: "5.1495",
+              rotationTime: "15.95",
+              distance: "1221,83",
+              colors: ["gold", "white"]
+            },
+            {
+              name: "Japet",
+              diameter: "1.4712",
+              rotationTime: "79.33",
+              distance: "3561,3",
+              colors: ["springGreen", "cyan"]
             }
-          ] */
+          ]
+        },
+        {
+          name: "大逃杀模式",
+          diameter: "40.0",
+          rotationTime: "30688.4",
+          ua: "19.2",
+          colors: [], // "#a3bebf", "#387a7d"
+          /* satellites: [
+           {
+             name: "titania",
+             diameter: "0.7884",
+             rotationTime: "8.7",
+             colors: ["#387a7d", "#a3bebf"]
+           }
+         ] */
         },
         {
           name: "mars",
@@ -419,7 +479,7 @@ export default {
         }
       }, 9000);
 
-      this.hall_stateStore.hall.match_request()
+      this.hall_stateStore.hall.match_request(this.type)
     },
     zoomIn() {
       if (this.planetsFilteredLength > 4) {
@@ -436,8 +496,13 @@ export default {
         console.log("onClickPlanet", i);
         this.selectedPlanetId = i;
         this.infoModalVisible = true;
+        this.type = 1;
         // let signal = (this.infoModalVisible == true) ? 1 : 0;
         // message.success(signal);
+      } else if (i == 6) {
+        this.selectedPlanetId = i;
+        this.infoModalVisible = true;
+        this.type = 2;
       }
     },
     onClickPlanetContainer(i) {
