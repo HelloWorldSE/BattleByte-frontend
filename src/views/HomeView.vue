@@ -129,7 +129,7 @@ export default {
         diameter: "0.01",
         colors: [] // "gold", "orange"
       },
-      selectedPlanetId: 3,
+      selectedPlanetId: 4,
       planetsFilteredLength: 0,
       planets: [
         {
