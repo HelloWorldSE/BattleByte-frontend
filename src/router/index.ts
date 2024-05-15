@@ -42,21 +42,17 @@ const router = createRouter({
       path: '/rule',
       name: 'rule',
       component: () => import('@/views/RuleView.vue')
-<<<<<<< feature/table
     },
     {
       path: '/table',
       name: 'table',
       component: () => import('@/components/ContestTable.vue')
-    }
-=======
-    }, 
+    },
     // {
     //   path: '/test',
     //   name: 'test',
     //   component: () => import('@/views/TestView.vue')
-    // }
->>>>>>> dev
+    // },
   ]
 })
 
