@@ -1,7 +1,9 @@
 <template>
+  <!--
   <div class="topBar">
     <TopNav/>
   </div>
+  -->
   <div id="app">
     <div class="star" v-for="n in 400"></div>
     <!-- MAIN CONTENT  -->
@@ -785,14 +787,6 @@ export default {
 </script>
 
 <style scoped>
-
-.topBar {
-  z-index: 1005;
-  width: 100%;
-  overflow: hidden; /* 隐藏超出部分 */
-  height: 60px;
-  position: relative; /* 确保 TopNav 绝对定位相对于 .top */
-}
 
 #app {
   background-color: black; /* 设置背景为黑色 */
