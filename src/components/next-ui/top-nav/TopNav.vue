@@ -7,6 +7,9 @@ import CenterButton from './CenterButton.vue';
 import SideButtons from './SideButtons.vue';
 import MyProfile from './MyProfile.vue';
 import { useRouter } from 'vue-router';
+import { Dropdown, Menu, MenuItem } from 'ant-design-vue';
+import { useHallState } from '@/stores/hall';
+import { getUserId } from '@/utils/auth';
 
 const router = useRouter()
 
@@ -14,13 +17,51 @@ const mainClick = () => {
     router.push('/')
 }
 
+const hall = useHallState()
+const log_out = () => {
+
+  hall.hall.logout()
+  localStorage.removeItem('token')
+  localStorage.removeItem('userId')
+  router.push('/auth/login')
+
+}
+
+const thisId = getUserId();
+
+const pushProfile = () => {
+  router.push(`/user/profile/${thisId}`);
+}
+
 </script>
 
 <template>
     <div class="bg">
-        <div class="left-area">
-            <MyProfile />
-        </div>
+            <div class="left-area">
+            <Dropdown>
+                <MyProfile />
+                <template #overlay>
+                <Menu style="width: 20rem;">
+                    <MenuItem key="1" @click="pushProfile">
+                    <ProfileOutlined />
+                    个人中心
+                    </MenuItem>
+                    <MenuItem key="2">
+                    <MessageOutlined />
+                    消息
+                    </MenuItem>
+                    <MenuItem key="3">
+                    <BellOutlined />
+                    新的朋友
+                    </MenuItem>
+                    <MenuItem key="4" @click="log_out">
+                    <LogoutOutlined />
+                    退出登录
+                    </MenuItem>
+                </Menu>
+                </template>
+            </Dropdown>
+            </div>
         <div class="center-button-area">
             <div class="topper">
                 <svg width="773" height="106" viewBox="0 0 773 106" fill="none" xmlns="http://www.w3.org/2000/svg">

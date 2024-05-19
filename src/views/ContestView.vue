@@ -1,7 +1,4 @@
 <template>
-  <div class="top">
-    <TopNav/>
-  </div>
   <div class="left">
     <QuestionView/>
   </div>
@@ -30,10 +27,4 @@ import ContestTable from "@/components/ContestTable.vue";
   overflow: hidden; /* 取消垂直滚动条 */
 }
 
-.top {
-  width: 100%;
-  overflow: hidden; /* 隐藏超出部分 */
-  height: 60px;
-  position: relative; /* 确保 TopNav 绝对定位相对于 .top */
-}
 </style>
