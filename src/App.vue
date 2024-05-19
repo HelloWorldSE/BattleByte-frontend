@@ -4,6 +4,8 @@ import GlobalReconnectingMessage from './components/websocket/GlobalReconnecting
 import { useConnector } from './stores/connector';
 import { useHallState } from './stores/hall';
 
+import TopNav from '@/components/next-ui/top-nav/TopNav.vue';
+
 // keep hallstore & conn store alive from the startup
 useConnector()
 useHallState()
@@ -12,6 +14,6 @@ useHallState()
 
 <template>
   <GlobalReconnectingMessage/>
-
+  <TopNav />
   <RouterView />
 </template>
