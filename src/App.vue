@@ -14,6 +14,23 @@ useHallState()
 
 <template>
   <GlobalReconnectingMessage/>
-  <TopNav />
-  <RouterView />
+  <div class="page">
+    <TopNav />
+    <div class="router-wrapper">
+      <RouterView />
+    </div>
+  </div>
 </template>
+
+<style scoped>
+.page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.router-wrapper {
+  flex: 1;
+  /*height: 100%;*/
+  /*position: relative;*/
+}
+</style>

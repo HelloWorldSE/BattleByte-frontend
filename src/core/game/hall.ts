@@ -35,18 +35,18 @@ export class Hall {
         // use arrow function to avoid 'this'-bindings
         const rcv_login_ack = (data: LoginResultData) => {
             this.set_status(HallStatus.ONLINE)
-            message.success({content: "登录成功！", key: 'hall_login', duration: 1})
+            // message.success({content: "登录成功！", key: 'hall_login', duration: 1})
         }
         const rcv_match_start = () => {
             this.set_status(HallStatus.MATCHING)
             this.game.match_info = undefined
-            message.loading({content: "正在匹配...", key: 'hall_match', duration: 0})
+            // message.loading({content: "正在匹配...", key: 'hall_match', duration: 0})
         }
         const rcv_match_enter = (data: MatchEnterData) => {
             this.set_status(HallStatus.IN_MATCH)
             this.game.match_info = data
             console.log(`STAGE A`, this.game.match_info)
-            message.loading({content: "匹配成功！", key: 'hall_match', duration: 1})
+            // message.loading({content: "匹配成功！", key: 'hall_match', duration: 1})
             this.router.push('/contest')
         }
         const rcv_match_end = () => {
@@ -143,7 +143,7 @@ export class Hall {
 
         this.conn.conn.send('LOGIN_REQ', login_req)
 
-        message.loading({content: "正在向服务器发送登录请求...", key: 'hall_login', duration: 0})
+        // message.loading({content: "正在向服务器发送登录请求...", key: 'hall_login', duration: 0})
 
     }
 
