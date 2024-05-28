@@ -70,7 +70,7 @@
   
     </div>
   </div>
-  <TestBell v-model="fieldData.bellVisible"></TestBell>
+  <BellTest v-model="fieldData.bellVisible"></BellTest>
 </template>
 
 <script lang="ts" setup>
@@ -81,7 +81,7 @@ import { Menu, MenuItem, SubMenu, MenuItemGroup, Button, Tooltip, Row, Col, Avat
 import type {Key} from "ant-design-vue/es/_util/type";
 import { useHallState } from '@/stores/hall';
 import { generateGet } from '@/utils/protocol';
-import TestBell from '@/components/TestBell.vue';
+import BellTest from '@/components/BellTest.vue';
 
 
 const thisId = localStorage.getItem('userId');
