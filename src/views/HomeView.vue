@@ -32,7 +32,7 @@
     </div>
 
     <div class="match-button">
-      <MatchingButton @click="onClickMatch()" :disabled="matchingDisabled"/>
+      <MatchingButton @click="onClickMatch()" :disabled="matchingDisabled || matching"/>
     </div>
 
     <div v-if="matching" class="match-button" style="z-index: 999;">
@@ -99,6 +99,7 @@ import {isLoggedIn} from '@/utils/auth'
 import {generateGet} from "@/utils/protocol";
 import MatchingButton from '@/components/next-ui/MatchingButton.vue';
 import { HallStatus } from '@/core/game/hall';
+import { pageIs } from '@/utils/pageis';
 
 export default {
   components: {
@@ -419,6 +420,8 @@ export default {
     this.mode = this.modes[0];
     this.planetsFilteredLength = this.planets.length;
     //this.startTimer();
+
+    pageIs('home')
   },
   /*destroyed() {
     // 组件销毁前清除定时器，防止内存泄漏
