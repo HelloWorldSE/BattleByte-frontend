@@ -284,6 +284,9 @@ const openAddFriend = () => {
   <div class="topBar">
     <TopNav/>
   </div>
+  <div id="app">
+    <div class="star" v-for="i in 400" :key="i">
+    </div>
     <Row :gutter="24" id="main">
         <Col :span="12"  class="colBox">
             <!-- src="https://i.pravatar.cc/700" -->
@@ -373,9 +376,19 @@ const openAddFriend = () => {
     <DeleteFriend :userId="deleteItem.userId" :userName="deleteItem.userName" :friendId="deleteItem.friendId" v-model="fieldData.openDeleteFriend"></DeleteFriend>
     
     <AddFriend :userId="pageUserId" v-model="fieldData.openAddFriend"></AddFriend>
+</div>
 </template>
 
 <style scoped>
+
+#app {
+  background-color: black; /* 设置背景为黑色 */
+  min-height: 100vh; /* 至少为视口的100%高度 */
+  display: flex;
+  flex-direction: column; /* 如果你需要垂直布局 */
+  align-items: stretch; /* 使子元素填满容器宽度 */
+}
+
 #main {
     padding: 0%;
     /* margin-top: 5vh;
@@ -402,7 +415,7 @@ const openAddFriend = () => {
 #avatar:hover {
     /* filter: brightness(0.5); */
     /* hover shade effect */
-    box-shadow: 0 0 11px rgba(33,33,33,.2); 
+    box-shadow: 0 0 11px rgb(255, 255, 255); 
 }
 
 #rightCard {
@@ -411,6 +424,9 @@ const openAddFriend = () => {
     object-fit: cover;
     margin: auto;
     padding: 10px;
+    /* transition: box-shadow .3s;
+    background: #fff; */
+    box-shadow: 0 0 6px 1px rgba(255, 255, 255, 0.5);
 }
 
 #cardDiv {
@@ -450,4 +466,23 @@ const openAddFriend = () => {
   z-index: 1005;
 }
 
+</style>
+
+<style lang="scss">
+.star {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  border-radius: 1px;
+  background: #fff;
+  @for $i from 1 through 400 {
+    &:nth-child(#{$i}) {
+      $randomOpacity: (random(95 + 1) + 5 - 1) / 100;
+      left: random(1000) / 10 * 1% - 1%;
+      bottom: random(1000) / 10 * 1% - 1%;
+      opacity: $randomOpacity;
+      box-shadow: 0 0 6px 1px rgba(255, 255, 255, $randomOpacity);
+    }
+  }
+}
 </style>

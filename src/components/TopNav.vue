@@ -56,9 +56,9 @@
               <MessageOutlined />
               消息
             </MenuItem>
-            <MenuItem key="3">
+            <MenuItem key="3" @click="bell">
               <BellOutlined />
-              新的朋友
+              通知
             </MenuItem>
             <MenuItem key="4" @click="log_out">
               <LogoutOutlined />
@@ -70,6 +70,7 @@
   
     </div>
   </div>
+  <TestBell v-model="fieldData.bellVisible"></TestBell>
 </template>
 
 <script lang="ts" setup>
@@ -80,6 +81,7 @@ import { Menu, MenuItem, SubMenu, MenuItemGroup, Button, Tooltip, Row, Col, Avat
 import type {Key} from "ant-design-vue/es/_util/type";
 import { useHallState } from '@/stores/hall';
 import { generateGet } from '@/utils/protocol';
+import TestBell from '@/components/TestBell.vue';
 
 
 const thisId = localStorage.getItem('userId');
@@ -151,6 +153,15 @@ const initProfile = async () => {
 };
 
 initProfile();
+
+// 通知Modal
+const fieldData = ref({
+  bellVisible: false
+});
+
+const bell = () => {
+  fieldData.value.bellVisible= true;
+};
 
 </script>
 
