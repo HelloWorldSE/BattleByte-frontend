@@ -32,9 +32,7 @@
     </div>
 
     <div class="match-button">
-      <button @click="onClickMatch()" type="primary" ghost>
-        开始匹配
-      </button>
+      <MatchingButton @click="onClickMatch()" :disabled="matchingDisabled || matching"/>
     </div>
 
     <div v-if="matching" class="match-button" style="z-index: 999;">
@@ -99,10 +97,14 @@ import {useHallState} from '@/stores/hall';
 import {mapStores} from 'pinia';
 import {isLoggedIn} from '@/utils/auth'
 import {generateGet} from "@/utils/protocol";
+import MatchingButton from '@/components/next-ui/MatchingButton.vue';
+import { HallStatus } from '@/core/game/hall';
+import { pageIs } from '@/utils/pageis';
 
 export default {
   components: {
     TopNav,
+    MatchingButton,
     'a-modal': Modal
   },
   created() {
@@ -399,6 +401,10 @@ export default {
         result.push(this.planets[i]);
       }
       return result;
+    },
+
+    matchingDisabled() {
+      return this.hall_stateStore.hallStatus != HallStatus.ONLINE
     }
   },
 
@@ -414,6 +420,8 @@ export default {
     this.mode = this.modes[0];
     this.planetsFilteredLength = this.planets.length;
     //this.startTimer();
+
+    pageIs('home')
   },
   /*destroyed() {
     // 组件销毁前清除定时器，防止内存泄漏
@@ -790,7 +798,7 @@ export default {
 
 #app {
   background-color: black; /* 设置背景为黑色 */
-  min-height: 100vh; /* 至少为视口的100%高度 */
+  min-height: 100%;
   display: flex;
   flex-direction: column; /* 如果你需要垂直布局 */
   align-items: stretch; /* 使子元素填满容器宽度 */
@@ -902,9 +910,10 @@ export default {
 
 .match-button {
   position: absolute;
+  z-index: 10;
   bottom: 20px; /* 调整底部边距 */
   left: 50%; /* 水平居中 */
-  transform: translateX(-50%); /* 居中对齐 */
+  transform: translateX(-57%); /* 居中对齐 */
 }
 
 

@@ -11,6 +11,9 @@ import CodeInputView from "@/views/CodeInputView.vue";
 import QuestionView from "@/views/QuestionView.vue";
 import TopNav from "@/components/TopNav.vue";
 import ContestTable from "@/components/ContestTable.vue";
+import { pageIs } from "@/utils/pageis";
+
+pageIs('in-match')
 </script>
 
 <style scoped>

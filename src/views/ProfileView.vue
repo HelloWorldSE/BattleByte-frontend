@@ -10,8 +10,9 @@ import DeleteFriend from "@/components/profile/DeleteFriend.vue";
 import AddFriend from "@/components/profile/AddFriend.vue";
 
 import { useHallState } from "@/stores/hall";
+import { pageIs } from "@/utils/pageis";
 
-// import { defineComponent } from '@vue/composition-api';
+pageIs('other')
 
 const route = useRoute();
 const router = useRouter();
