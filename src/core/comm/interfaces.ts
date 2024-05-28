@@ -40,6 +40,13 @@ export interface ItemUsedData {
     type: string
 }
 
+export interface RoomRefreshData {
+    roomid: number,
+    userid: number[],
+    username: string[],
+    avatarUrl: string[]
+}
+
 export interface ErrorData {
     ack: number,
     msg: string

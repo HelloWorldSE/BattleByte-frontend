@@ -35,11 +35,12 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { Spin, Avatar, Tooltip } from 'ant-design-vue';
 import 'animate.css';
 import LottieJson from '@/assets/Animation_fighting.json';
 import { Vue3Lottie } from 'vue3-lottie'
+import { useRoomState } from '@/stores/room';
   // import LottieVuePlayer from '@lottiefiles/vue-lottie-player';
 
 interface Player {
@@ -47,14 +48,19 @@ interface Player {
   avatarUrl: string;
 }
 
-const onlinePlayers = ref<Player[]>([
-  { username: 'Player1', avatarUrl: '/logo.jpg' },
-  { username: 'Player2', avatarUrl: '/logo.jpg' },
-  { username: 'Player3', avatarUrl: '/logo.jpg' },
-  { username: 'Player4', avatarUrl: '/logo.jpg' },
-  { username: 'Player5', avatarUrl: '/logo.jpg' },
-  { username: 'Player6', avatarUrl: '/logo.jpg' },
-]);
+const roomState = useRoomState()
+
+
+const onlinePlayers = computed(() => {
+  const players: Player[] = []
+  for (let i = 0; i < (roomState.roomInfo?.userid?.length ?? 0); i++) {
+    players.push({
+      username: roomState.roomInfo?.username[i] ?? 'NONAME',
+      avatarUrl: roomState.roomInfo?.avatarUrl[i] ?? ''
+    })
+  }
+  return players
+});
 </script>
 <style scoped>
 #app {
