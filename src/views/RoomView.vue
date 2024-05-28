@@ -25,8 +25,8 @@
             <div
               @mouseover="showOpenIcon = true"
               @mouseout="showOpenIcon = false"
+              @click="handleEnterRoom"
               class="custom-button secondary"
-              
             >
           <img
             :src="showOpenIcon ? 'door-open.svg' : 'door-close.svg'"
@@ -68,7 +68,9 @@ import { EditOutlined, EllipsisOutlined, SettingOutlined, PlusOutlined } from '@
 import { Card, CardMeta, Avatar, Button, Tooltip, Row, Col } from 'ant-design-vue';
 import { ref, reactive } from 'vue';
 import AddRoom from '@/components/AddRoom.vue';
+import { useRoute, useRouter } from "vue-router";
 
+const router = useRouter();
 const color = ref('red');
 const showOpenIcon = ref(false);
 const fieldData = ref({
@@ -77,7 +79,10 @@ const fieldData = ref({
 
 const handleOpenCreateRoom = () => {
   fieldData.value.createRoom = true;
+};
 
+const handleEnterRoom = () => {
+  router.push('/roomDetails');
 };
 </script>
 <style scoped>

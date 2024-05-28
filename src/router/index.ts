@@ -63,6 +63,11 @@ const router = createRouter({
       name: 'roomDetails',
       component: () => import('@/views/RoomDetailsView.vue')
     },
+    // {
+    //   path: '/backgroundTest',
+    //   name: 'backgroundTest',
+    //   component: () => import('@/views/BackgroundTest.vue')
+    // }
   ]
 })
 

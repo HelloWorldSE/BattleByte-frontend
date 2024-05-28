@@ -52,11 +52,13 @@ const handleCancel = () => {
 
 const handleOk = () => {
     generatePost('/api/room/add', {
-        roomName: formState.roomName,
+        name: formState.roomName,
     }).then((res) => {
         if (res.data.status === 0) {
             loading.value = false;
             message.success('创建成功');
+            formRef.value?.resetFields();
+            formState.roomName = '';
             modalVisible.value = false;
         } else {
             message.error(res.data.msg);
