@@ -1,18 +1,32 @@
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
+import { computed } from 'vue';
 
+const model = defineModel<number>({required: true})
+
+const game = useGameStore()
+
+const avail_problems = computed(() => 
+    game.match_info?.info.questionId.slice(0, game.match_info.info.currentQuestion + 1)
+)
 </script>
 
 <template>
-    <div class="wrapper">
-        <ol class="steps">
-            <li class="step1 current"><span>Shipping</span></li>
-            <li class="step2"><span>Payment</span></li>
-        </ol>
-    </div>
+    <ol class="steps">
+        <template v-for="problem_id, index of avail_problems">
+            <li :class="[`step${index+1}`, model == index ? 'current' : undefined]"
+                @click="model = index">
+                <span>{{ problem_id }}</span>
+            </li>
+        </template>
+    </ol>
 </template>
 
 <style scoped lang="scss">
 ol.steps {
+    width: 100%;
+    display: flex;
+
     $line_height: 20px;
     $padding: 9px;
     $arrow_size: ($line_height + 2 * $padding)/2;
@@ -37,6 +51,9 @@ ol.steps {
         background: #dae4eb;
         position: relative;
         margin-left: 5px + 2 * $arrow_size;
+        user-select: none;
+
+        flex: 1;
         
         // Appended arrow.
         &:after {

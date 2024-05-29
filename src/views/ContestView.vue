@@ -5,7 +5,7 @@
       <div v-else>没有选中题目！</div>
     </div>
     <div class="question-picker">
-      <QuestionPicker />
+      <QuestionPicker v-model="pickedProblemId"/>
     </div>
   </div>
   <div class="right">
@@ -20,13 +20,15 @@ import TopNav from "@/components/TopNav.vue";
 import ContestTable from "@/components/ContestTable.vue";
 import { pageIs } from "@/utils/pageis";
 import { useGameStore } from "@/stores/game";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
 pageIs('in-match')
 
+const pickedProblemId = ref<number>(0)
+
 const game = useGameStore();
 const currentProblemId = computed(() => 
-  game.match_info?.info.questionId[game.match_info.info.currentQuestion] ?? undefined
+  game.match_info?.info.questionId[pickedProblemId.value] ?? undefined
 )
 
 
