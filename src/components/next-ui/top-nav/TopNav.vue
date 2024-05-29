@@ -164,6 +164,7 @@ const cancelMatch = () => {
 </template>
 
 <style scoped>
+
 .topper {
     position: relative;
     z-index: 1000;
@@ -304,6 +305,8 @@ const cancelMatch = () => {
     z-index: 10;
 
     box-shadow: 1px 3px 7px 5px rgba(255, 255, 255, 0.2);
+    width: 100%;
+    height: 4.5rem;
 }
 .small-button-area {
     position: relative;

@@ -29,7 +29,9 @@ export class Hall {
 
     constructor(private state_update_callback?: (new_value: HallStatus) => void,
                 private sync_callback: (
-                    type: 'POS_SYNC' | 'SCORE_SYNC' | 'ANSWER_RESULT' | 'CHAT_MSG' | 'GAME_END' | 'ITEM_USED',
+                    type: 'POS_SYNC' | 'SCORE_SYNC' | 'ANSWER_RESULT' |
+                          'CHAT_MSG' | 'GAME_END' | 'ITEM_USED' |
+                          'ROOM_REFRESH',
                     data: any) => void = () => {}) {
 
         // use arrow function to avoid 'this'-bindings
@@ -72,6 +74,9 @@ export class Hall {
         const rcv_item_used = (data: any) => {
             this.sync_callback('ITEM_USED', data)
         }
+        const rcv_romm_refresh = (data: any) => {
+            this.sync_callback('ROOM_REFRESH', data)
+        }
 
 
         const conn_state_change = (state: WSConnectState) => {
@@ -101,6 +106,7 @@ export class Hall {
         this.conn.conn.addListener('CHAT_MSG', rcv_chat_msg)
         this.conn.conn.addListener('GAME_END', rcv_game_end)
         this.conn.conn.addListener('ITEM_USED', rcv_item_used)
+        this.conn.conn.addListener('ROOM_REFRESH', rcv_romm_refresh)
 
         // OFFLINE EVENT
         this.conn.registerStateChangeEvent(conn_state_change)
@@ -212,6 +218,19 @@ export class Hall {
     use_item(type: string = 'ink') {
         this.conn.conn.send('ITEM_SEND', {
             type: type
+        })
+    }
+
+    room_enter(roomid: number) {
+        this.conn.conn.send('ROOM_REQUEST', {
+            roomid: roomid,
+            type: 'in'
+        })
+    }
+    room_leave(roomid: number) {
+        this.conn.conn.send('ROOM_REQUEST', {
+            roomid: roomid,
+            type: 'out'
         })
     }
 }

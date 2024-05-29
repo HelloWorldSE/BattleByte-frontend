@@ -29,7 +29,8 @@ useHallState()
   flex-direction: column;
 }
 .router-wrapper {
-  flex: 1;
+  flex-grow: 1;
+  min-height: 23.125rem;
   /*height: 100%;*/
   /*position: relative;*/
 }

@@ -2,17 +2,22 @@ import { defineStore } from "pinia";
 import { useConnector } from "./connector";
 import { Hall, HallStatus } from "@/core/game/hall";
 import { ref, watch } from "vue";
-import type { ChatMsgData, ItemUsedData, PosSyncData } from "@/core/comm/interfaces";
+import type { ChatMsgData, ItemUsedData, PosSyncData, RoomRefreshData } from "@/core/comm/interfaces";
+import { useRoomState } from "./room";
 
 export const useHallState = defineStore('hall_state', () => {
     const hallStatus = ref<HallStatus>(HallStatus.OFFLINE)
+
+    const roomState = useRoomState()
 
     const rcv_chat_msg = ref<(data: ChatMsgData) => void>(()=>{})
     const rcv_answer_result = ref<(data: any) => void>(()=>{})
     const rcv_game_end = ref<(data: {result: 'win'|'lose'}) => void>(()=>{})
     const rcv_pos_sync = ref<(data: PosSyncData) => void>(()=>{})
     const rcv_item_used = ref<(data: ItemUsedData) => void>(()=>{})
-    
+    const rcv_room_refresh = ref<(data: RoomRefreshData) => void>((data)=>{
+        roomState.roomInfo = data
+    })
 
 
     const hall = new Hall(
@@ -30,6 +35,8 @@ export const useHallState = defineStore('hall_state', () => {
                 rcv_game_end.value(data)
             } else if (type == 'ITEM_USED') {
                 rcv_item_used.value(data)
+            } else if (type == 'ROOM_REFRESH') {
+                rcv_room_refresh.value(data)
             }
         }
     )
@@ -43,6 +50,6 @@ export const useHallState = defineStore('hall_state', () => {
         answer_result_callback: rcv_answer_result,
         pos_sync_callback: rcv_pos_sync,
         game_end_callback: rcv_game_end,
-        item_used_callback: rcv_item_used,
+        item_used_callback: rcv_item_used
     }
 })

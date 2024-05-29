@@ -386,6 +386,13 @@ const handleChangeLineHeight = (event) => {
 </script>
 
 <style scoped>
+.area2 {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+
 .components-code-input {
   display: flex;
   flex-direction: column;
@@ -395,15 +402,16 @@ const handleChangeLineHeight = (event) => {
 
 .editor {
   width: 100%;
-  height: 400px;
+  /* height: 400px; */
   flex: 1;
   position: relative;
+  min-height: 0;
 }
 
 .bottom {
   width: 100%;
   height: 200px;
-  flex: 1;
+  /* flex: 1; */
   position: relative;
   overflow: hidden;
 }
