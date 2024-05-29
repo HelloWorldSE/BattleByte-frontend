@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, reactive} from 'vue';
+import {computed, onMounted, reactive} from 'vue';
 import {CopyOutlined} from '@ant-design/icons-vue';
 import axios from 'axios';
 import {message,Tag} from "ant-design-vue";
@@ -80,15 +80,15 @@ const data = reactive({
 });
 
 onMounted(() => {
-  fetchData().then(() => {MathJax()})
+  fetchData(props.problemId).then(() => {MathJax()})
 });
 
-const game = useGameStore();
-console.log(game.match_info?.info.questionId);
-const problemId = game.match_info?.info.questionId;
-console.log(problemId);
 
-async function fetchData() {
+const props = defineProps<{
+  problemId: number
+}>()
+
+async function fetchData(problemId: number) {
   try {
     const response = await generateGet(`/api/oj/problem?id=${problemId}`); // 替换成你的API地址
     console.log(response.data.data.data);
@@ -112,7 +112,7 @@ async function fetchData() {
 .components-question-area {
   background-color: white; /* 设置背景为黑色 */
   color: #1E1E1E; /* 设置文字颜色为白色 */
-  min-height: 100vh;
+  /* min-height: 100vh; */
   overflow-y: auto; /* 添加垂直滚动条 */
 }
 
