@@ -38,7 +38,6 @@ const currentProblemId = computed(() =>
 .left {
   width: 50%;
   height: 100%; /* 为左右两部分设置一个固定高度 */
-  overflow-y: scroll;
   float: left;
 
   display: flex;
@@ -55,6 +54,7 @@ const currentProblemId = computed(() =>
   flex: 1;
   min-height: 0;
   width: 100%;
+  overflow-y: scroll;
 }
 
 .question-picker {
