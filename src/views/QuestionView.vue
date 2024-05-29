@@ -148,7 +148,7 @@ h1 {
 
 .showArea {
   background-color: #eaf3f8; /* 或者其他深色调以便于阅读 */
-  height: 75%; /* 让showArea占据父容器的全部高度 */
+  height: 60%; /* 让showArea占据父容器的全部高度 */
   display: flex;
   flex-direction: column;
 }
