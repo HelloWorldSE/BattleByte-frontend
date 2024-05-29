@@ -98,6 +98,11 @@ import Tomato from '@/components/items/tomato.vue';
 import ContestTable from "@/components/ContestTable.vue";
 import ResultTable from "@/components/ResultTable.vue";
 
+
+const props = defineProps({
+  problemId: Number
+})
+
 const surrender = () => {
   hall.hall.surrender()
 }
@@ -343,8 +348,13 @@ const handleSubmit = async () => {
   console.log(code);
 
   console.log(`STAGE B`, gameStore.match_info, gameStore.match_info.info.questionId)
+  if (props.problemId === undefined) {
+    console.warn('未选中题目，本次提交已取消。')
+    return
+  }
+  
   generatePost("/api/oj/submit", {
-    problem_id: gameStore.match_info.info.questionId ,//+ 745,
+    problem_id: props.problemId,
     language: language.value,
     code: code
   }).then(res => {
