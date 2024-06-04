@@ -31,7 +31,7 @@ export class Hall {
                 private sync_callback: (
                     type: 'POS_SYNC' | 'SCORE_SYNC' | 'ANSWER_RESULT' |
                           'CHAT_MSG' | 'GAME_END' | 'ITEM_USED' |
-                          'ROOM_REFRESH',
+                          'ROOM_REFRESH' | 'HP_CHANGE',
                     data: any) => void = () => {}) {
 
         // use arrow function to avoid 'this'-bindings
@@ -77,6 +77,9 @@ export class Hall {
         const rcv_romm_refresh = (data: any) => {
             this.sync_callback('ROOM_REFRESH', data)
         }
+        const rcv_hp_change = (data: any) => {
+            this.sync_callback('HP_CHANGE', data)
+        }
 
 
         const conn_state_change = (state: WSConnectState) => {
@@ -107,6 +110,7 @@ export class Hall {
         this.conn.conn.addListener('GAME_END', rcv_game_end)
         this.conn.conn.addListener('ITEM_USED', rcv_item_used)
         this.conn.conn.addListener('ROOM_REFRESH', rcv_romm_refresh)
+        this.conn.conn.addListener('HP_CHANGE', rcv_hp_change)
 
         // OFFLINE EVENT
         this.conn.registerStateChangeEvent(conn_state_change)
