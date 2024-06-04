@@ -3,6 +3,7 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
+
 import mockDevServerPlugin from 'vite-plugin-mock-dev-server'
 
 // https://vitejs.dev/config/

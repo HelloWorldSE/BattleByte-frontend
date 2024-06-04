@@ -11,3 +11,7 @@ export type PosData = {
 export type PosMap = {
     [user_id: number]: PosData
 }
+
+export type HpMap = {
+    [user_id: number]: number
+}

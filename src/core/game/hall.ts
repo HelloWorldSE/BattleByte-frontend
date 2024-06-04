@@ -29,24 +29,26 @@ export class Hall {
 
     constructor(private state_update_callback?: (new_value: HallStatus) => void,
                 private sync_callback: (
-                    type: 'POS_SYNC' | 'SCORE_SYNC' | 'ANSWER_RESULT' | 'CHAT_MSG' | 'GAME_END' | 'ITEM_USED',
+                    type: 'POS_SYNC' | 'SCORE_SYNC' | 'ANSWER_RESULT' |
+                          'CHAT_MSG' | 'GAME_END' | 'ITEM_USED' |
+                          'ROOM_REFRESH' | 'HP_CHANGE',
                     data: any) => void = () => {}) {
 
         // use arrow function to avoid 'this'-bindings
         const rcv_login_ack = (data: LoginResultData) => {
             this.set_status(HallStatus.ONLINE)
-            message.success({content: "登录成功！", key: 'hall_login', duration: 1})
+            // message.success({content: "登录成功！", key: 'hall_login', duration: 1})
         }
         const rcv_match_start = () => {
             this.set_status(HallStatus.MATCHING)
             this.game.match_info = undefined
-            message.loading({content: "正在匹配...", key: 'hall_match', duration: 0})
+            // message.loading({content: "正在匹配...", key: 'hall_match', duration: 0})
         }
         const rcv_match_enter = (data: MatchEnterData) => {
             this.set_status(HallStatus.IN_MATCH)
             this.game.match_info = data
             console.log(`STAGE A`, this.game.match_info)
-            message.loading({content: "匹配成功！", key: 'hall_match', duration: 1})
+            // message.loading({content: "匹配成功！", key: 'hall_match', duration: 1})
             this.router.push('/contest')
         }
         const rcv_match_end = () => {
@@ -71,6 +73,12 @@ export class Hall {
         }
         const rcv_item_used = (data: any) => {
             this.sync_callback('ITEM_USED', data)
+        }
+        const rcv_romm_refresh = (data: any) => {
+            this.sync_callback('ROOM_REFRESH', data)
+        }
+        const rcv_hp_change = (data: any) => {
+            this.sync_callback('HP_CHANGE', data)
         }
 
 
@@ -101,6 +109,8 @@ export class Hall {
         this.conn.conn.addListener('CHAT_MSG', rcv_chat_msg)
         this.conn.conn.addListener('GAME_END', rcv_game_end)
         this.conn.conn.addListener('ITEM_USED', rcv_item_used)
+        this.conn.conn.addListener('ROOM_REFRESH', rcv_romm_refresh)
+        this.conn.conn.addListener('HP_CHANGE', rcv_hp_change)
 
         // OFFLINE EVENT
         this.conn.registerStateChangeEvent(conn_state_change)
@@ -143,7 +153,7 @@ export class Hall {
 
         this.conn.conn.send('LOGIN_REQ', login_req)
 
-        message.loading({content: "正在向服务器发送登录请求...", key: 'hall_login', duration: 0})
+        // message.loading({content: "正在向服务器发送登录请求...", key: 'hall_login', duration: 0})
 
     }
 
@@ -212,6 +222,19 @@ export class Hall {
     use_item(type: string = 'ink') {
         this.conn.conn.send('ITEM_SEND', {
             type: type
+        })
+    }
+
+    room_enter(roomid: number) {
+        this.conn.conn.send('ROOM_REQUEST', {
+            roomid: roomid,
+            type: 'in'
+        })
+    }
+    room_leave(roomid: number) {
+        this.conn.conn.send('ROOM_REQUEST', {
+            roomid: roomid,
+            type: 'out'
         })
     }
 }
