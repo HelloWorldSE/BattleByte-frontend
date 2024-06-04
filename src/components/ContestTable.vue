@@ -12,21 +12,22 @@
 </template>
 
 <script lang="ts" setup>
+import { useGameStore } from '@/stores/game';
 import BloodBar from './BloodBar.vue';
 import { Table } from "ant-design-vue";
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 // 为ref函数提供泛型参数
 const columns = ref<Column[]>([
   {
-    dataIndex: 'name',
-    title: 'Name',
-    key: 'name',
-  },
-  {
     title: 'Rank',
     dataIndex: 'rank',
     key: 'rank',
+  },
+  {
+    dataIndex: 'name',
+    title: 'Name',
+    key: 'name',
   },
   {
     key: 'hp',
@@ -37,11 +38,6 @@ const columns = ref<Column[]>([
     }),
   },
   {
-    title: 'Quantity',
-    dataIndex: 'quantity',
-    key: 'quantity',
-  },
-  {
     title: 'AC',
     dataIndex: 'ac',
     key: 'ac',
@@ -49,31 +45,28 @@ const columns = ref<Column[]>([
 
 ]);
 
-const data = ref<DataItem[]>([
-  {
-    key: '1',
-    name: 'Sword',
-    rank: 1,
-    hp: 5,
-    quantity: 3,
-    ac: 10,
-  },
-  {
-    key: '2',
-    name: 'Shield',
-    rank: 2,
-    hp: 3,
-    quantity: 2,
-    ac: 15,
-  },
-]);
+const game = useGameStore()
+
+const data = computed(() => {
+  const dataItems: DataItem[] = []
+  for (const teamId in game.match_info?.playerMap) {
+    const playerId = game.match_info.playerMap[teamId]
+    dataItems.push({
+      key: playerId.toString(),
+      name: 'NONAME',
+      rank: 0,
+      hp: game.match_info.HPMAP[playerId],
+      ac: game.match_info.acMAP[playerId]
+    })
+  }
+  return dataItems
+})
 
 interface DataItem {
   key: string;
   name: string;
   rank: number;
   hp: number;
-  quantity: number;
   ac: number;
 }
 

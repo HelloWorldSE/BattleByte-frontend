@@ -20,6 +20,12 @@ export interface MatchEnterData {
     },
     playerMap: {
         [team_id: string]: number
+    },
+    HPMAP: {
+        [user_id: number]: number
+    },
+    acMAP: {
+        [user_id: number]: number
     }
 }
 
@@ -46,6 +52,11 @@ export interface RoomRefreshData {
     userid: number[],
     username: string[],
     avatarUrl: string[]
+}
+
+export interface HpChangeData {
+    change_id: number,
+    hp: number
 }
 
 export interface ErrorData {
