@@ -9,15 +9,29 @@
                 <Input v-model:value="formState.roomName" placeholder="Room Name"></Input>
             </FormItem>
             <FormItem label="选择题目">
-                <Select :options="options" @change="onSelectChange"></Select>
+                <template v-for="tag in selectedProblems" :key="tag">
+                    <Tag closable @close="handleCloseTag(tag)">#{{ tag }}</Tag>
+                </template>
+                <Select :options="options" @change="onSelectChange" placeholder="搜索题目难度"></Select>
                 <List>
-                    <ListItem v-for="problem in promblems" :key="problem.id">
+                    <ListItem v-for="problem in showProblems" :key="problem.id">
                         <ListItemMeta
                             :title="problem.title"
-                            :description="problem.description"
+                            :description="formatDescription(problem.description)"
                         >
                         </ListItemMeta>
+                        <template #actions>
+                            <a key="check-problem">查看</a>
+                <a key="add-problem" @click="addProblem(problem)">添加</a>
+                        </template>
                     </ListItem>
+                    <template #loadMore>
+                        <div
+                            :style="{ textAlign: 'center', marginTop: '12px', height: '32px', lineHeight: '32px' }"
+                        >
+                            <Pagination @change="onLoadMore" :current="currentPage" :total="totalProblems" :pageSize="onePageSize" simple/>
+                        </div>
+                    </template>
                 </List>
             </FormItem> 
         </Form>
@@ -28,10 +42,14 @@
 
 <script lang="ts" setup>
 import { defineProps, defineEmits } from 'vue';
-import { Modal, Button, Form, FormItem, Input, message, type FormInstance, Select } from 'ant-design-vue';
+import { Modal, Button, Form, FormItem, Input, message, type FormInstance, Select, List, ListItem, ListItemMeta, Pagination, Tag } from 'ant-design-vue';
 import { computed, reactive, ref } from 'vue';
 import { generatePost, generateGet } from '@/utils/protocol';
-import { get } from 'http';
+
+
+const currentPage = ref(1);
+const onePageSize = 5;
+const totalProblems = ref(0);
 
 const props = defineProps({
     modelValue: {
@@ -54,7 +72,9 @@ const formState = reactive({
 
 const loading = ref(false);
 const formRef = ref<FormInstance | null>(null);
-const promblems = ref([] as any);
+const promblems = ref([] as any[]);
+const showProblems = ref([] as any[]);
+const selectedProblems = ref<string[]>([]);
 
 const roomNameCheck = (_: any, value: string) => {
     if (!value) {
@@ -92,6 +112,7 @@ const getProblems = () => {
         if (res.data.status === 0) {
             console.log(res.data.data);
             promblems.value = res.data.data.results;
+            
         } else {
             message.error(res.data.msg);
         }
@@ -104,13 +125,15 @@ getProblems();
 
 const options = [{value:'easy'}, {value:'middle'}];
 
-const onSelectChange = (value: string) => {
+const onSelectChange = (value:any) => {
     console.log(value);
     generateGet(`/api/oj/search?tag=${value}`).then((res) => {
         if (res.data.status === 0) {
             console.log(res.data.data);
-            promblems.value = res.data.data.results;
+            promblems.value = res.data.data.data.results;
             console.log("problems is ", promblems.value);
+            totalProblems.value = promblems.value.length;
+            showProblems.value = promblems.value.slice(0, onePageSize);
         } else {
             message.error(res.data.msg);
         }
@@ -118,6 +141,32 @@ const onSelectChange = (value: string) => {
         message.error('网络错误');
     });
 };
+
+function formatDescription(description: string) {
+    // 去除首尾的 <p> 标签
+    description = description.replace(/^<p>|<\/p>$/g, "");
+
+    // 如果字数超过 50 个字，则省略
+    if (description.length > 80) {
+    return description.slice(0, 80) + "...";
+    }
+    return description;
+}
+
+const onLoadMore = (val:any) => {
+    currentPage.value = val;
+    showProblems.value = promblems.value.slice((currentPage.value - 1) * onePageSize, currentPage.value * onePageSize);
+}
+
+const handleCloseTag = (tag: string) => {
+    console.log(tag);
+    selectedProblems.value = selectedProblems.value.filter((item: any) => item !== tag);
+}
+
+const addProblem = (problem: any) => {
+    console.log(problem);
+    selectedProblems.value.push(problem.title);
+}
 </script>
 <style scoped>
 
