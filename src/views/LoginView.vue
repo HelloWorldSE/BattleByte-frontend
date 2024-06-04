@@ -43,6 +43,7 @@ import { useHallState } from "@/stores/hall";
 import TopNav from "@/components/TopNav.vue";
 import JSEncrypt from "jsencrypt";
 import { encryptPassword } from "@/utils/auth";
+import { pageIs } from "@/utils/pageis";
 
 const formItem = Form.Item;
 const inputPassword = Input.Password;
@@ -57,6 +58,7 @@ if (isLoggedIn()) {
   router.push('/')
 }
 
+pageIs('other')
 
 // 定义一个没用的玩意
 const formRef = ref<FormInstance>()

@@ -1,4 +1,5 @@
 <template>
+<Loading :loading="loading">
   <div class="components-question-area">
     <h1 v-if="data.title">{{ data.title }}</h1>
     <h1 v-else>标题</h1>
@@ -46,10 +47,11 @@
       <Tag v-for="(str, idx) in data.tags" :key="idx" class="tag" color="blue" >{{ str }}</Tag>
     </div>
   </div>
+</Loading>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, reactive} from 'vue';
+import {computed, onMounted, reactive, ref, watch} from 'vue';
 import {CopyOutlined} from '@ant-design/icons-vue';
 import axios from 'axios';
 import {message,Tag} from "ant-design-vue";
@@ -57,8 +59,9 @@ import {useGameStore} from "@/stores/game";
 import { generateGet } from '@/utils/protocol';
 
 import MathJax from '@/utils/mathjax';
+import Loading from '@/components/next-ui/Loading.vue';
 
-
+const loading = ref(false)
 
 const copyInput = (inputText: string) => {
   const el = document.createElement('textarea');
@@ -80,15 +83,19 @@ const data = reactive({
 });
 
 onMounted(() => {
-  fetchData().then(() => {MathJax()})
+  fetchData(props.problemId).then(() => {MathJax()})
 });
 
-const game = useGameStore();
-console.log(game.match_info?.info.questionId);
-const problemId = game.match_info?.info.questionId;
-console.log(problemId);
+const props = defineProps<{
+  problemId: number
+}>()
 
-async function fetchData() {
+watch(()=>props.problemId, (val)=>{
+  fetchData(props.problemId).then(() => {MathJax()})
+})
+
+async function fetchData(problemId: number) {
+  loading.value = true
   try {
     const response = await generateGet(`/api/oj/problem?id=${problemId}`); // 替换成你的API地址
     console.log(response.data.data.data);
@@ -99,6 +106,7 @@ async function fetchData() {
     data.output_description = list.output_description;
     data.samples = list.samples;
     data.tags = list.tags;
+    loading.value = false
 
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -112,7 +120,7 @@ async function fetchData() {
 .components-question-area {
   background-color: white; /* 设置背景为黑色 */
   color: #1E1E1E; /* 设置文字颜色为白色 */
-  min-height: 100vh;
+  /* min-height: 100vh; */
   overflow-y: auto; /* 添加垂直滚动条 */
 }
 
@@ -148,7 +156,7 @@ h1 {
 
 .showArea {
   background-color: #eaf3f8; /* 或者其他深色调以便于阅读 */
-  height: 75%; /* 让showArea占据父容器的全部高度 */
+  height: 60%; /* 让showArea占据父容器的全部高度 */
   display: flex;
   flex-direction: column;
 }

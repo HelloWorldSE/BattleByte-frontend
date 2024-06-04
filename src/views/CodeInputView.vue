@@ -31,7 +31,7 @@
 
     </div>
     <div class="area2">
-      <div ref="main" class="editor">
+      <div  ref="main" class="editor">
         <div v-for="pos, player in gameStore.posMap">
           <div class="curpos" :class="(player == my_userid) ? 'me' : 'enermy'" :style="curPosStyles[player]"></div>
           <div class="maxpos" :class="(player == my_userid) ? 'me' : 'enermy'" :style="maxLineStyles[player]"></div>
@@ -43,10 +43,17 @@
 
       <div class="bottom">
         <div class="table">
-          <ContestTable/>
+          <template v-if="isResultShown">
+            <ResultTable :result-array="resultArray" />
+          </template>
+          <template v-else>
+            <ContestTable/>
+          </template>
         </div>
         <div class="other">
-
+          <Button class="showResult" @click="handleResult" type="primary" shape="round">
+            {{ isResultShown ? '收起评测结果' : '显示评测结果' }}
+          </Button>
           <div class="chat-box">
           <ChatBox/>
           </div>
@@ -65,6 +72,7 @@
             <Button class="tomato-button" @click="tomato(1)">🍅</Button>
             <Button class="tomato-3-button" @click="tomato(3)">🍅x3</Button>
           </div>
+
         </div>
       </div>
     </div>
@@ -76,7 +84,7 @@ import {ref, onMounted, computed} from 'vue';
 import {Button, Select, SelectOption, message} from 'ant-design-vue';
 import {FlagOutlined} from '@ant-design/icons-vue';
 import * as monaco from 'monaco-editor';
-import axios from 'axios';
+
 import {generateCompletionItems} from '@/components/generateCompletionItem'; // 注意路径是否正确
 
 import {useGameStore} from '@/stores/game';
@@ -88,6 +96,12 @@ import {generatePost} from '@/utils/protocol';
 import router from '@/router';
 import Tomato from '@/components/items/tomato.vue';
 import ContestTable from "@/components/ContestTable.vue";
+import ResultTable from "@/components/ResultTable.vue";
+
+
+const props = defineProps({
+  problemId: Number
+})
 
 const surrender = () => {
   hall.hall.surrender()
@@ -140,7 +154,7 @@ const font = ref('14');
 const height = ref('20');
 const selfDiv = ref(null);
 const main = ref(null);
-
+let isResultShown = ref(false);
 
 const codeTemplates = {
   'C++': `#include <iostream>\n\nint main() {\n\t// Your C++ code here\n\treturn 0;\n}`,
@@ -164,6 +178,8 @@ const maxpos_pos_my = ref({top: '0px'})
 let curLineNumber = 1
 let curColumn = 1
 const scrollOffset = ref(0)
+
+const resultArray = [];
 
 const updateMaxLine = () => {
   const maxLine = monacoEditor?.getModel().getLineCount()
@@ -239,6 +255,7 @@ onMounted(() => {
 
 });
 
+
 const theme = ref('vs-dark');
 const fontSize = ref(14);
 const lineHeight = ref(20);
@@ -304,6 +321,9 @@ const refresh_submit_status_callback = (data) => {
       clearInterval(refresh_timeout)
     }
   }
+  resultArray.push(data.result.data)
+  console.log(resultArray)
+
 }
 
 const game_end_callback = (data) => {
@@ -316,6 +336,11 @@ const game_end_callback = (data) => {
 hall.answer_result_callback = refresh_submit_status_callback
 hall.game_end_callback = game_end_callback
 
+
+const handleResult = () => {
+  isResultShown.value = !isResultShown.value;
+};
+
 //处理提交事件
 const handleSubmit = async () => {
   //获取编辑器中的代码
@@ -323,8 +348,13 @@ const handleSubmit = async () => {
   console.log(code);
 
   console.log(`STAGE B`, gameStore.match_info, gameStore.match_info.info.questionId)
+  if (props.problemId === undefined) {
+    console.warn('未选中题目，本次提交已取消。')
+    return
+  }
+  
   generatePost("/api/oj/submit", {
-    problem_id: gameStore.match_info.info.questionId + 745,
+    problem_id: props.problemId,
     language: language.value,
     code: code
   }).then(res => {
@@ -333,6 +363,8 @@ const handleSubmit = async () => {
     }
 
     console.log(res)
+
+
 
     submit_id_to_refresh.value = res.data.data.data.id
     if (refresh_timeout) {
@@ -347,6 +379,8 @@ const handleSubmit = async () => {
   })
 
 };
+
+
 
 const changeLanguageHandle = (event) => {
   const selectedLanguage = event;
@@ -386,6 +420,13 @@ const handleChangeLineHeight = (event) => {
 </script>
 
 <style scoped>
+.area2 {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+
 .components-code-input {
   display: flex;
   flex-direction: column;
@@ -395,15 +436,16 @@ const handleChangeLineHeight = (event) => {
 
 .editor {
   width: 100%;
-  height: 400px;
+  /* height: 400px; */
   flex: 1;
   position: relative;
+  min-height: 0;
 }
 
 .bottom {
   width: 100%;
   height: 200px;
-  flex: 1;
+  /* flex: 1; */
   position: relative;
   overflow: hidden;
 }
@@ -484,6 +526,10 @@ const handleChangeLineHeight = (event) => {
   background-color: red;
 }
 
+.showResult {
+  margin-top: 5px;
+  width: 100%;
+}
 
 .v-enter-active,
 .v-leave-active {
@@ -492,6 +538,14 @@ const handleChangeLineHeight = (event) => {
 
 .v-leave-to {
   opacity: 0;
+}
+
+.pcjg {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 </style>

@@ -15,10 +15,17 @@ export interface LoginResultData {
 
 export interface MatchEnterData {
     info: {
-        questionId: number
+        questionId: number[],
+        currentQuestion: number
     },
     playerMap: {
         [team_id: string]: number
+    },
+    HPMAP: {
+        [user_id: number]: number
+    },
+    acMAP: {
+        [user_id: number]: number
     }
 }
 
@@ -38,6 +45,18 @@ export interface PosSyncData {
 export interface ItemUsedData {
     sender_id: number,
     type: string
+}
+
+export interface RoomRefreshData {
+    roomid: number,
+    userid: number[],
+    username: string[],
+    avatarUrl: string[]
+}
+
+export interface HpChangeData {
+    change_id: number,
+    hp: number
 }
 
 export interface ErrorData {

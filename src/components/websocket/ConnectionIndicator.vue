@@ -42,7 +42,7 @@ const status_str = computed(() => {
   position: relative;
   color: #8E8E93;
   font-size: 12px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
 }
 .status_box::before {
