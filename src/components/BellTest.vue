@@ -84,7 +84,7 @@ import { useRouter } from 'vue-router';
         console.log("res is", res);
         localApps.value = res.data.data.content;
         initLoading.value = false;
-        curAppPage.value = res.data.pageable.pageNumber + 1;
+        curAppPage.value = res.data.data.pageable.pageNumber + 1;
         totalAppsPages.value = res.data.data.totalPages;
       } else {
         console.log("res is", res);
@@ -104,7 +104,7 @@ import { useRouter } from 'vue-router';
         console.log("res is", res);
         localApps.value = res.data.data.content;
         appsLoading.value = false;
-        curAppPage.value = res.data.pageable.pageNumber + 1;
+        curAppPage.value = res.data.data.pageable.pageNumber + 1;
         totalAppsPages.value = res.data.data.totalPages;
       } else {
         console.log("res is", res);
