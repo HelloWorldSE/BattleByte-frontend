@@ -10,6 +10,7 @@ import DeleteFriend from "@/components/profile/DeleteFriend.vue";
 import AddFriend from "@/components/profile/AddFriend.vue";
 
 import { useHallState } from "@/stores/hall";
+import Stars from "@/components/Stars.vue";
 import { pageIs } from "@/utils/pageis";
 
 pageIs('other')
@@ -286,8 +287,7 @@ const openAddFriend = () => {
     <TopNav/>
   </div>
   <div id="app">
-    <div class="star" v-for="i in 400" :key="i">
-    </div>
+    <Stars />
     <Row :gutter="24" id="main">
         <Col :span="12"  class="colBox">
             <!-- src="https://i.pravatar.cc/700" -->
@@ -469,21 +469,4 @@ const openAddFriend = () => {
 
 </style>
 
-<style lang="scss">
-.star {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  border-radius: 1px;
-  background: #fff;
-  @for $i from 1 through 400 {
-    &:nth-child(#{$i}) {
-      $randomOpacity: (random(95 + 1) + 5 - 1) / 100;
-      left: random(1000) / 10 * 1% - 1%;
-      bottom: random(1000) / 10 * 1% - 1%;
-      opacity: $randomOpacity;
-      box-shadow: 0 0 6px 1px rgba(255, 255, 255, $randomOpacity);
-    }
-  }
-}
-</style>
+

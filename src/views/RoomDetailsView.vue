@@ -1,10 +1,9 @@
 <template>
   <div id="app">
-      <div class="star" v-for="i in 400" :key="i">
-      </div>
+      <Stars/>
       <div class="waiting-room">
           <div class="waiting-title">
-              <h2>当前房间：房间号</h2>
+              <h2>当前房间：{{ roomInfo.name }}</h2>
               <h2>正在等待其他玩家加入...</h2>
           </div>
           <div class="player-list">
@@ -40,13 +39,45 @@ import { Spin, Avatar, Tooltip } from 'ant-design-vue';
 import 'animate.css';
 import LottieJson from '@/assets/Animation_fighting.json';
 import { Vue3Lottie } from 'vue3-lottie'
+
+import { useRoute } from 'vue-router';
+import { generateGet } from '@/utils/protocol';
+import Stars from '@/components/Stars.vue';
 import { useRoomState } from '@/stores/room';
+
   // import LottieVuePlayer from '@lottiefiles/vue-lottie-player';
 
+const route = useRoute();
+
+function getPageRoomId(params: string | string[]) {
+  return params ? (Array.isArray(params) ? params[0] as string : params as string) : '';
+}
+
+const roomId = ref(getPageRoomId(route.params.id))
+const curUserId = ref(localStorage.getItem('userId'))
+const roomInfo = ref<any>({name: ''})
 interface Player {
   username: string;
   avatarUrl: string;
 }
+
+
+const initRoomInfo = async () => {
+  console.log('roomId', roomId.value);
+
+  generateGet(`/api/room/id?id=${roomId.value}`).then((res) => {
+    if (res.data.status === 0) {
+      roomInfo.value = res.data.data;
+      console.log('roomInfo', roomInfo.value.name);
+    } else {
+      console.log(res.data.msg);
+    }
+  }).catch((err) => {
+    console.log(err);
+  });
+};
+
+initRoomInfo();
 
 const roomState = useRoomState()
 
@@ -61,6 +92,7 @@ const onlinePlayers = computed(() => {
   }
   return players
 });
+
 </script>
 <style scoped>
 #app {
@@ -77,6 +109,7 @@ align-items: stretch; /* 使子元素填满容器宽度 */
   align-items: center;
   justify-content: center;
   height: 100vh;
+
   /* background-color: #f0f2f5; */
 }
 
@@ -155,21 +188,3 @@ align-items: stretch; /* 使子元素填满容器宽度 */
 
 </style>
 
-<style lang="scss">
-.star {
-position: absolute;
-width: 1px;
-height: 1px;
-border-radius: 1px;
-background: #fff;
-@for $i from 1 through 400 {
-  &:nth-child(#{$i}) {
-    $randomOpacity: (random(95 + 1) + 5 - 1) / 100;
-    left: random(1000) / 10 * 1% - 1%;
-    bottom: random(1000) / 10 * 1% - 1%;
-    opacity: $randomOpacity;
-    box-shadow: 0 0 6px 1px rgba(255, 255, 255, $randomOpacity);
-  }
-}
-}
-</style>
