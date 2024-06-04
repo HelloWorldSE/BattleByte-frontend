@@ -7,11 +7,11 @@ export const useGameStore = defineStore('game', () => {
     const match_info = ref<MatchInfo | undefined>($undefined({
         "playerMap":{"0":15,"1":10},
         "info":{"questionId": [26, 25], 'currentQuestion':1},
-        HPMAP: {
+        hpMap: {
             26: 100,
             25: 10
         },
-        acMAP: {
+        acMap: {
             26: 0,
             25: 1
         }

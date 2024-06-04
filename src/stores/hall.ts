@@ -22,7 +22,7 @@ export const useHallState = defineStore('hall_state', () => {
     })
     const rcv_hp_change = ref<(data: HpChangeData) => void>((data) => {
         if (gameState.match_info) {
-            gameState.match_info.HPMAP[data.change_id] = data.hp
+            gameState.match_info.hpMap[data.change_id] = data.hp
         }
     })
 

@@ -55,8 +55,8 @@ const data = computed(() => {
       key: playerId.toString(),
       name: 'NONAME',
       rank: 0,
-      hp: game.match_info.HPMAP[playerId],
-      ac: game.match_info.acMAP[playerId]
+      hp: game.match_info.hpMap[playerId],
+      ac: game.match_info.acMap[playerId]
     })
   }
   return dataItems

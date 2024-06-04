@@ -21,10 +21,10 @@ export interface MatchEnterData {
     playerMap: {
         [team_id: string]: number
     },
-    HPMAP: {
+    hpMap: {
         [user_id: number]: number
     },
-    acMAP: {
+    acMap: {
         [user_id: number]: number
     }
 }
