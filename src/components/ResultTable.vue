@@ -1,8 +1,15 @@
 <template>
   <div>
     <Table :columns="columns" :dataSource="data" rowKey="id" :pagination=false >
-      <template #status="{ text }">
-        <Tag color="red">{{ text }}</Tag>
+      <template #bodyCell="{ column, text }">
+        <template v-if="column.dataIndex === 'status'">
+          <Tag :color="getStatusColor(text)">
+            {{text}}
+          </Tag>
+        </template>
+        <template v-else>
+          {{ text }}
+        </template>
       </template>
     </Table>
   </div>
@@ -23,34 +30,33 @@ const props = defineProps({
 
 const columns = [
   {
-    title: 'When',
+    title: '时间',
     dataIndex: 'when',
     key: 'when',
     customRender: ({ text }) => formatDate(text)
   },
   {
-    title: 'Status',
+    title: '状态',
     dataIndex: 'status',
     key: 'status',
-    scopedSlots: { customRender: 'status' },
   },
   {
-    title: 'Problem',
+    title: '题目号',
     dataIndex: 'problem',
     key: 'problem',
   },
   {
-    title: 'Time',
+    title: '时间消耗',
     dataIndex: 'time',
     key: 'time',
   },
   {
-    title: 'Memory',
+    title: '内存消耗',
     dataIndex: 'memory',
     key: 'memory',
   },
   {
-    title: 'Language',
+    title: '语言',
     dataIndex: 'language',
     key: 'language',
   },
@@ -80,35 +86,34 @@ const data = computed(() => {
 
 const getStatusColor = (status) => {
   const colors = {
-    '-2': 'gray',
-    '-1': 'red',
-    '0': 'green',
-    '1': 'orange',
-    '2': 'orange',
-    '3': 'purple',
-    '4': 'red',
-    '5': 'gray',
-    '6': 'blue',
-    '7': 'blue',
-    '8': 'yellow',
-    '9': 'blue'
+    'CE': 'gray',
+    'WA': 'red',
+    'AC': 'green',
+    'TLE': 'orange',
+    'MLE': 'purple',
+    'RE': 'red',
+    'SE': 'gray',
+    'PD': 'blue',
+    'JDG': 'blue',
+    'PA': 'yellow',
+    'SBM': 'blue'
   };
   return colors[status] || 'default';
 };
 
 const status_name = {
-  '-2': 'Compile Error',
-  '-1': 'Wrong Answer',
-  '0': 'Accepted',
-  '1': 'Time Limit Exceeded',
-  '2': 'Time Limit Exceeded',
-  '3': 'Memory Limit Exceeded',
-  '4': 'Runtime Error',
-  '5': 'System Error',
-  '6': 'Pending',
-  '7': 'Judging',
-  '8': 'Partial Accepted',
-  '9': 'Submitting'
+  '-2': 'CE',
+  '-1': 'WA',
+  '0': 'AC',
+  '1': 'TLE',
+  '2': 'TLE',
+  '3': 'MLE',
+  '4': 'RE',
+  '5': 'SE',
+  '6': 'PD',
+  '7': 'JDG',
+  '8': 'PA',
+  '9': 'SBM'
 }
 
 
