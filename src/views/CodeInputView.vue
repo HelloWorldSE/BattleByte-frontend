@@ -51,12 +51,13 @@
           </template>
         </div>
         <div class="other">
-          <Button class="showResult" @click="handleResult" type="primary" shape="round">
+          <div class="chat-box">
+            <ChatBox/>
+          </div>
+          <Button class="showResult" @click="handleResult" >
             {{ isResultShown ? '收起评测结果' : '显示评测结果' }}
           </Button>
-          <div class="chat-box">
-          <ChatBox/>
-          </div>
+
           <!-- 提交按钮 -->
           <Button class="submit-button" @click="handleSubmit" type="primary" shape="round">
             提交
@@ -352,7 +353,7 @@ const handleSubmit = async () => {
     console.warn('未选中题目，本次提交已取消。')
     return
   }
-  
+
   generatePost("/api/oj/submit", {
     problem_id: props.problemId,
     language: language.value,
@@ -528,7 +529,7 @@ const handleChangeLineHeight = (event) => {
 
 .showResult {
   margin-top: 5px;
-  width: 100%;
+  width: 75%;
 }
 
 .v-enter-active,
