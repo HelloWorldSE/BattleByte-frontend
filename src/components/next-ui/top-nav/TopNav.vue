@@ -108,7 +108,7 @@ const cancelMatch = () => {
         </div>
         <div class="center-button-area">
             <div class="topper">
-                <svg width="807" height="150" viewBox="0 0 807 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg class="center-svg-panel" width="807" height="150" viewBox="0 0 807 150" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path id="button-2" :class="buttonActive2" d="M725.064 92.5H543.662C542.932 92.5 542.448 91.7425 542.755 91.0798L569.621 33.0587C570.767 30.5839 573.246 29 575.973 29H757.901C758.635 29 759.119 29.7636 758.806 30.4269L731.394 88.4885C730.238 90.9376 727.772 92.5 725.064 92.5Z" fill="#D9D9D9" fill-opacity="0"/>
                     <path id="button-1" :class="buttonActive1" d="M522.085 92H329.565C328.835 92 328.351 91.2425 328.658 90.5798L355.524 32.5587C356.67 30.0839 359.149 28.5 361.876 28.5H554.922C555.656 28.5 556.139 29.2636 555.826 29.9269L528.415 87.9885C527.258 90.4376 524.793 92 522.085 92Z" fill="#D9D9D9" fill-opacity="0"/>            
                     <path @click="mainClick" id="main-button" :class="buttonActiveMain" d="M328.148 32.0125L304.143 82.7037C301.455 88.3795 295.726 92 289.433 92H56.7901C50.4968 92 44.768 88.3795 42.0802 82.7037L18.0753 32.0125C17.447 30.6857 18.4148 29.1566 19.8829 29.1566H326.34C327.808 29.1566 328.776 30.6857 328.148 32.0125Z" fill="#CC2828" fill-opacity="0"/>
@@ -165,9 +165,14 @@ const cancelMatch = () => {
 
 <style scoped>
 
+.center-svg-panel {
+    pointer-events: none;
+}
+
 .topper {
     position: relative;
     z-index: 1000;
+    pointer-events: none;
 }
 
 .matching-timer {
