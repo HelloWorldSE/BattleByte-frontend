@@ -36,15 +36,23 @@ import Stars from "@/components/Stars.vue";
 import { generateGet } from "@/utils/protocol";
 
 const localUserId = localStorage.getItem("userId");
-const history = ref([]); // 创建一个ref来存储历史记录数据
+const history = ref<HistoryItem[]>([]); // 创建一个ref来存储历史记录数据
 const searchValue = ref(''); // 创建一个ref来存储搜索输入值
+
+type HistoryItem = {
+  gameId: number,
+  id: number,
+  rank: number,
+  team: number,
+  userId: 4
+}
 
 const columns = [
   {
     title: 'Game ID',
     dataIndex: 'gameId',
     key: 'gameId',
-    sorter: (a, b) => a.gameId - b.gameId,
+    sorter: (a : HistoryItem, b : HistoryItem ) => a.gameId - b.gameId,
   },
   {
     title: 'Mode',
@@ -59,7 +67,7 @@ const columns = [
 ]; // 定义表格列的配置
 
 
-const renderTeamMode = (team) => {
+const renderTeamMode = (team : number | null | '') => {
   if (team === null || team === '' || team === 1 || team === 2 || team == 0) {
     return '单人模式';
   } else if (team > 2) {
@@ -75,11 +83,11 @@ const filteredHistory = computed(() => {
   return history.value.filter(item => item.gameId.toString().includes(searchValue.value));
 }); // 根据搜索值过滤历史记录数据
 
-const onSearch = (value) => {
+const onSearch = (value : string) => {
   searchValue.value = value;
 }; // 搜索函数
 
-const getStatusColor = (status) => {
+const getStatusColor = (status:string) => {
   switch (status) {
     case 'active':
       return 'green';
