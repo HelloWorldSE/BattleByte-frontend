@@ -1,5 +1,5 @@
 <template>
-    <Modal v-model:open="modalVisible" title="创建房间" @ok="handleOk" centered>
+    <Modal v-model:open="modalVisible" title="创建房间" @ok="handleOk" @cancel="handleCancel" :wrapClassName="wrapAddRoom"  centered>
         <template #footer>
             <Button key="back" @click="handleCancel">取消</Button>
             <Button key="submit" type="primary" :loading="loading" @click="handleOk">创建房间</Button>
@@ -9,11 +9,19 @@
                 <Input v-model:value="formState.roomName" placeholder="Room Name"></Input>
             </FormItem>
             <FormItem label="选择题目">
-                <template v-for="tag in selectedProblems" :key="tag">
-                    <Tag closable @close="handleCloseTag(tag)">#{{ tag }}</Tag>
-                </template>
-                <Select :options="options" @change="onSelectChange" placeholder="搜索题目难度"></Select>
-                <List>
+                    <template v-for="tag in selectedProblems" :key="tag">
+                        <Tag closable @close="handleCloseTag(tag)" :color="tag.color">{{ tag.title }}</Tag>
+                    </template>
+
+                    <Divider />
+                
+                <Select @change="onSelectChange" placeholder="搜索题目难度">
+                    <SelectOption v-for="item in options" :key="item.value" :value="item.value">
+                        <span :aria-label="item.value" :class="'custom-span-' + item.color"> {{ item.value }}</span>
+                    </SelectOption>
+                
+                </Select>
+                <List v-if="searchLoading===false">
                     <ListItem v-for="problem in showProblems" :key="problem.id">
                         <ListItemMeta
                             :title="problem.title"
@@ -21,7 +29,7 @@
                         >
                         </ListItemMeta>
                         <template #actions>
-                            <a key="check-problem">查看</a>
+                            <a key="check-problem" @click="openDrawer(problem)">查看</a>
                 <a key="add-problem" @click="addProblem(problem)">添加</a>
                         </template>
                     </ListItem>
@@ -33,23 +41,43 @@
                         </div>
                     </template>
                 </List>
+                <div v-else class="spinContainer">
+                    <Spin />
+                </div>
             </FormItem> 
         </Form>
     
     </Modal>
+    <Drawer
+        title="题目详情"
+        placement="right"
+        :visible="isDrawerOpen"
+        @close="closeDrawer"
+        :mask="false"
+        width="600"
+        >
+        <QuestionView :problem-id="curProblemId"
+        v-if="curProblemId !== -1"/>
+        <p v-else>没有选中题目！</p>
+    </Drawer>
     
 </template>
 
 <script lang="ts" setup>
 import { defineProps, defineEmits } from 'vue';
-import { Modal, Button, Form, FormItem, Input, message, type FormInstance, Select, List, ListItem, ListItemMeta, Pagination, Tag } from 'ant-design-vue';
-import { computed, reactive, ref } from 'vue';
+import { Modal, Button, Form, FormItem, Input, message, type FormInstance, Select, List, ListItem, ListItemMeta, Pagination, Tag, Divider, SelectOption, Drawer, Spin } from 'ant-design-vue';
+import { computed, reactive, ref, watch } from 'vue';
 import { generatePost, generateGet } from '@/utils/protocol';
+import QuestionView from '@/views/QuestionView.vue';
 
 
 const currentPage = ref(1);
 const onePageSize = 5;
 const totalProblems = ref(0);
+const isDrawerOpen = ref(false);
+const curProblemId = ref(-1);
+
+const searchLoading = ref(false);
 
 const props = defineProps({
     modelValue: {
@@ -74,7 +102,7 @@ const loading = ref(false);
 const formRef = ref<FormInstance | null>(null);
 const promblems = ref([] as any[]);
 const showProblems = ref([] as any[]);
-const selectedProblems = ref<string[]>([]);
+const selectedProblems = ref<any[]>([]);
 
 const roomNameCheck = (_: any, value: string) => {
     if (!value) {
@@ -86,6 +114,8 @@ const roomNameCheck = (_: any, value: string) => {
 
 const handleCancel = () => {
     modalVisible.value = false;
+    formRef.value?.resetFields();
+    isDrawerOpen.value = false;
 };
 
 const handleOk = () => {
@@ -98,6 +128,7 @@ const handleOk = () => {
             formRef.value?.resetFields();
             formState.roomName = '';
             modalVisible.value = false;
+            isDrawerOpen.value = false;
             location.reload();
         } else {
             message.error(res.data.msg);
@@ -107,29 +138,31 @@ const handleOk = () => {
     });
 };
 
-const getProblems = () => {
-    generateGet('/api/oj/search?tag=middle').then((res) => {
-        if (res.data.status === 0) {
-            console.log(res.data.data);
-            promblems.value = res.data.data.results;
+// const getProblems = () => {
+//     generateGet('/api/oj/search?tag=middle').then((res) => {
+//         if (res.data.status === 0) {
+//             console.log(res.data.data);
+//             promblems.value = res.data.data.results;
             
-        } else {
-            message.error(res.data.msg);
-        }
-    }).catch((err) => {
-        message.error('网络错误');
-    });
-};
+//         } else {
+//             message.error(res.data.msg);
+//         }
+//     }).catch((err) => {
+//         message.error('网络错误');
+//     });
+// };
 
-getProblems();
+// getProblems();
 
-const options = [{value:'easy'}, {value:'middle'}];
+const options = [{value:'Loop', color:"green"}, {value:'middle', color:"blue"}, {value:'Input and Output', color:'red'}, {value:'String', color:'orange'}];
 
 const onSelectChange = (value:any) => {
+    searchLoading.value = true;
     console.log(value);
     generateGet(`/api/oj/search?tag=${value}`).then((res) => {
         if (res.data.status === 0) {
             console.log(res.data.data);
+            searchLoading.value = false;
             promblems.value = res.data.data.data.results;
             console.log("problems is ", promblems.value);
             totalProblems.value = promblems.value.length;
@@ -165,9 +198,87 @@ const handleCloseTag = (tag: string) => {
 
 const addProblem = (problem: any) => {
     console.log(problem);
-    selectedProblems.value.push(problem.title);
+    if (selectedProblems.value.some((item: any) => item.title === problem.title)){
+        return;
+    }
+    selectedProblems.value.push({
+        id: problem.id,
+        title: problem.title,
+        color: problem.tags[0] === "middle" ? "blue" :
+         problem.tags[0] === "Loop" ? "green" :
+         problem.tags[0] === "String" ? "orange" :"red",
+    });
+    console.log("problem.tags[0] is", problem.tags[0]);
+    console.log("select is", selectedProblems.value);
 }
+
+const judgeIfDisabled = (problem: any) => {
+    console.log("selectedProblems.value is", selectedProblems.value);
+    return selectedProblems.value.some((item: any) => item.title === problem.title);
+}
+
+
+const openDrawer = (problem:any) => {
+    isDrawerOpen.value = true;
+    curProblemId.value = problem._id;
+};
+
+const closeDrawer = () => {
+  isDrawerOpen.value = false;
+};
+
+const wrapAddRoom = computed(() => {
+  return isDrawerOpen.value ? 'modalMask' : '';
+});
+
+watch(modalVisible, (newVal) => {
+  if (!newVal) {
+    isDrawerOpen.value = false;
+  }
+});
+
+
 </script>
-<style scoped>
+
+<style>
+.modalMask {
+  right: 600px;
+}
+
+/* 定义 Modal 左移的动画效果 */
+.modalMask .ant-modal-content {
+    transform: translateX(-50%);
+    transition: transform 0.3s ease;
+}
+
+/* 确保 Modal 正常显示时复位 */
+.ant-modal-content {
+  transition: transform 0.3s ease;
+}
+
+.custom-span-green {
+    color: #52c41a;
+}
+
+.custom-span-blue {
+    color: #1890ff;
+}
+
+.custom-span-red {
+    color: #f5222d;
+}
+
+.custom-span-orange {
+    color: #fa8c16;
+}
+
+.spinContainer {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    /* background: rgba(0, 0, 0, 0.05); */
+}
 
 </style>

@@ -1,9 +1,10 @@
 <template>
+  <div id="mainPage">
   <div id="app">
     <Stars></Stars>
-    <div class="topBar">
+    <!-- <div class="topBar">
         <TopNav/>
-    </div>
+    </div> -->
     <Row :gutter="{ xs: 8, sm: 16, md: 24, lg: 32 }" type="flex" justify="center" class="main">
       <Col :span="6" v-for="(room, index) in curRooms" :key="room" :style="{marginTop: '50px'}">
         <Card hoverable class="roomCard">
@@ -38,7 +39,7 @@
     </template>
   </Pagination>
   </Row>
-    <div class="fixed-button">
+  <div class="fixed-button">
     <Tooltip title="添加房间" placement="left">
       <Button type="primary" shape="circle" @click="handleOpenCreateRoom" size="large">
         <template #icon>
@@ -47,8 +48,13 @@
       </Button>
     </Tooltip>
     </div>
-    <AddRoom v-model="fieldData.createRoom" :roomList="curRooms"/>
   </div>
+  <div id="BigParentBox">
+    <AddRoom v-model="fieldData.createRoom" :roomList="curRooms"/>
+    
+  </div>
+
+</div>
 </template>
 <script lang="ts" setup>
 
@@ -62,6 +68,8 @@ import { generateGet } from '@/utils/protocol';
 import EnterRoomButton from '@/components/EnterRoomButton.vue';
 import DeleteRoomButton from '@/components/DeleteRoomButton.vue';
 import Stars from '@/components/Stars.vue';
+import { pageIs } from '@/utils/pageis';
+pageIs('rooms');
 
 const router = useRouter();
 const fieldData = ref({
@@ -159,12 +167,18 @@ const onShowSizeChange = (current: number, size: number) => {
 };
 </script>
 <style scoped>
+#mainPage {
+  height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
 #app {
-background-color: black; /* 设置背景为黑色 */
-min-height: 100vh; /* 至少为视口的100%高度 */
-display: flex;
-flex-direction: column; /* 如果你需要垂直布局 */
-align-items: stretch; /* 使子元素填满容器宽度 */
+  background-color: black; /* 设置背景为黑色 */
+  min-height: 100vh; /* 至少为视口的100%高度 */
+  display: flex;
+  flex-direction: column; /* 如果你需要垂直布局 */
+  align-items: stretch; /* 使子元素填满容器宽度 */
 }
 
 .topBar {
@@ -174,6 +188,7 @@ align-items: stretch; /* 使子元素填满容器宽度 */
   position: relative; /* 确保 TopNav 绝对定位相对于 .top */
   z-index: 1005;
 }
+
 :deep(.ant-list-item-meta-content h4) {
     margin-top: 0;
 }
