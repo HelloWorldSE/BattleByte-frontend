@@ -36,7 +36,7 @@ const router = createRouter({
     {
       path: '/contest',
       name: 'contest',
-      component: () => import('@/views/ContestView.vue')
+      component: () => import('@/views/ContestViewAsync.vue')
     },
     {
       path: '/rule',
@@ -72,7 +72,12 @@ const router = createRouter({
     //   path: '/backgroundTest',
     //   name: 'backgroundTest',
     //   component: () => import('@/views/BackgroundTest.vue')
-    // }
+    // },
+    {
+      path: '/loading',
+      name: 'loading',
+      component: () => import('@/components/next-ui/loading/LoadingPage.vue')
+    }
   ]
 })
 
