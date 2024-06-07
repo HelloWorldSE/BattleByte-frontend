@@ -20,6 +20,7 @@
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { generateDelete } from '@/utils/protocol';
+import { message } from 'ant-design-vue';
 
 const showOpenIcon = ref(false);
 
@@ -33,10 +34,10 @@ const props = defineProps({
 const router = useRouter();
 const handleDeleteRoom = () => {
     console.log('delete room');
-    generateDelete('/api/room', {id: props.roomId}).then((res) => {
+    generateDelete(`/api/room/${props.roomId}`).then((res) => {
         if (res.data.status === 0) {
             message.success('删除房间成功');
-            location.reload();
+            // location.reload();
         } else {
             message.error('删除房间失败');
         }
