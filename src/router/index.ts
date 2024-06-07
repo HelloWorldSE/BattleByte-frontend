@@ -67,17 +67,17 @@ const router = createRouter({
       path: '/history',
       name: 'history',
       component: () => import('@/views/HistoryView.vue')
-    }
+    },
     // {
     //   path: '/backgroundTest',
     //   name: 'backgroundTest',
     //   component: () => import('@/views/BackgroundTest.vue')
     // },
-    {
-      path: '/loading',
-      name: 'loading',
-      component: () => import('@/components/next-ui/loading/LoadingPage.vue')
-    }
+    // {
+    //   path: '/loading',
+    //   name: 'loading',
+    //   component: () => import('@/components/next-ui/loading/LoadingPage.vue')
+    // }
   ]
 })
 
