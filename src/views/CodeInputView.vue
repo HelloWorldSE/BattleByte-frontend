@@ -327,15 +327,8 @@ const refresh_submit_status_callback = (data) => {
 
 }
 
-const game_end_callback = (data) => {
-  const match_res = data.result;
-  message.success(match_res, 2).then(() => {
-    router.push('/')
-  })
-}
 
 hall.answer_result_callback = refresh_submit_status_callback
-hall.game_end_callback = game_end_callback
 
 
 const handleResult = () => {

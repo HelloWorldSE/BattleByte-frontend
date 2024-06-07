@@ -11,6 +11,7 @@
   <div class="right">
       <CodeInputView :problem-id="currentProblemId"/>
   </div>
+  <LottiePage :animation-data="animationWin" v-show="is_win"/>
 </template>
 <script setup lang="ts">
 import CodeInputView from "@/views/CodeInputView.vue";
@@ -21,6 +22,17 @@ import ContestTable from "@/components/ContestTable.vue";
 import { pageIs } from "@/utils/pageis";
 import { useGameStore } from "@/stores/game";
 import { computed, ref } from "vue";
+import { useHallState } from "@/stores/hall"
+import router from "@/router";
+import { message } from "ant-design-vue";
+import LottiePage from "@/components/next-ui/loading/LottiePage.vue";
+
+// const animationWin = ref<any>({})
+// import ("@/assets/Animation-win.json").then((val) => animationWin.value=val)
+
+import animationWin from "@/assets/Animation-win.json"
+import { delay } from "@/utils/delay";
+
 
 pageIs('in-match')
 
@@ -30,6 +42,24 @@ const game = useGameStore();
 const currentProblemId = computed(() => 
   game.match_info?.info.questionId[pickedProblemId.value] ?? undefined
 )
+
+const is_win = ref(false)
+const hall = useHallState()
+
+hall.game_end_callback = (data) => {
+  const match_res = data.result;
+  if (match_res === "win") {
+    is_win.value = true
+
+    delay(6000).then(() => {
+      router.push('/')
+    })
+  } else {
+    message.info(match_res)
+  }
+  message.info(match_res)
+}
+
 
 
 </script>
