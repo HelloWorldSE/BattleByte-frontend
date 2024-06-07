@@ -283,9 +283,10 @@ const openAddFriend = () => {
     <!-- Use grid layout to show Profile-->
     <!-- The left is Avatar, and the right is a card with tab-list
         tab-1 shows Username, email, and tab-2 shows  friends-->
-  <div class="topBar">
-    <TopNav/>
-  </div>
+<!--  <div class="topBar">-->
+<!--    <TopNav/>-->
+<!--  </div>-->
+  <div id="mainPage">
   <div id="app">
     <Stars />
     <Row :gutter="24" id="main">
@@ -336,7 +337,7 @@ const openAddFriend = () => {
                                 </template>
                                 <template #renderItem="{ item }">
                                 <ListItem>
-                                    
+
                                     <template #actions>
                                     <a key="list-loadmore-edit" @click="deleteOneFriend(item)">删除</a>
                                     <a key="list-loadmore-more">聊天</a>
@@ -370,17 +371,24 @@ const openAddFriend = () => {
         <Button type="primary" @click="openEditPassword">修改密码</Button>
         <Button type="primary" @click="openAddFriend">添加好友</Button>
         <Button type="primary" @click="logOut">退出登录</Button>
-    </Flex > 
+    </Flex >
     <EditProfile :userId="pageUserId" v-model="fieldData.openEditProfile" :userName="pageUserName" :userEmail="pageEmail" :avatar="pageAvatar"/>
     <EditPassword :userId="pageUserId" v-model="fieldData.openEditPassword"/>
 
     <DeleteFriend :userId="deleteItem.userId" :userName="deleteItem.userName" :friendId="deleteItem.friendId" v-model="fieldData.openDeleteFriend"></DeleteFriend>
-    
+
     <AddFriend :userId="pageUserId" v-model="fieldData.openAddFriend"></AddFriend>
 </div>
+  </div>
 </template>
 
 <style scoped>
+
+#mainPage {
+  height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
 
 #app {
   background-color: black; /* 设置背景为黑色 */
@@ -409,14 +417,14 @@ const openAddFriend = () => {
     height: 50%;
     object-fit: cover;
     transition: box-shadow .3s;
-    
+
     /* filter: brightness(0.5); */
-    
+
 }
 #avatar:hover {
     /* filter: brightness(0.5); */
     /* hover shade effect */
-    box-shadow: 0 0 11px rgb(255, 255, 255); 
+    box-shadow: 0 0 11px rgb(255, 255, 255);
 }
 
 #rightCard {
