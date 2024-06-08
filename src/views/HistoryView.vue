@@ -34,6 +34,9 @@ import {computed, ref} from 'vue';
 import { Table, Tag, InputSearch } from 'ant-design-vue';
 import Stars from "@/components/Stars.vue";
 import { generateGet } from "@/utils/protocol";
+import { pageIs } from '@/utils/pageis';
+
+pageIs('history')
 
 const localUserId = localStorage.getItem("userId");
 const history = ref<HistoryItem[]>([]); // 创建一个ref来存储历史记录数据

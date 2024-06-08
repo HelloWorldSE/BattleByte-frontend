@@ -2,6 +2,9 @@
 import { defineAsyncComponent } from 'vue'
 import LoadingPage from '@/components/next-ui/loading/LoadingPage.vue'
 import { delay } from '@/utils/delay';
+import { pageIs } from "@/utils/pageis";
+
+pageIs('in-match')
 
 const AsyncComp = defineAsyncComponent({
   // the loader function
