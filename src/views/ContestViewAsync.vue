@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import { defineAsyncComponent } from 'vue'
 import LoadingPage from '@/components/next-ui/loading/LoadingPage.vue'
-
-const delay = (time: number) => new Promise<void>((r)=>{
-    setTimeout(() => {
-        r()
-    }, time);
-})
+import { delay } from '@/utils/delay';
 
 const AsyncComp = defineAsyncComponent({
   // the loader function
