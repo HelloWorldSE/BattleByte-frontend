@@ -32,6 +32,7 @@ import LottiePage from "@/components/next-ui/loading/LottiePage.vue";
 
 import animationWin from "@/assets/Animation-win.json"
 import { delay } from "@/utils/delay";
+import { HallStatus } from "@/core/game/hall";
 
 
 pageIs('in-match')
@@ -47,17 +48,19 @@ const is_win = ref(false)
 const hall = useHallState()
 
 hall.game_end_callback = (data) => {
+  hall.hallStatus = HallStatus.SETTLING
+
   const match_res = data.result;
   if (match_res === "win") {
     is_win.value = true
-
-    delay(6000).then(() => {
-      router.push('/')
-    })
   } else {
     message.info(match_res)
   }
-  message.info(match_res)
+  
+  delay(6000).then(() => {
+    hall.hallStatus = HallStatus.ONLINE
+    router.push('/')
+  })
 }
 
 

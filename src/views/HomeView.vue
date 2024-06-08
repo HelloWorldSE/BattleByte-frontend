@@ -32,12 +32,12 @@
     </div>
 
     <div class="match-button">
-      <MatchingButton @click="onClickMatch()" :disabled="matchingDisabled || matching"/>
+      <MatchingButton @click="onClickMatch()" :disabled="matchingDisabled"/>
     </div>
 
-    <div v-if="matching" class="match-button" style="z-index: 999;">
+    <!--<div v-if="matching" class="match-button" style="z-index: 999;">
       <button @click="cancelMatch">取消匹配</button>
-    </div>
+    </div>-->
 
     <!-- INFORMATION  -->
     <div class="information-container">
@@ -123,7 +123,6 @@ export default {
       // peopleNum: null,
       type: 1,
       timer: null,
-      matching: false,
       infoModalVisible: false,
       mode: null,
       modes: ["WIDTH", "SPEED", "DISTANCE"],
@@ -460,10 +459,8 @@ export default {
     },
     cancelMatch() {
       window.location.reload();
-      this.matching = false;
     },
     onClickMatch() {
-      this.matching = true;
       this.mode = "SPEED";
       setTimeout(() => {
         this.mode = "DISTANCE";

@@ -25,5 +25,8 @@ export default defineConfig({
         ws: true
       }
     }
+  },
+  optimizeDeps: {
+    exclude: ['vue-demi']
   }
 })

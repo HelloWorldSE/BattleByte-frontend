@@ -15,6 +15,7 @@
     "@ant-design/icons-vue": "^7.0.1",
     "@lottiefiles/lottie-player": "^2.0.4",
     "@lottiefiles/vue-lottie-player": "^1.1.0",
+    "@vueuse/sound": "^2.0.1",
     "animate.css": "^4.1.1",
     "ant-design-vue": "^4.1.2",
     "axios": "^1.6.8",
