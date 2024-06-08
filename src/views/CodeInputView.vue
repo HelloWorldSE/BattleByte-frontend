@@ -180,7 +180,7 @@ let curLineNumber = 1
 let curColumn = 1
 const scrollOffset = ref(0)
 
-const resultArray = [];
+const resultArray = ref([]);
 
 const updateMaxLine = () => {
   const maxLine = monacoEditor?.getModel().getLineCount()
@@ -322,8 +322,8 @@ const refresh_submit_status_callback = (data) => {
       clearInterval(refresh_timeout)
     }
   }
-  resultArray.push(data.result.data)
-  console.log(resultArray)
+  resultArray.value.push(data.result.data)
+  // console.log(resultArray.value)
 
 }
 

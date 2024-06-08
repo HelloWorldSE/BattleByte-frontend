@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Table :columns="columns" :dataSource="data" rowKey="id" :pagination=false >
+    <Table sticky :columns="columns" :dataSource="data" rowKey="id" :pagination=false >
       <template #bodyCell="{ column, text }">
         <template v-if="column.dataIndex === 'status'">
           <Tag :color="getStatusColor(text)">
@@ -33,27 +33,32 @@ const columns = [
     title: '时间',
     dataIndex: 'when',
     key: 'when',
-    customRender: ({ text }) => formatDate(text)
+    // customRender: ({ text }) => formatDate(text)
+    width: '20%',
   },
   {
     title: '状态',
     dataIndex: 'status',
     key: 'status',
+    width: '12%',
   },
   {
     title: '题目号',
     dataIndex: 'problem',
     key: 'problem',
+    width: '17%',
   },
   {
     title: '时间消耗',
     dataIndex: 'time',
     key: 'time',
+    ellipsis: true
   },
   {
     title: '内存消耗',
     dataIndex: 'memory',
     key: 'memory',
+    ellipsis: true
   },
   {
     title: '语言',
@@ -75,11 +80,11 @@ const formatDate = (dateString) => {
 
 const data = computed(() => {
   return props.resultArray.map(item => ({
-    when: item.create_time,
+    when: formatDate(item.create_time),
     status: status_name[item.result],
     problem: item.problem,
-    time: item.statistic_info.time_cost,
-    memory: item.statistic_info.memory_cost,
+    time: `${item.statistic_info.time_cost} ms`,
+    memory: `${(item.statistic_info.memory_cost / 1024/1024).toFixed(1)} MB`,
     language: item.language,
   }))
 });
