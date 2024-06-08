@@ -1,5 +1,5 @@
 <template>
-  <Table :columns="columns" :data-source="data" :pagination="false">
+  <Table sticky :columns="columns" :data-source="data" :pagination="false">
     <template v-slot:bodyCell="data">
       <template v-if="data.column.key === 'hp'">
         <BloodBar :value="data.text"/>
