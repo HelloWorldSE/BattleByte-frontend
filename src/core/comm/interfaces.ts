@@ -58,6 +58,9 @@ export interface HpChangeData {
     change_id: number,
     hp: number
 }
+export interface GameAddData {
+    currentQuestion: number
+}
 
 export interface ErrorData {
     ack: number,

@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { useConnector } from "./connector";
 import { Hall, HallStatus } from "@/core/game/hall";
 import { ref, watch } from "vue";
-import type { ChatMsgData, HpChangeData, ItemUsedData, PosSyncData, RoomRefreshData } from "@/core/comm/interfaces";
+import type { ChatMsgData, GameAddData, HpChangeData, ItemUsedData, PosSyncData, RoomRefreshData } from "@/core/comm/interfaces";
 import { useRoomState } from "./room";
 import { useGameStore } from "./game";
 
@@ -23,6 +23,11 @@ export const useHallState = defineStore('hall_state', () => {
     const rcv_hp_change = ref<(data: HpChangeData) => void>((data) => {
         if (gameState.match_info) {
             gameState.match_info.hpMap[data.change_id] = data.hp
+        }
+    })
+    const rcv_game_add = ref<(data: GameAddData) => void>((data) => {
+        if (gameState.match_info) {
+            gameState.match_info.info.currentQuestion = data.currentQuestion
         }
     })
 
@@ -46,6 +51,8 @@ export const useHallState = defineStore('hall_state', () => {
                 rcv_room_refresh.value(data)
             } else if (type == 'HP_CHANGE') {
                 rcv_hp_change.value(data)
+            } else if (type == 'GAME_ADD') {
+                
             }
         }
     )
