@@ -6,7 +6,7 @@ import { ref } from "vue";
 export const useGameStore = defineStore('game', () => {
     const match_info = ref<MatchInfo | undefined>($undefined({
         "playerMap":{"0":15,"1":12},
-        "info":{"questionId": [26, 25], 'currentQuestion':1},
+        "info":{"questionId": [1, 2, 3, 4, 5], 'currentQuestion':0},
         hpMap: {
             26: 100,
             25: 10

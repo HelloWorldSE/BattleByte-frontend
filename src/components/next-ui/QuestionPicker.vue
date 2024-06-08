@@ -12,9 +12,12 @@ const avail_problems = computed(() =>
 </script>
 
 <template>
+    <!--TESTING PURPOSE<button @click="game.match_info!.info.currentQuestion++">add</button>-->
     <ol class="steps">
-        <template v-for="problem_id, index of avail_problems">
-            <li :class="[`step${index+1}`, model == index ? 'current' : undefined]"
+        <template v-for="problem_id, index of game.match_info?.info.questionId">
+            <li :class="[`step${index+1}`,
+                         model == index ? 'current' : undefined,
+                         game.match_info!.info.currentQuestion < index ? 'remove' : undefined]"
                 @click="model = index">
                 <span>{{ problem_id }}</span>
             </li>
@@ -54,7 +57,12 @@ ol.steps {
         user-select: none;
 
         flex: 1;
+        transition: flex 1s;
         
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
         // Appended arrow.
         &:after {
             position: absolute;
@@ -74,7 +82,7 @@ ol.steps {
         &:first-child {
             margin-left: 0;
             span {
-                padding: $padding;
+                padding: $padding ($padding + 9px);
                 &:after {
                     border: none;
                 }
@@ -89,8 +97,15 @@ ol.steps {
         }
 
         span {
-            display: block;
-            padding: $padding ($padding + $arrow_size) $padding $padding;
+            width: 0;
+            transition: padding 1s;
+
+            overflow: hidden;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: $padding ($padding + $arrow_size + 9px) $padding ($padding + 9px);
 
             // Prepended arrow inset.
             &:after {
@@ -111,7 +126,18 @@ ol.steps {
             &:before {
                 content: counter(li) ") ";
                 counter-increment: li;
+
+                margin-right: 0.25rem;
             }
+        }
+    }
+
+    li.remove {
+        flex: 0;
+        span {
+            width: 0;
+            padding-left: 0;
+            padding-right: 0;
         }
     }
 
