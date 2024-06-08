@@ -51,10 +51,11 @@ export class Hall {
             // message.loading({content: "匹配成功！", key: 'hall_match', duration: 1})
             this.router.push('/contest')
         }
+        /* -- DEPRECATED --
         const rcv_match_end = () => {
-            this.set_status(HallStatus.SETTLING)
             message.success('比赛已结束！', 1)
         }
+        */
 
         const rcv_pos_sync = (data: any) => {
             this.sync_callback('POS_SYNC', data)
@@ -69,6 +70,7 @@ export class Hall {
             this.sync_callback('CHAT_MSG', data)
         }
         const rcv_game_end = (data: any) => {
+            this.set_status(HallStatus.SETTLING)
             this.sync_callback('GAME_END', data)
         }
         const rcv_item_used = (data: any) => {
@@ -100,7 +102,6 @@ export class Hall {
         this.conn.conn.addListener('LOGIN_ACK', rcv_login_ack)
         this.conn.conn.addListener('MATCH_START', rcv_match_start)
         this.conn.conn.addListener('MATCH_ENTER', rcv_match_enter)
-        this.conn.conn.addListener('MATCH_END', rcv_match_end)
 
         // SYNC CALLBACK
         this.conn.conn.addListener('POS_SYNC', rcv_pos_sync)
@@ -235,6 +236,18 @@ export class Hall {
         this.conn.conn.send('ROOM_REQUEST', {
             roomid: roomid,
             type: 'out'
+        })
+    }
+
+    room_start(roomid: number) {
+        this.conn.conn.send('ROOM_START', {
+            roomid: roomid
+        })
+    }
+
+    room_refresh(roomid: number) {
+        this.conn.conn.send('ROOM_GET_INFO', {
+            roomid: roomid
         })
     }
 }
