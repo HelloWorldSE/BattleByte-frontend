@@ -48,8 +48,6 @@ const is_win = ref(false)
 const hall = useHallState()
 
 hall.game_end_callback = (data) => {
-  hall.hallStatus = HallStatus.SETTLING
-
   const match_res = data.result;
   if (match_res === "win") {
     is_win.value = true
@@ -58,7 +56,7 @@ hall.game_end_callback = (data) => {
   }
   
   delay(6000).then(() => {
-    hall.hallStatus = HallStatus.ONLINE
+    hall.hall.quit_settlement()
     router.push('/')
   })
 }
