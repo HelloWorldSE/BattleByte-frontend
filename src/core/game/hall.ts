@@ -14,6 +14,7 @@ export enum HallStatus {
     ONLINE,
     MATCHING,
     IN_MATCH,
+    IN_ROOM,
     SETTLING
 }
 
@@ -170,6 +171,9 @@ export class Hall {
     }
 
     match_request(type: number) {
+        if (this.status != HallStatus.ONLINE) {
+            throw 'Not in ONLINE status. The match request has been cancelled.'
+        }
 
         this.conn.conn.send('MATCH_REQ', {
             type: type
@@ -231,16 +235,28 @@ export class Hall {
     }
 
     room_enter(roomid: number) {
+        if (this.status != HallStatus.ONLINE) {
+            throw 'Not in ONLINE status. The room enter request has been cancelled.'
+        }
+
         this.conn.conn.send('ROOM_REQUEST', {
             roomid: roomid,
             type: 'in'
         })
+
+        this.set_status(HallStatus.IN_ROOM)
     }
     room_leave(roomid: number) {
+        if (this.status != HallStatus.IN_ROOM) {
+            throw 'Not in IN_ROOM status. The room leave request has been cancelled.'
+        }
+
         this.conn.conn.send('ROOM_REQUEST', {
             roomid: roomid,
             type: 'out'
         })
+
+        this.set_status(HallStatus.ONLINE)
     }
 
     room_start(roomid: number) {
@@ -253,5 +269,6 @@ export class Hall {
         this.conn.conn.send('ROOM_GET_INFO', {
             roomid: roomid
         })
+        this.set_status(HallStatus.IN_ROOM)
     }
 }
