@@ -53,12 +53,21 @@ const data = computed(() => {
     const playerId = game.match_info.playerMap[teamId]
     dataItems.push({
       key: playerId.toString(),
-      name: 'NONAME',
+      name: game.match_info.nameMap[teamId],
       rank: 0,
       hp: game.match_info.hpMap[playerId],
       ac: game.match_info.acMap[playerId]
     })
   }
+  dataItems.sort((a, b) => {
+    if (a.ac == b.ac) {
+      return b.hp - a.hp
+    }
+    return b.ac - a.ac
+  })
+  dataItems.forEach((val, index) => {
+    val.rank = index + 1
+  })
   return dataItems
 })
 
