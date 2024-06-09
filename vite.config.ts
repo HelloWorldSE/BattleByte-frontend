@@ -21,6 +21,7 @@ export default defineConfig({
   server: {
     proxy: {
       '^/api': 'http://81.70.241.166/',
+      '^/avatar': 'http://81.70.241.166/',
       '/socket': {
         target: 'ws://81.70.241.166/', // 'ws://localhost:5174',
         ws: true

@@ -44,6 +44,7 @@ import TopNav from "@/components/TopNav.vue";
 import JSEncrypt from "jsencrypt";
 import { encryptPassword } from "@/utils/auth";
 import { pageIs } from "@/utils/pageis";
+import { useMyProfile } from "@/stores/my";
 
 const formItem = Form.Item;
 const inputPassword = Input.Password;
@@ -93,6 +94,7 @@ const passWordCheck = async (_rule: Rule, value: string) => {
 
 
 const hall = useHallState()
+const myProfile = useMyProfile()
 
 const Login_Submit = async () => {
   const userName = formState.userName;
@@ -108,6 +110,9 @@ const Login_Submit = async () => {
       hall.hall.login()
       
       let userId = getUserId();
+      
+      myProfile.userId = userId
+
       localStorage.setItem('userId', userId);
       router.push('/user/profile/' + `${userId}`);
     } else {
