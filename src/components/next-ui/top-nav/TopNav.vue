@@ -14,6 +14,7 @@ import { computed, ref, watch } from 'vue';
 
 import { pageId } from '@/utils/pageis';
 import { timeIntervalStr } from '@/utils/timeUtils'
+import { useMyProfile } from '@/stores/my';
 
 const router = useRouter()
 
@@ -34,11 +35,15 @@ const click = (bid: 1 | 2) => {
 }
 
 const hall = useHallState()
+const myProfile = useMyProfile()
+
 const log_out = () => {
 
   hall.hall.logout()
   localStorage.removeItem('token')
   localStorage.removeItem('userId')
+  
+  myProfile.userId = ''
   router.push('/auth/login')
 
 }

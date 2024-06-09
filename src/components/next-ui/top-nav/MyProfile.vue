@@ -2,17 +2,21 @@
 import { Avatar, Progress } from 'ant-design-vue';
 import LevelTip from './LevelTip.vue';
 import ConnectionIndicator from '@/components/websocket/ConnectionIndicator.vue';
+import { useMyProfile } from '@/stores/my';
+
+const myProfile = useMyProfile()
+
 </script>
 
 <template>
     <div class="wrapper">
         <div class="avatar-area">
-            <Avatar :size="50"/>
+            <Avatar :size="50" :src="myProfile.profile.avatar"/>
         </div>
         <div class="info-area">
             <div class="info-text-area">
                 <span class="info-text-name">
-                    某机智的BBer
+                    {{ myProfile.profile.userName }}
                     <ConnectionIndicator />
                 </span>
                 <LevelTip title="黄金IV" level="gold"/>
