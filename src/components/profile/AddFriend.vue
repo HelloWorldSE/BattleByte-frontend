@@ -150,6 +150,7 @@ const checkUser = (item:any) => {
 const addApplication = (item:any) => {
     generatePost('api/user/friend/add-apply', item.id).then((res) => {
         if (res.data.status === 0) {
+            
             message.success('已经向' + item.userName + '发送申请');
         } else {
             // message.error('发送申请失败');

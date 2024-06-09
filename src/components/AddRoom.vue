@@ -100,8 +100,8 @@ const formState = reactive({
 
 const loading = ref(false);
 const formRef = ref<FormInstance | null>(null);
-const promblems = ref([] as any[]);
-const showProblems = ref([] as any[]);
+const promblems = ref<any[]>([]);
+const showProblems = ref<any[]>([]);
 const selectedProblems = ref<any[]>([]);
 
 const roomNameCheck = (_: any, value: string) => {
