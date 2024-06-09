@@ -8,12 +8,16 @@ export const useGameStore = defineStore('game', () => {
         "playerMap":{"0":15,"1":12},
         "info":{"questionId": [1, 2, 3, 4, 5], 'currentQuestion':0},
         hpMap: {
-            26: 100,
-            25: 10
+            15: 100,
+            12: 10
         },
         acMap: {
-            26: 0,
-            25: 1
+            15: 0,
+            12: 1
+        },
+        nameMap: {
+            "0": "xzr",
+            "1": "dbd"
         }
     }))
 

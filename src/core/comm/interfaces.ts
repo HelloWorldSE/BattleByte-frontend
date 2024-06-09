@@ -26,6 +26,9 @@ export interface MatchEnterData {
     },
     acMap: {
         [user_id: number]: number
+    },
+    nameMap: {
+        [team_id: string]: string
     }
 }
 
