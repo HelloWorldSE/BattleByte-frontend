@@ -29,13 +29,22 @@ const props = defineProps({
         type: Number,
         required: true,
     },
+    curRooms: {
+        type: Array,
+        required: true,
+    },
 });
 
 const router = useRouter();
+const curRooms = ref(props.curRooms);
 const handleDeleteRoom = () => {
     console.log('delete room');
     generateDelete(`/api/room/${props.roomId}`).then((res) => {
         if (res.data.status === 0) {
+          console.log('curRooms:', curRooms.value);
+
+          curRooms.value = curRooms.value.filter((room) => room.id !== props.roomId);
+          console.log('curRooms1:', curRooms.value);
             message.success('删除房间成功');
             // location.reload();
         } else {

@@ -31,6 +31,7 @@ const props = defineProps({
 
 const router = useRouter();
 const handleEnterRoom = () => {
+
     router.push(`/roomDetails/${props.roomId}`);
 };
 

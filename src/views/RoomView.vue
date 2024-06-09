@@ -17,7 +17,7 @@
           </template>
           <template #actions>
             <EnterRoomButton :roomId="room.id"/>
-            <DeleteRoomButton :roomId="room.id"/>
+            <DeleteRoomButton :roomId="room.id" :curRooms="curRooms"/>
         <!-- <Button type="primary" @click="color='blue'">Change Color</Button> -->
           </template>
           <CardMeta :title="room.name" description="等待中...">
@@ -106,7 +106,7 @@ const getAvatars = (roomList:any[]) => {
 const onePageSize = ref(10);
 const currentPage = ref(1);
 const totalPages = ref(0);
-const curRooms = ref([] as any);
+const curRooms = ref<any[]>([]);
 
 const roomsLoading = ref(false);
 
@@ -165,6 +165,7 @@ const onShowSizeChange = (current: number, size: number) => {
   currentPage.value = 1;
   initGetRooms();
 };
+
 </script>
 <style scoped>
 #mainPage {
