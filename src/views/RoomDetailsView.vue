@@ -5,6 +5,7 @@
           <div class="waiting-title">
               <h2>当前房间：{{ roomInfo.name }}</h2>
               <h2>正在等待其他玩家加入...</h2>
+              <button @click="hall.hall.room_leave(roomId as unknown as number)">exit (测试)</button>
           </div>
           <div class="player-list">
               <template v-for="(player, index) in onlinePlayers" :key="player.username">
@@ -44,8 +45,13 @@ import { useRoute } from 'vue-router';
 import { generateGet } from '@/utils/protocol';
 import Stars from '@/components/Stars.vue';
 import { useRoomState } from '@/stores/room';
+import { pageIs } from '@/utils/pageis';
+import { useHallState } from '@/stores/hall';
+import { HallStatus } from '@/core/game/hall';
 
   // import LottieVuePlayer from '@lottiefiles/vue-lottie-player';
+
+pageIs('in-room')
 
 const route = useRoute();
 
@@ -92,6 +98,11 @@ const onlinePlayers = computed(() => {
   }
   return players
 });
+
+const hall = useHallState()
+if (hall.hall.status == HallStatus.ONLINE) {
+  hall.hall.room_enter(roomId.value as unknown as number)
+}
 
 </script>
 <style scoped>
