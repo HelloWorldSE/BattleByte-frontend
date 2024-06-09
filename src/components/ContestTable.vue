@@ -16,6 +16,7 @@ import { useGameStore } from '@/stores/game';
 import BloodBar from './BloodBar.vue';
 import { Table } from "ant-design-vue";
 import { computed, ref } from 'vue';
+import { getUserId } from '@/utils/auth';
 
 // 为ref函数提供泛型参数
 const columns = ref<Column[]>([
@@ -53,7 +54,7 @@ const data = computed(() => {
     const playerId = game.match_info.playerMap[teamId]
     dataItems.push({
       key: playerId.toString(),
-      name: game.match_info.nameMap[teamId],
+      name: `${game.match_info.nameMap[teamId]}${playerId.toString() == getUserId() ? ' (我)' : ''}`,
       rank: 0,
       hp: game.match_info.hpMap[playerId],
       ac: game.match_info.acMap[playerId]
