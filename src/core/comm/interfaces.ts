@@ -65,6 +65,11 @@ export interface GameAddData {
     currentQuestion: number
 }
 
+export interface RoomInvitedData {
+    roomid: number,
+    friendid: number
+}
+
 export interface ErrorData {
     ack: number,
     msg: string

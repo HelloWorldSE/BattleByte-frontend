@@ -32,7 +32,8 @@ export class Hall {
                 private sync_callback: (
                     type: 'POS_SYNC' | 'SCORE_SYNC' | 'ANSWER_RESULT' |
                           'CHAT_MSG' | 'GAME_END' | 'ITEM_USED' |
-                          'ROOM_REFRESH' | 'HP_CHANGE' | 'GAME_ADD',
+                          'ROOM_REFRESH' | 'HP_CHANGE' | 'GAME_ADD' |
+                          'ROOM_INVITED' ,
                     data: any) => void = () => {}) {
 
         // use arrow function to avoid 'this'-bindings
@@ -78,6 +79,7 @@ export class Hall {
             this.sync_callback('ITEM_USED', data)
         }
         const rcv_romm_refresh = (data: any) => {
+            this.set_status(HallStatus.IN_ROOM)
             this.sync_callback('ROOM_REFRESH', data)
         }
         const rcv_hp_change = (data: any) => {
@@ -86,6 +88,9 @@ export class Hall {
         const rcv_game_add = (data: any) => {
             this.sync_callback('GAME_ADD', data)
         }
+        const rcv_room_invited = (data: any) => {
+            this.sync_callback('ROOM_INVITED', data)
+        } 
 
 
         const conn_state_change = (state: WSConnectState) => {
@@ -117,6 +122,7 @@ export class Hall {
         this.conn.conn.addListener('ROOM_REFRESH', rcv_romm_refresh)
         this.conn.conn.addListener('HP_CHANGE', rcv_hp_change)
         this.conn.conn.addListener('GAME_ADD', rcv_game_add)
+        this.conn.conn.addListener('ROOM_INVITED', rcv_room_invited)
 
         // OFFLINE EVENT
         this.conn.registerStateChangeEvent(conn_state_change)
@@ -243,8 +249,6 @@ export class Hall {
             roomid: roomid,
             type: 'in'
         })
-
-        this.set_status(HallStatus.IN_ROOM)
     }
     room_leave(roomid: number) {
         if (this.status != HallStatus.IN_ROOM) {
@@ -270,5 +274,12 @@ export class Hall {
             roomid: roomid
         })
         this.set_status(HallStatus.IN_ROOM)
+    }
+
+    room_invite(roomid: number, friendid: number) {
+        this.conn.conn.send('ROOM_INVITE', {
+            roomid: roomid,
+            friendid: friendid
+        })
     }
 }
