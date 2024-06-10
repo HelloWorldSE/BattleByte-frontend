@@ -8,6 +8,7 @@ import type {
     RoomInvitedData, RoomRefreshData } from "@/core/comm/interfaces";
 import { useRoomState } from "./room";
 import { useGameStore } from "./game";
+import { openMsgBox } from "@/components/next-ui/notifications/notifications";
 
 export const useHallState = defineStore('hall_state', () => {
     const hallStatus = ref<HallStatus>(HallStatus.OFFLINE)
@@ -34,7 +35,7 @@ export const useHallState = defineStore('hall_state', () => {
         }
     })
     const rcv_room_invited = ref<(data: RoomInvitedData) => void>((data) => {
-        
+        openMsgBox(data.friendid, data.roomid)
     })
 
 
@@ -60,7 +61,7 @@ export const useHallState = defineStore('hall_state', () => {
             } else if (type == 'GAME_ADD') {
                 rcv_game_add.value(data)
             } else if (type == 'ROOM_INVITED') {
-
+                rcv_room_invited.value(data)
             }
         }
     )
