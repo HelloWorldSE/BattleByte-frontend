@@ -10,10 +10,12 @@ import TopNav from '@/components/next-ui/top-nav/TopNav.vue';
 useConnector()
 useHallState()
 
+import NotificationHolder from './components/next-ui/notifications/NotificationHolder.vue';
 </script>
 
 <template>
   <GlobalReconnectingMessage/>
+  <NotificationHolder/>
   <div class="page">
     <TopNav />
     <div class="router-wrapper">
