@@ -16,26 +16,40 @@ import { pageId } from '@/utils/pageis';
 import { timeIntervalStr } from '@/utils/timeUtils'
 import { useMyProfile } from '@/stores/my';
 import { useRoomState } from '@/stores/room';
+import { useSoundFX } from '@/stores/soundfx';
 
 const router = useRouter()
 const roomInfo = useRoomState()
 
+const soundfx = useSoundFX()
+
+const trySwitchAndSound = (path: string) => {
+    if (router.currentRoute.value.path != path) {
+        soundfx.play('topbar-switch')
+        router.push(path)
+    }
+}
+
 const mainClick = () => {
     if (pageId.value != 'in-match' && hall.hallStatus == HallStatus.IN_MATCH) {
-        router.push('/contest')
+        trySwitchAndSound('/contest')
     } else if (pageId.value != 'in-room' && hall.hallStatus == HallStatus.IN_ROOM) {
-        router.push(`/roomDetails/${roomInfo.roomInfo?.roomid}`)
+        trySwitchAndSound(`/roomDetails/${roomInfo.roomInfo?.roomid}`)
     } else {
-        router.push('/')
+        trySwitchAndSound('/')
     }
 }
 
 const click = (bid: 1 | 2) => {
     if (bid == 1) {
-        router.push('/history')
+        trySwitchAndSound('/history')
     } else if (bid == 2) {
-        router.push('/rooms')
+        trySwitchAndSound('/rooms')
     }
+}
+
+const hover = () => {
+    soundfx.play('button-hover')
 }
 
 const hall = useHallState()
@@ -103,7 +117,7 @@ watch(downerActive, (val) => {
         startMatchingTimer()
     }
 })
-
+//39.72 282.42
 const cancelMatch = () => {
     router.go(0)
 }
@@ -140,9 +154,9 @@ const cancelMatch = () => {
         <div class="center-button-area">
             <div class="topper">
                 <svg class="center-svg-panel" width="807" height="150" viewBox="0 0 807 150" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path id="button-2" @click="click(2)" :class="buttonActive2" d="M722.064 92.5H540.662C539.932 92.5 539.448 91.7425 539.755 91.0798L566.621 33.0587C567.767 30.5839 570.246 29 572.973 29H754.901C755.635 29 756.119 29.7636 755.806 30.4269L728.394 88.4885C727.238 90.9376 724.772 92.5 722.064 92.5Z" fill="#D9D9D9" fill-opacity="0"/>
-                    <path id="button-1" @click="click(1)" :class="buttonActive1" d="M519.085 92H326.565C325.835 92 325.351 91.2425 325.658 90.5798L352.524 32.5587C353.67 30.0839 356.149 28.5 358.876 28.5H551.922C552.656 28.5 553.139 29.2636 552.826 29.9269L525.415 87.9885C524.258 90.4376 521.793 92 519.085 92Z" fill="#D9D9D9" fill-opacity="0"/>            
-                    <path @click="mainClick" id="main-button" :class="buttonActiveMain" d="M328.148 32.0125L304.143 82.7037C301.455 88.3795 295.726 92 289.433 92H56.7901C50.4968 92 44.768 88.3795 42.0802 82.7037L18.0753 32.0125C17.447 30.6857 18.4148 29.1566 19.8829 29.1566H326.34C327.808 29.1566 328.776 30.6857 328.148 32.0125Z" fill="#CC2828" fill-opacity="0"/>
+                    <path id="button-2" @mouseenter="hover()" @click="click(2)" :class="buttonActive2" d="M722.064 92.5H540.662C539.932 92.5 539.448 91.7425 539.755 91.0798L566.621 33.0587C567.767 30.5839 570.246 29 572.973 29H754.901C755.635 29 756.119 29.7636 755.806 30.4269L728.394 88.4885C727.238 90.9376 724.772 92.5 722.064 92.5Z" fill="#D9D9D9" fill-opacity="0"/>
+                    <path id="button-1" @mouseenter="hover()" @click="click(1)" :class="buttonActive1" d="M519.085 92H326.565C325.835 92 325.351 91.2425 325.658 90.5798L352.524 32.5587C353.67 30.0839 356.149 28.5 358.876 28.5H551.922C552.656 28.5 553.139 29.2636 552.826 29.9269L525.415 87.9885C524.258 90.4376 521.793 92 519.085 92Z" fill="#D9D9D9" fill-opacity="0"/>            
+                    <path @click="mainClick" id="main-button" @mouseenter="hover()" :class="buttonActiveMain" d="M328.148 32.0125L304.143 82.7037C301.455 88.3795 295.726 92 289.433 92H56.7901C50.4968 92 44.768 88.3795 42.0802 82.7037L18.0753 32.0125C17.447 30.6857 18.4148 29.1566 19.8829 29.1566H326.34C327.808 29.1566 328.776 30.6857 328.148 32.0125Z" fill="#CC2828" fill-opacity="0"/>
                     
                     <line x1="756.72" y1="41.2124" x2="738.453" y2="80.1394" stroke="#B5B5B5"/>
                     <line x1="555.586" y1="41.2489" x2="537.319" y2="80.1759" stroke="#B5B5B5"/>
@@ -150,7 +164,7 @@ const cancelMatch = () => {
                     <path id="main-button-downer" :class="downerActive" d="M42.6542 93.7946L35.9454 80.07C39.7846 84.7092 45.5451 87.5 51.7396 87.5H297.26C302.924 87.5 308.225 85.1671 312.026 81.2215L306.339 93.8083L306.335 93.8189C303.3 100.974 296.852 105.5 289.809 105.5H59.1914C52.1481 105.5 45.7002 100.974 42.6653 93.8189L42.6601 93.8066L42.6542 93.7946Z" fill="black" stroke="url(#paint0_linear_53_17)"/>
                     <path id="button-2-big" :class="buttonActive2" d="M779.328 10L740.396 88.854C737.026 95.6792 730.075 100 722.463 100H529.188C527.713 100 526.745 98.4577 527.387 97.1297L564.04 21.2966C567.379 14.3889 574.375 10 582.047 10H779.328Z" fill="#CC2828" opacity="0"/>
                     <path id="button-1-big" :class="buttonActive1" d="M573.966 9L535.936 88.6201C532.614 95.5733 525.594 100 517.889 100L311.142 100C309.679 100 308.711 98.4792 309.331 97.1532L345.142 20.5317C348.43 13.496 355.495 9.00001 363.261 9.00001L573.966 9Z" fill="#CC2828" opacity="0"/>
-                    <path id="main-button-big" @click="mainClick" :class="[buttonActive, buttonActiveMain]" d="M2.48128 28.5418C-3.78528 15.2746 5.89277 0 20.5655 0H328.435C343.107 0 352.785 15.2746 346.519 28.5418L315.345 94.5418C312.04 101.538 304.997 106 297.26 106H51.7396C44.0026 106 36.9597 101.538 33.6554 94.5418L2.48128 28.5418Z" opacity="0"/>
+                    <path id="main-button-big" @mouseenter="hover()" @click="mainClick" :class="[buttonActive, buttonActiveMain]" d="M2.48128 28.5418C-3.78528 15.2746 5.89277 0 20.5655 0H328.435C343.107 0 352.785 15.2746 346.519 28.5418L315.345 94.5418C312.04 101.538 304.997 106 297.26 106H51.7396C44.0026 106 36.9597 101.538 33.6554 94.5418L2.48128 28.5418Z" opacity="0"/>
                     
                     
                     <path id="button-2-text" class="svg-text" d="M617.185 55H618.645V59.48C618.645 62.42 618.285 66.52 615.965 69.24C615.705 68.98 615.065 68.56 614.705 68.4C616.925 65.8 617.185 62.16 617.185 59.46V55ZM617.925 55H631.365V59.32H617.925V58.16H629.885V56.16H617.925V55ZM615.745 52.28H632.545V53.64H615.745V52.28ZM617.845 61.06H633.045V62.3H617.845V61.06ZM623.185 63.9H629.985V65.1H623.185V63.9ZM624.085 59.16H625.565V61.68H624.085V59.16ZM629.605 63.9H631.105C631.105 63.9 631.085 64.3 631.045 64.5C630.785 67.46 630.505 68.7 629.985 69.2C629.645 69.54 629.225 69.66 628.665 69.68C628.125 69.72 627.045 69.72 625.945 69.64C625.905 69.26 625.765 68.74 625.545 68.38C626.605 68.48 627.665 68.5 628.045 68.5C628.405 68.5 628.605 68.46 628.785 68.3C629.125 67.98 629.365 66.88 629.605 64.1V63.9ZM622.885 61.68H624.365C623.985 65.54 622.905 68.26 618.285 69.66C618.145 69.32 617.745 68.78 617.445 68.5C621.685 67.34 622.545 64.96 622.885 61.68ZM669.695 55.72H671.215V69.62H669.695V55.72ZM669.975 52.18L671.135 51.48C672.075 52.3 673.155 53.5 673.655 54.32L672.395 55.14C671.955 54.32 670.895 53.08 669.975 52.18ZM674.895 52.34H685.435V53.74H674.895V52.34ZM684.575 52.34H686.115V67.78C686.115 68.62 685.955 69.02 685.435 69.26C684.895 69.5 684.035 69.52 682.795 69.52C682.735 69.14 682.535 68.52 682.335 68.12C683.175 68.16 683.995 68.14 684.235 68.14C684.515 68.14 684.575 68.04 684.575 67.78V52.34ZM675.435 62.1V64.8H680.255V62.1H675.435ZM675.435 58.18V60.86H680.255V58.18H675.435ZM674.075 56.94H681.675V66.06H674.075V56.94Z" fill="white" fill-opacity="0.72"/>

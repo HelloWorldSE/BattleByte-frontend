@@ -98,6 +98,7 @@ import router from '@/router';
 import Tomato from '@/components/items/tomato.vue';
 import ContestTable from "@/components/ContestTable.vue";
 import ResultTable from "@/components/ResultTable.vue";
+import { useSoundFX } from '@/stores/soundfx';
 
 
 const props = defineProps({
@@ -108,11 +109,14 @@ const surrender = () => {
   hall.hall.surrender()
 }
 
+const soundfx = useSoundFX()
 const tomato = (number) => {
   if (number == 1) {
     hall.hall.use_item('tomato')
+    soundfx.play('tomato-threw')
   } else if (number == 3) {
     hall.hall.use_item('tomato3')
+    soundfx.play('tomato-threw')
   }
 }
 
@@ -137,10 +141,12 @@ const tomatoes = ref([])
 const item_used_callback = (data) => {
   if (data.type == 'tomato') {
     create_tomato()
+    soundfx.play('tomato-thrown')
   } else if (data.type == 'tomato3') {
     create_tomato()
     create_tomato()
     create_tomato()
+    soundfx.play('tomato-thrown')
   }
 }
 
@@ -312,12 +318,14 @@ const refresh_submit_status_callback = (data) => {
     if (data.result.data.result !== 6 && data.result.data.result !== 7 && data.result.data.result !== 9) {
       if (data.result.data.result === 0) {
         message.success({content: '通过！', duration: 2, key: 'oj-pending'})
+        soundfx.play('submit-accepted')
       } else {
         message.warn({
           content: `未能通过，评测状态：${status_name[data.result.data.result.toString()]}`,
           duration: 2,
           key: 'oj-pending'
         })
+        soundfx.play('submit-wrong')
       }
       clearInterval(refresh_timeout)
     }
@@ -493,7 +501,7 @@ const handleChangeLineHeight = (event) => {
   content: "";
   width: 100%;
   height: 1px;
-  z-index: 1000;
+  z-index: 1;
 }
 
 .maxpos.me {
@@ -509,7 +517,7 @@ const handleChangeLineHeight = (event) => {
   content: "";
   width: 3px;
   background-color: green;
-  z-index: 1000;
+  z-index: 1;
 }
 
 .curpos.me {
