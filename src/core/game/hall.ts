@@ -231,7 +231,6 @@ export class Hall {
 
     surrender() {
         this.conn.conn.send('SURRENDER', {})
-        message.info('已发起投降！', 2)
     }
 
     use_item(type: string = 'ink') {

@@ -3,13 +3,17 @@ import { Avatar, Progress } from 'ant-design-vue';
 import LevelTip from './LevelTip.vue';
 import ConnectionIndicator from '@/components/websocket/ConnectionIndicator.vue';
 import { useMyProfile } from '@/stores/my';
+import { useSoundFX } from '@/stores/soundfx';
 
 const myProfile = useMyProfile()
-
+const soundfx = useSoundFX()
+const hover = () => {
+    soundfx.play('button-hover')
+}
 </script>
 
 <template>
-    <div class="wrapper">
+    <div class="wrapper" @mouseenter="hover">
         <div class="avatar-area">
             <Avatar :size="50" :src="myProfile.profile.avatar"/>
         </div>
