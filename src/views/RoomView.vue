@@ -75,7 +75,7 @@ const router = useRouter();
 const fieldData = ref({
   createRoom: false,
 });
-const roomList = ref([] as any)
+// const roomList = ref([] as any)
 const roomAvatar = ref([] as any)
 const roomName = ref(Array<any>());
 
@@ -90,11 +90,11 @@ const handleEnterRoom = () => {
 };
 
 const getAvatars = (roomList:any[]) => {
-  roomList.forEach((room) => {
+  roomList.forEach((room, index) => {
     generateGet(`/api/user/profile`, {id: room.uid}).then((res) => {
       if (res.data.status === 0) {
-        roomAvatar.value.push(res.data.data.avatar);
-        roomName.value.push(res.data.data.userName);
+        roomAvatar.value[index] = res.data.data.avatar;
+        roomName.value[index] = res.data.data.userName;
       } else {
         console.log(res.data.msg);
       }
@@ -112,8 +112,8 @@ const curRooms = ref<any[]>([]);
 
 const roomsLoading = ref(false);
 
-const initGetRooms = () => {
-  generateGet('/api/room', {pageSize: onePageSize.value, page:currentPage.value}).then((res) => {
+const initGetRooms = (status:number) => {
+  generateGet(`/api/room?status=${0}`, {pageSize: onePageSize.value, page:currentPage.value}).then((res) => {
     if (res.data.status === 0) {
       curRooms.value = res.data.data.content;
       getAvatars(curRooms.value);
@@ -129,7 +129,9 @@ const initGetRooms = () => {
   });
 };
 
-initGetRooms();
+initGetRooms(0);
+
+const status = ref(0)
 
 const onLoadMoreRooms = (val: any) => {
   currentPage.value = val;
@@ -141,7 +143,7 @@ const onLoadMoreRooms = (val: any) => {
   // curRooms.value = xx;
   // roomAvatar.value = yy;
 
-  generateGet("api/room", {pageSize: onePageSize.value, page: currentPage.value}).then((res) => {
+  generateGet(`api/room?status=${status.value}`, {pageSize: onePageSize.value, page: currentPage.value}).then((res) => {
     if (res.data.status === 0) {
       curRooms.value = res.data.data.content;
       getAvatars(curRooms.value);
@@ -166,7 +168,7 @@ const pageSizeOptions = ref<string[]>(['10', '20', '30', '40', '50']);
 const onShowSizeChange = (current: number, size: number) => {
   onePageSize.value = size;
   currentPage.value = 1;
-  initGetRooms();
+  initGetRooms(0);
 };
 
 </script>
