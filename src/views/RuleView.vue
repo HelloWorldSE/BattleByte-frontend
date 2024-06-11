@@ -1,8 +1,5 @@
 <template>
-    <div class="topBar">
-        <TopNav/>
-    </div>
-    <div>
+    <div class="wrapper">
         <Row :gutter="24" id="main">
     <Col span="18" class="colBox">
     <Typography id="typo">
@@ -74,7 +71,9 @@
 </template>
 
 <script lang="ts" setup>
-import TopNav from "@/components/TopNav.vue";
+import { pageIs } from "@/utils/pageis";
+pageIs('rule')
+
 import { Typography, Anchor, TypographyTitle, Divider, TypographyParagraph, TypographyText, RadioGroup, Radio, Table, TypographyLink, Row, Col } from "ant-design-vue";
 import { onMounted, ref } from "vue";
 
@@ -117,12 +116,9 @@ const anchorItems = ref<Array<any>>( [
 </script>
 
 <style scoped>
-.topBar {
-  z-index: 1005;
-  width: 100%;
-  overflow: hidden; /* 隐藏超出部分 */
-  height: 60px;
-  position: relative; /* 确保 TopNav 绝对定位相对于 .top */
+.wrapper {
+    overflow-y: scroll;
+    height: 100%;
 }
 
 #main {
