@@ -4,18 +4,18 @@
       <Modal v-model:open="modalVisible" title="修改个人信息" @ok="handleOk" centered>
         <template #footer>
           <Button key="back" @click="handleCancel">取消</Button>
-          <Button key="submit" type="primary" :loading="loading" @click="handleOk">修改信息</Button>
+          <Button key="submit" type="primary" :loading="loading" html-type="submit" @click="handleOk">修改信息</Button>
         </template>
         <Form ref="formRef" :model="formState" layout="vertical">
-            <FormItem label="新用户名" :rules="[{validator: userNameCheck, trigger: 'blur'}]">
+            <FormItem label="新用户名" :rules="[{validator: userNameCheck, trigger: 'blur'}]" name="userName">
               <Input v-model:value="formState.userName" placeholder="Username"></Input>
               
             </FormItem>
-            <FormItem label="新邮箱" :rules="[{validator: emailCheck, trigger: 'blur'}]">
+            <FormItem label="新邮箱" :rules="[{validator: emailCheck, trigger: 'blur'}]" name="email">
                 <Input v-model:value="formState.email" placeholder="Email"></Input>
             </FormItem>
             <FormItem 
-            label="头像">
+            label="头像" name="avatar">
             <Upload
             v-model:file-list="fileList"
             action="#"
@@ -96,8 +96,11 @@
     const formRef = ref<FormInstance>();
     
     const handleOk = () => {
-       
-        loading.value = true;
+
+        // validate form
+        formRef.value?.validate().then(() => {
+            console.log('formRef.value is', formRef.value);
+            loading.value = true;
         const userName = formState.userName;
         const email = formState.email;
         const avatar = formState.avatar;
@@ -122,7 +125,7 @@
                 formState.email = '';
                 formState.avatar = '';
                 emit('update:modelValue', false);
-                location.reload();
+                // location.reload();
             } else {
                 message.error('修改失败');
                 loading.value = false;
@@ -131,7 +134,8 @@
             message.error(err);
             loading.value = false;
         })
-
+     })
+       
         // setTimeout(() => {
         // loading.value = false;
         // open.value = false;
