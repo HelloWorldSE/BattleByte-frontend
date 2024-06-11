@@ -3,7 +3,7 @@
     <Stars/>
     <div class="search-container">
       <InputSearch
-          placeholder="Search by Game ID"
+          placeholder="根据游戏编号搜索"
           enter-button
           @search="onSearch"
           v-model:value="searchValue"
