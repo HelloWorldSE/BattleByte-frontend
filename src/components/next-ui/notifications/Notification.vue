@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useDrawerState } from '@/stores/drawer';
+import { generatePost } from '@/utils/protocol';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons-vue';
 import { Button, notification } from 'ant-design-vue';
 import { h } from 'vue'
@@ -8,20 +10,44 @@ const props = defineProps<{
     description: string,
     duration: number,
     _key: string,
-    newBurningCircle: any
+    newBurningCircle: any,
+    extraInfo: any
 }>()
 
 const close = () => {
     notification.close(props._key)
 }
 
-const accept = () => {
-    // TODO: 接受好友申请
-    close()
+
+const processApplication = (appId: number, accept: boolean) => {
+  generatePost('api/user/friend/process?accept='+((accept)?'true':'false'), 
+    appId
+  ).then((res) => {
+    if (res.data.status === 0) {
+    } else {
+      console.error(res.data.msg);
+    }
+  });
 }
 
+const accept = (e: MouseEvent) => {
+    const appId = props.extraInfo as unknown as number
+    processApplication(appId, true)
+    close()
+    e.stopPropagation()
+}
+
+const decline = (e: MouseEvent) => {
+    const appId = props.extraInfo as unknown as number
+    processApplication(appId, false)
+    close()
+    e.stopPropagation()
+}
+
+const drawerState = useDrawerState()
 const jump = () => {
     // TODO：打开侧边栏并跳转好友申请页
+    drawerState.friendOpen = true
     close()
 }
 </script>
@@ -30,13 +56,13 @@ const jump = () => {
 <div class="wrapper" @click="jump">
     <div class="content">
         <div class="header">
-            USERNAME
+            {{props.title}}
         </div>
         <div class="message">
-            申请添加您为好友
+            {{props.description}}
         </div>
         <div class="buttons">
-            <Button ghost shape="round" danger size="small" :icon="h(CloseOutlined)" @click="close"></Button>
+            <Button ghost shape="round" danger size="small" :icon="h(CloseOutlined)" @click="decline"></Button>
             <Button ghost shape="round" size="small" :icon="h(CheckOutlined)" @click="accept"></Button>
         </div>
     </div>

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ConfigProvider, Modal } from 'ant-design-vue';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import MBButton from '@/components/next-ui/notifications/MBButton.vue'
 import { useRouter } from 'vue-router';
+import { generateGet } from '@/utils/protocol';
 
 const open = ref(true)
 
@@ -10,6 +11,51 @@ const props = defineProps<{
     friendid: number,
     roomid: number
 }>()
+
+const friendName = ref<string>('')
+const roomName = ref<string>('')
+
+const initFriendInfo = async (friendid: number) => {
+  return await generateGet("api/user/profile", { id: friendid }).then((res) => {
+    if (res.data.status === 0) {
+      return res.data.data.userName as string
+    } else {
+      console.log(res.data.msg);
+      return '好友'
+    }
+  }).catch((err) => {
+    console.log(err);
+    return '好友'
+  });
+};
+
+const initRoomInfo = async (roomid: number) => {
+  return await generateGet(`/api/room/id?id=${roomid}`).then((res) => {
+    if (res.data.status === 0) {
+      return res.data.data.name as string
+    } else {
+      console.log(res.data.msg);
+      return '房间'
+    }
+  }).catch((err) => {
+    console.log(err);
+    return '房间'
+  });
+};
+
+watch(()=> props.friendid, (val) => {
+    friendName.value = val.toString()
+    initFriendInfo(val).then((name) => {
+        friendName.value = name
+    })
+}, { immediate: true })
+watch(()=> props.roomid, (val) => {
+    roomName.value = val.toString()
+    initRoomInfo(val).then((name) => {
+        roomName.value = name
+    })
+}, { immediate: true })
+
 
 
 const router = useRouter()
@@ -40,11 +86,11 @@ const enter = () => {
 
             <div class="content">
                 <div class="title">
-                    <span class="username">{{props.friendid}}</span>
+                    <span class="username">{{ friendName }}</span>
                     <span>邀请你加入</span>
                 </div>
                 <div class="roomname">
-                    <span>{{props.roomid}}</span>
+                    <span>{{ roomName }}</span>
                 </div>
             </div>
 

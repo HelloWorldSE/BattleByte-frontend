@@ -11,18 +11,19 @@ useConnector()
 useHallState()
 
 import NotificationHolder from './components/next-ui/notifications/NotificationHolder.vue';
-import FriendListDrawer from './components/FriendListDrawer.vue';
+import SidePanelFriend from './components/next-ui/sidepanel/SidePanelFriend.vue';
 </script>
 
 <template>
   <GlobalReconnectingMessage/>
   <NotificationHolder/>
+  <!--<BellTest :model-value="true"/>-->
   <div class="page">
     <TopNav />
     <div class="router-wrapper">
       <RouterView />
+      <SidePanelFriend />
     </div>
-    
   </div>
 </template>
 
