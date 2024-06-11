@@ -3,12 +3,12 @@ import { useConnector } from "./connector";
 import { Hall, HallStatus } from "@/core/game/hall";
 import { ref, watch } from "vue";
 import type { 
-    ChatMsgData, GameAddData, HpChangeData, 
+    ChatMsgData, FriendInvitationData, GameAddData, HpChangeData, 
     ItemUsedData, PosSyncData, 
     RoomInvitedData, RoomRefreshData } from "@/core/comm/interfaces";
 import { useRoomState } from "./room";
 import { useGameStore } from "./game";
-import { openMsgBox } from "@/components/next-ui/notifications/notifications";
+import { openMsgBox, openNotification } from "@/components/next-ui/notifications/notifications";
 
 export const useHallState = defineStore('hall_state', () => {
     const hallStatus = ref<HallStatus>(HallStatus.OFFLINE)
@@ -37,6 +37,9 @@ export const useHallState = defineStore('hall_state', () => {
     const rcv_room_invited = ref<(data: RoomInvitedData) => void>((data) => {
         openMsgBox(data.friendid, data.roomid)
     })
+    const rcv_friend_invitation = ref<(data: FriendInvitationData) => void>((data) => {
+        openNotification(data.name, '想添加您为好友', data.friendid)
+    })
 
 
     const hall = new Hall(
@@ -62,6 +65,8 @@ export const useHallState = defineStore('hall_state', () => {
                 rcv_game_add.value(data)
             } else if (type == 'ROOM_INVITED') {
                 rcv_room_invited.value(data)
+            } else if (type == 'FRIEND_INVITATION') {
+                rcv_friend_invitation.value(data)
             }
         }
     )

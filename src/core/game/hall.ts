@@ -33,7 +33,7 @@ export class Hall {
                     type: 'POS_SYNC' | 'SCORE_SYNC' | 'ANSWER_RESULT' |
                           'CHAT_MSG' | 'GAME_END' | 'ITEM_USED' |
                           'ROOM_REFRESH' | 'HP_CHANGE' | 'GAME_ADD' |
-                          'ROOM_INVITED' ,
+                          'ROOM_INVITED' | 'FRIEND_INVITATION',
                     data: any) => void = () => {}) {
 
         // use arrow function to avoid 'this'-bindings
@@ -91,6 +91,9 @@ export class Hall {
         const rcv_room_invited = (data: any) => {
             this.sync_callback('ROOM_INVITED', data)
         } 
+        const rcv_friend_invitation = (data: any) => {
+            this.sync_callback('FRIEND_INVITATION', data)
+        }
 
 
         const conn_state_change = (state: WSConnectState) => {
@@ -123,6 +126,7 @@ export class Hall {
         this.conn.conn.addListener('HP_CHANGE', rcv_hp_change)
         this.conn.conn.addListener('GAME_ADD', rcv_game_add)
         this.conn.conn.addListener('ROOM_INVITED', rcv_room_invited)
+        this.conn.conn.addListener('FRIEND_INVITATION', rcv_friend_invitation)
 
         // OFFLINE EVENT
         this.conn.registerStateChangeEvent(conn_state_change)

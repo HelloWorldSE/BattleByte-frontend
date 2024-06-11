@@ -1,16 +1,31 @@
 <script setup lang="ts">
+import { useSoundFX } from '@/stores/soundfx';
 import type { AntdIconType } from './d';
 
 const props = defineProps<{
     icon: AntdIconType
 }>()
 
+const emit = defineEmits<{
+    click: []
+}>()
+
 const Icon: AntdIconType = props.icon
+
+const soundfx = useSoundFX()
+const click = () => {
+    soundfx.play('topbar-switch')
+    emit('click')
+}
+
+const hover = () => {
+    soundfx.play('button-hover')
+}
 
 </script>
 
 <template>
-    <div class="button">
+    <div class="button" @click="click" @mouseenter="hover">
         <Icon class="icon"/>
     </div>
 </template>

@@ -17,6 +17,7 @@ import { timeIntervalStr } from '@/utils/timeUtils'
 import { useMyProfile } from '@/stores/my';
 import { useRoomState } from '@/stores/room';
 import { useSoundFX } from '@/stores/soundfx';
+import { useDrawerState } from '@/stores/drawer';
 
 const router = useRouter()
 const roomInfo = useRoomState()
@@ -124,6 +125,15 @@ const cancelMatch = () => {
     router.go(0)
 }
 
+const drawerState = useDrawerState()
+const smallButtonClick = (bid: 1|2) => {
+    if (bid == 1) {
+        drawerState.friendOpen = true
+    } else if (bid == 2) {
+        drawerState.settingsOpen = true
+    }
+}
+
 </script>
 
 <template>
@@ -134,19 +144,15 @@ const cancelMatch = () => {
                 <template #overlay>
                 <Menu style="width: 20rem;">
                     <MenuItem key="1" @click="pushProfile">
-                    <ProfileOutlined />
                     个人中心
                     </MenuItem>
                     <MenuItem key="2">
-                    <MessageOutlined />
                     消息
                     </MenuItem>
                     <MenuItem key="3">
-                    <BellOutlined />
                     新的朋友
                     </MenuItem>
                     <MenuItem key="4" @click="log_out">
-                    <LogoutOutlined />
                     退出登录
                     </MenuItem>
                 </Menu>
@@ -219,8 +225,8 @@ const cancelMatch = () => {
             </div>
         </div>
         <div class="small-button-area">
-            <SmallButton :icon="TeamOutlined" />
-            <SmallButton :icon="SettingOutlined" />
+            <SmallButton :icon="TeamOutlined" @click="smallButtonClick(1)"/>
+            <SmallButton :icon="SettingOutlined" @click="smallButtonClick(2)"/>
         </div>
     </div>
 </template>

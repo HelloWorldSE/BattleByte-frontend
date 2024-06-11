@@ -8,16 +8,19 @@ import { notification } from 'ant-design-vue';
 import { h } from "vue";
 import BurningCircle from '@/components/next-ui/notifications/BurningCircle.vue'
 import Notification from '@/components/next-ui/notifications/Notification.vue'
+import { useSoundFX } from "@/stores/soundfx";
 
 let id = 0
 
-export const openNotification = (title: string, description: string, duration: number = 3) => {
+export const openNotification = (title: string, description: string, extraInfo: any, duration: number = 3) => {
 
     const newBurningCircle = () => h(BurningCircle, {duration: duration * 1000})
     const key = `BB_NOTIF_${id++}`
 
+    useSoundFX().play('notification')
+
     notification.open({
-        message: h(Notification, {title: title, description, duration, _key: key, newBurningCircle}),
+        message: h(Notification, {title: title, description, duration, _key: key, newBurningCircle, extraInfo}),
         key: key,
         description: () => {},
         style: {

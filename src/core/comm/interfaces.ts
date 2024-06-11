@@ -69,6 +69,11 @@ export interface RoomInvitedData {
     roomid: number,
     friendid: number
 }
+export interface FriendInvitationData {
+    friendid: number,
+    id: number,
+    name: string
+}
 
 export interface ErrorData {
     ack: number,
