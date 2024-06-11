@@ -5,7 +5,7 @@
             <Button key="submit" type="primary" :loading="loading" @click="handleOk">创建房间</Button>
         </template>
         <Form ref="formRef" :model="formState" layout="vertical">
-            <FormItem label="房间名" :rules="[{ required: true, message: '请输入房间名', trigger: 'blur', validator:roomNameCheck }]">
+            <FormItem label="房间名" name="roomName" :rules="[{ required: true, message: '请输入房间名', trigger: 'blur', validator:roomNameCheck }]" >
                 <Input v-model:value="formState.roomName" placeholder="Room Name"></Input>
             </FormItem>
             <FormItem label="选择题目">
@@ -15,7 +15,7 @@
 
                     <Divider />
                 
-                <Select @change="onSelectChange" placeholder="搜索题目难度">
+                <Select @change="onSelectChange" placeholder="搜索题目标签">
                     <SelectOption v-for="item in options" :key="item.value" :value="item.value">
                         <span :aria-label="item.value" :class="'custom-span-' + item.color"> {{ item.value }}</span>
                     </SelectOption>
@@ -67,6 +67,7 @@
 import { defineProps, defineEmits } from 'vue';
 import { Modal, Button, Form, FormItem, Input, message, type FormInstance, Select, List, ListItem, ListItemMeta, Pagination, Tag, Divider, SelectOption, Drawer, Spin } from 'ant-design-vue';
 import { computed, reactive, ref, watch } from 'vue';
+import type { Rule } from 'ant-design-vue/es/form';
 import { generatePost, generateGet } from '@/utils/protocol';
 import QuestionView from '@/views/QuestionView.vue';
 
@@ -104,12 +105,16 @@ const promblems = ref<any[]>([]);
 const showProblems = ref<any[]>([]);
 const selectedProblems = ref<any[]>([]);
 
-const roomNameCheck = (_: any, value: string) => {
+const roomNameCheck = async (_rule: Rule, value: string) => {
+    console.log("roomName:", value);
     if (!value) {
         return Promise.reject('请输入房间名');
     } 
-    console.log("roomName:", value);
-    return Promise.resolve();
+    else {
+        console.log("roomName:", value);
+        return Promise.resolve();
+    }
+    
 };
 
 const handleCancel = () => {
@@ -119,23 +124,43 @@ const handleCancel = () => {
 };
 
 const handleOk = () => {
-    generatePost('/api/room/add', {
-        name: formState.roomName,
-    }).then((res) => {
-        if (res.data.status === 0) {
-            loading.value = false;
-            message.success('创建成功');
-            formRef.value?.resetFields();
-            formState.roomName = '';
-            modalVisible.value = false;
-            isDrawerOpen.value = false;
-            location.reload();
-        } else {
-            message.error(res.data.msg);
-        }
+    formRef.value?.validate().then(() => {
+        loading.value = true;
+        console.log("roomName1:", formState.roomName);
+        generatePost('/api/room/add', {
+            name: formState.roomName,
+        }).then((res) => {
+            if (res.data.status === 0) {
+                const addedProblems = selectedProblems.value.map((item) => item._id);
+                console.log("problems:", addedProblems);
+                generatePost(`/api/game/gameaddbatch?id=${res.data.data.gameId}`, addedProblems ).then((res) => {
+                    if (res.data.status === 0) {
+                        console.log(res.data.data);
+                        loading.value = false;
+                        message.success('创建成功');
+                        formRef.value?.resetFields();
+                        formState.roomName = '';
+                        modalVisible.value = false;
+                        isDrawerOpen.value = false;
+                    } else {
+                        loading.value = false;
+                        message.error(res.data.msg);
+                    }
+                }).catch((err) => {
+                    message.error('网络错误');
+                });
+                
+                // location.reload();
+            } else {
+                message.error(res.data.msg);
+            }
+        }).catch((err) => {
+            message.error('网络错误');
+        });
     }).catch((err) => {
-        message.error('网络错误');
+        message.error('请输入房间名');
     });
+    
 };
 
 // const getProblems = () => {
@@ -203,6 +228,7 @@ const addProblem = (problem: any) => {
     }
     selectedProblems.value.push({
         id: problem.id,
+        _id: problem._id,
         title: problem.title,
         color: problem.tags[0] === "middle" ? "blue" :
          problem.tags[0] === "Loop" ? "green" :

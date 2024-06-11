@@ -17,12 +17,12 @@
           </template>
           <template #actions>
             <EnterRoomButton :roomId="room.id"/>
-            <DeleteRoomButton :roomId="room.id" :curRooms="curRooms"/>
+            <DeleteRoomButton :roomId="room.id" :curRooms="curRooms" v-if="curUserId==room.uid"/>
         <!-- <Button type="primary" @click="color='blue'">Change Color</Button> -->
           </template>
           <CardMeta :title="room.name" description="等待中...">
             <template #avatar>
-            <Tooltip title="房主" placement="bottom">
+            <Tooltip :title="'房主：' + roomName[index]" placement="bottom">
               <Avatar :src="'http://81.70.241.166/avatar/'+roomAvatar[index]"></Avatar>
             </Tooltip>
           </template>
@@ -77,6 +77,7 @@ const fieldData = ref({
 });
 const roomList = ref([] as any)
 const roomAvatar = ref([] as any)
+const roomName = ref(Array<any>());
 
 const curUserId = ref(localStorage.getItem('userId'));
 
@@ -93,6 +94,7 @@ const getAvatars = (roomList:any[]) => {
     generateGet(`/api/user/profile`, {id: room.uid}).then((res) => {
       if (res.data.status === 0) {
         roomAvatar.value.push(res.data.data.avatar);
+        roomName.value.push(res.data.data.userName);
       } else {
         console.log(res.data.msg);
       }
@@ -118,6 +120,7 @@ const initGetRooms = () => {
       console.log("roomAvatar.value is",roomAvatar.value);
       totalPages.value = res.data.data.totalPages;
       console.log("totalPages.value is",totalPages.value);
+      console.log("curUserId.value is",curUserId.value);
     } else {
       console.log(res.data.msg);
     }

@@ -1,22 +1,26 @@
 <template>
   <div id="app">
       <Stars/>
+      
+
       <div class="waiting-room">
           <div class="waiting-title">
-              <h2>当前房间：{{ roomInfo.name }}</h2>
-              <h2>正在等待其他玩家加入...</h2>
+              <h2>当前房间：{{ roomInfo.name }}，玩家数：{{ onlinePlayers.length }}</h2>
+              <h2 v-if="onlinePlayers.length<8">正在等待其他玩家加入...</h2>
+              <h2 v-if="onlinePlayers.length===8 && curUserId !== roomInfo.uid">请等待房主开始游戏...</h2>
+              <h2 v-if="onlinePlayers.length===8 && curUserId === roomInfo.uid">玩家已到齐，可以开始游戏</h2>
               <button @click="hall.hall.room_leave(roomId as unknown as number)">exit (测试)</button>
           </div>
           <div class="player-list">
               <template v-for="(player, index) in onlinePlayers" :key="player.username">
-              <Tooltip :title="player.username" placement="top">
+              <Tooltip  placement="top" :title="player.userid === curUserId ? 'You' : player.username">
                   <Avatar :src="player.avatarUrl"
                   :class="[
                   'player-avatar',
-                  index === 0 ? 'self-avatar' : 'other-avatar',
+                  curUserId === player.userid ? 'self-avatar' : 'other-avatar',
                   index === 0 ? 'animate__animated animate__pulse' : ''
                   ]" />
-                  <div :class="index === 0 ? 'self-name' : 'player-name'">{{ player.username }}</div>
+                  <div :class="[curUserId === player.userid ? 'self-name' : 'player-name']">{{ player.username }}</div>
               </Tooltip>
               </template>
           </div>
@@ -29,29 +33,89 @@
                   :animation-data="LottieJson">
                   </Vue3Lottie>
           </div>
+          <Flex wrap="wrap" gap="large">
+            <Button type="primary" size="large" @click="()=>{hall.hall.room_start(roomId as unknown as number)}"
+            :disabled="!(onlinePlayers.length>=2)" :class="onlinePlayers.length>=2 ? undefined : 'disabled-btn'" v-if="curUserId==roomInfo.uid">开始游戏</Button>
+            <Button type="primary" size="large" @click="()=>{confirmLeave=true}">退出房间</Button>
+            <Button type="primary" size="large">踢人</Button>
+            <Button type="primary" size="large" v-if="curUserId==roomInfo.uid" @click="openDrawer">查看题目</Button>
+
+          </Flex>
+
       </div>
+      <Modal v-model:open="confirmLeave" title="提示" @ok="handleOk" @cancel="handleCancel" centered>
+          <p>确定要离开房间吗？</p>
+      </Modal>
+      <Drawer
+          title="当前题单"
+          placement="right"
+          :visible="isDrawerOpen"
+          @close="closeDrawer"
+          :mask="false"
+          width="600"
+          >
+          <List>
+              <ListItem v-for="problem in showProblems" :key="problem.id">
+                  <ListItemMeta
+                      :title="problem.title"
+                      :description="formatDescription(problem.description)"
+                  >
+                  </ListItemMeta>
+                  <template #actions>
+                      <a key="check-problem" @click="openDetailsDrawer(problem._id)">查看</a>
+                      <a key="delete-problem" @click="deleteProblem(problem._id)">删除</a>
+                  </template>
+              </ListItem>
+              <template #loadMore>
+                  <div
+                      :style="{ textAlign: 'center', marginTop: '12px', height: '32px', lineHeight: '32px' }"
+                  >
+                      <Pagination @change="onLoadMore" :current="currentPage" :total="totalProblems" :pageSize="onePageSize" simple/>
+                  </div>
+              </template>
+          </List>
+
+          <Drawer
+            title="题目详情"
+            placement="right"
+            :visible="isDetailsDrawerOpen"
+            @close="closeDetailsDrawer"
+            :mask="false"
+            width="600"
+          >
+            <QuestionView :problem-id="curProblemId"
+            v-if="curProblemId !== -1"/>
+            <p v-else>没有选中题目！</p>
+
+          </Drawer>
+          
+      </Drawer>
   </div>
   
 </template>
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
-import { Spin, Avatar, Tooltip } from 'ant-design-vue';
+import { Spin, Avatar, Tooltip, Button, Flex, Drawer, Modal, message } from 'ant-design-vue';
 import 'animate.css';
 import LottieJson from '@/assets/Animation_fighting.json';
 import { Vue3Lottie } from 'vue3-lottie'
 
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { generateGet } from '@/utils/protocol';
 import Stars from '@/components/Stars.vue';
 import { useRoomState } from '@/stores/room';
 import { pageIs } from '@/utils/pageis';
 import { useHallState } from '@/stores/hall';
 import { HallStatus } from '@/core/game/hall';
+import QuestionView from './QuestionView.vue';
+import FriendListDrawer from '@/components/FriendListDrawer.vue';
 
   // import LottieVuePlayer from '@lottiefiles/vue-lottie-player';
 
 pageIs('in-room')
+
+// const curUserId = ref(localStorage.getItem('userId'));
 
 const route = useRoute();
 
@@ -61,8 +125,11 @@ function getPageRoomId(params: string | string[]) {
 
 const roomId = ref(getPageRoomId(route.params.id))
 const curUserId = ref(localStorage.getItem('userId'))
+
+
 const roomInfo = ref<any>({name: ''})
 interface Player {
+  userid: string;
   username: string;
   avatarUrl: string;
 }
@@ -74,7 +141,8 @@ const initRoomInfo = async () => {
   generateGet(`/api/room/id?id=${roomId.value}`).then((res) => {
     if (res.data.status === 0) {
       roomInfo.value = res.data.data;
-      console.log('roomInfo', roomInfo.value.name);
+      console.log('roomInfo', roomInfo.value);
+      console.log('curUserId', curUserId.value);
     } else {
       console.log(res.data.msg);
     }
@@ -85,15 +153,20 @@ const initRoomInfo = async () => {
 
 initRoomInfo();
 
-const roomState = useRoomState()
+const router = useRouter();
+
+const roomState = useRoomState();
+
 
 
 const onlinePlayers = computed(() => {
   const players: Player[] = []
   for (let i = 0; i < (roomState.roomInfo?.userid?.length ?? 0); i++) {
+    const avatarUrl = roomState.roomInfo?.avatarUrl[i] ?? ''
     players.push({
+      userid: roomState.roomInfo?.userid[i].toString() ?? '',
       username: roomState.roomInfo?.username[i] ?? 'NONAME',
-      avatarUrl: roomState.roomInfo?.avatarUrl[i] ?? ''
+      avatarUrl: avatarUrl == '' ? '/logo.jpg'  : 'http://81.70.241.166/avatar/' + avatarUrl
     })
   }
   return players
@@ -104,6 +177,91 @@ if (hall.hall.status == HallStatus.ONLINE) {
   hall.hall.room_enter(roomId.value as unknown as number)
 }
 
+const confirmLeave = ref(false)
+const handleOk = () => {
+  hall.hall.room_leave(roomId.value as unknown as number)
+  confirmLeave.value = false
+  router.push('/rooms')
+}
+
+const handleCancel = () => {
+  confirmLeave.value = false
+}
+
+const isDrawerOpen = ref(false);
+const showProblems = ref(Array<any>());
+const totalProblems = ref(0);
+const allProblems = ref(Array<any>());
+
+
+const initGetProblems = () => {
+  generateGet(`/api/game/getquestion?id=${roomInfo.value.gameId}`).then((res) => {
+    if (res.data.status === 0) {
+      allProblems.value = res.data.data;
+      // showProblems.value = res.data.data.content;
+      totalProblems.value = showProblems.value.length;
+    } else {
+      console.log(res.data.msg);
+    }
+  }).catch((err) => {
+    console.log(err);
+  });
+};
+
+const openDrawer = () => {
+  isDrawerOpen.value = true;
+  initGetProblems();
+};
+
+const closeDrawer = () => {
+  isDrawerOpen.value = false;
+};
+
+function formatDescription(description: string) {
+    // 去除首尾的 <p> 标签
+    description = description.replace(/^<p>|<\/p>$/g, "");
+
+    // 如果字数超过 50 个字，则省略
+    if (description.length > 80) {
+    return description.slice(0, 80) + "...";
+    }
+    return description;
+}
+
+const isDetailsDrawerOpen = ref(false);
+const curProblemId = ref(-1);
+
+const openDetailsDrawer = (id: number) => {
+  curProblemId.value = id;
+  isDetailsDrawerOpen.value = true;
+};
+
+const closeDetailsDrawer = () => {
+  isDetailsDrawerOpen.value = false;
+};
+
+const currentPage = ref(1);
+const onePageSize = 10;
+
+
+const onLoadMore = (val:any) => {
+    currentPage.value = val;
+    showProblems.value = allProblems.value.slice((currentPage.value - 1) * onePageSize, currentPage.value * onePageSize);
+}
+
+const deleteProblem = (problem_id: number) => {
+    console.log(problem_id);
+    generateGet(`/api/game/delquestion/${problem_id}?gid=${roomId.value}`).then((res) => {
+        if (res.data.status === 0) {
+            message.success('删除成功');
+            initGetProblems();
+        } else {
+            message.error(res.data.msg);
+        }
+    }).catch((err) => {
+        message.error('网络错误');
+    });
+}
 </script>
 <style scoped>
 #app {
@@ -197,5 +355,9 @@ align-items: stretch; /* 使子元素填满容器宽度 */
   }
 }
 
+.disabled-btn {
+  /* margin-top: 24px; */
+  background: white;
+}
 </style>
 
