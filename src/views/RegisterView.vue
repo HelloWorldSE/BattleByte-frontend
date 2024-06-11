@@ -1,7 +1,4 @@
 <template>
-    <div class="topBar">
-      <TopNav/>
-    </div>
     <div class="login">
       <div class="blurBox">
         <div id="backBox">
@@ -27,10 +24,10 @@
             <InputPassword placeholder="请再次输入密码" v-model:value="formState.passWord2"></InputPassword>
             </FormItem>
           <FormItem>
-            
+
             <!-- 提交按钮宽度100% -->
             <Button type="primary" html-type="submit" style="width: 100%" @click="Login_Submit">注册</Button>
-            
+
           </FormItem>
           <FormItem>
             <Button type="primary" style="width: 100%" @click="Login_Page_Submit">已有账号？去登录</Button>
@@ -40,7 +37,7 @@
       </div>
     </div>
   </template>
-  
+
   <script lang="ts" setup>
   import type {FormInstance} from "ant-design-vue";
   import {reactive, ref, defineComponent} from "vue";
@@ -55,10 +52,10 @@
   import JSEncrypt from "jsencrypt";
   import { encryptPassword } from "@/utils/auth";
 
-  
+
   const formItem = Form.Item;
   const inputPassword = Input.Password;
-  
+
   // const publicKey = process.env.VUE_APP_PUBLIC_KEY;
 
 
@@ -68,19 +65,19 @@
   //   encryptor.setPrivateKey(privateKey); // 设置私钥
   //   return encryptor.decrypt(txt); // 对需要解密的数据进行解密
   // }
-  
-  
+
+
   // 定义路由器，负责路由跳转
   const router = useRouter();
-  
+
   // 如果已经登录，跳转 home
   if (isLoggedIn()) {
     router.push('/')
   }
-  
+
   // 定义一个没用的玩意
   const formRef = ref<FormInstance>()
-  
+
   // 定义表单域
   const formState = reactive({
     userName: '',
@@ -88,7 +85,7 @@
     passWord: '',
     passWord2: ''
   })
-  
+
     // 用户名校验规则
     const userNameCheck = async (_rule: Rule, value: string) => {
         if (!value) {
@@ -110,7 +107,7 @@
         return Promise.resolve();
     }
     };
-  
+
   // 密码校验规则
   const passWordCheck = async (_rule: Rule, value: string) => {
     if (!value) {
@@ -132,7 +129,7 @@
       return Promise.resolve()
     }
   }
-  
+
   const hall = useHallState()
 
   // 登录按钮：路由跳转
@@ -151,12 +148,12 @@
         // localStorage.setItem('userId', userId);
         message.info('注册成功')
         router.push('/auth/login');
-        
+
         // 跳转到主页
         // router.push('/');
       } else {
         // 登录失败
-      
+
         console.log('注册失败');
         alert('注册失败, 错误信息：' + res.data.msg);
 
@@ -164,23 +161,23 @@
       }
     }).catch((err) => {
       console.log(err);
-    
+
   });
   }
-  
+
   // 登录按钮：路由跳转
   function Login_Page_Submit() {
     // console.log(userNameCheck);
     router.push('/auth/login');
   }
-  
+
   function jump() {
     router.push('/');
   }
-  
-  
+
+
   </script>
-  
+
   <style scoped>
   .login {
     min-width: 100vw;
@@ -192,7 +189,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-   
+
   }
 
     #backBox {
@@ -214,7 +211,7 @@
         align-items: center;
         /* filter: none; */
     }
-  
+
   /* 通过 .blurBox 和 .blurBox::before 实现透明效果 */
     .blurBox {
     width: 460px;
@@ -226,10 +223,10 @@
     /* z-index: -10; */
     /* filter: blur(10px); */
 
-    display: flex; 
+    display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center; 
+    align-items: center;
     }
 
 
@@ -237,13 +234,13 @@
     .blurBox::before {
     background: inherit;
     content: "";
-    filter: blur(10px); 
+    filter: blur(10px);
     width: 100%;
     height: 100%;
     position: absolute;
     z-index: -10;
-    } 
-  
+    }
+
   .title {
     font-weight: bold;
     color: #190d11;
@@ -257,4 +254,3 @@
   position: relative; /* 确保 TopNav 绝对定位相对于 .top */
 }
   </style>
-  
