@@ -53,15 +53,18 @@
           @close="closeDrawer"
           :mask="false"
           width="600"
-          :push="{distance: 600}"
-          >
+          :push="addProblemsDrawer == true ? {distance: 400} : {distance:600}"
+      >
           <List>
-              <ListItem v-for="problem in showProblemInfo" :key="problem.id">
+            <!-- {{ allProblemsInfo }} -->
+              <ListItem v-for="problem in showProblems" :key="problem._id">
+                <Skeleton :loading="skeletonLoading">
                   <ListItemMeta
                       :title="problem.title"
                       :description="formatDescription(problem.description)"
                   >
                   </ListItemMeta>
+                </Skeleton>
                   <template #actions>
                       <a key="check-problem" @click="openDetailsDrawer(problem._id)">查看</a>
                       <a key="delete-problem" @click="deleteProblem(problem._id)">删除</a>
@@ -77,7 +80,9 @@
           </List>
           <Button type="primary" @click="()=>{addProblemsDrawer = true}">添加题目</Button>
 
-          <AddProblems :modelValue="addProblemsDrawer" />
+          <AddProblems v-model:modelValue="addProblemsDrawer" v-model:existedProblems="allProblemsInfo" 
+          @update="initGetProblems()"
+          :gameId="roomInfo.gameId"/>
 
           <Drawer
             title="题目详情"
@@ -110,8 +115,8 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
-import { Spin, Avatar, Tooltip, Button, Flex, Drawer, Modal, message, FloatButton, List, ListItem,ListItemMeta, Pagination } from 'ant-design-vue';
+import { computed, ref, watch } from 'vue';
+import { Spin, Avatar, Tooltip, Button, Flex, Drawer, Modal, message, FloatButton, List, ListItem,ListItemMeta, Pagination, Skeleton } from 'ant-design-vue';
 import 'animate.css';
 import LottieJson from '@/assets/Animation_fighting.json';
 import { Vue3Lottie } from 'vue3-lottie'
@@ -135,6 +140,8 @@ import AddProblems from '@/components/AddProblems.vue';
 
 pageIs('in-room');
 
+const pair = ref({start:0, end:10});
+
 const addProblemsDrawer = ref(false);
 
 // const curUserId = ref(localStorage.getItem('userId'));
@@ -147,6 +154,7 @@ function getPageRoomId(params: string | string[]) {
 
 const roomId = ref(getPageRoomId(route.params.id))
 const curUserId = ref(localStorage.getItem('userId'))
+const gameId = ref('')
 
 
 const roomInfo = ref<any>({name: ''})
@@ -163,6 +171,7 @@ const initRoomInfo = async () => {
   generateGet(`/api/room/id?id=${roomId.value}`).then((res) => {
     if (res.data.status === 0) {
       roomInfo.value = res.data.data;
+      gameId.value = roomInfo.value.gameId;
       console.log('roomInfo', roomInfo.value);
       console.log('curUserId', curUserId.value);
     } else {
@@ -210,10 +219,12 @@ const handleCancel = () => {
   confirmLeave.value = false
 }
 
-const showProblemInfo = ref(Array<any>());
+const allProblemsInfo = ref(Array<any>());
+const skeletonLoading = ref(true);
 
 const isDrawerOpen = ref(false);
-const showProblems = ref(Array<any>());
+
+const showProblems = ref(Array.from({ length: 10 }, () => ({} as any)));
 const totalProblems = ref(0);
 const allProblems = ref(Array<any>());
 
@@ -224,15 +235,28 @@ const initGetProblems = () => {
       allProblems.value = res.data.data;
       // showProblems.value = res.data.data.content;
       totalProblems.value = allProblems.value.length;
-      showProblems.value = allProblems.value.slice(0, onePageSize);
-      allProblems.value.forEach((problem, index) => {
+      pair.value = {start:0, end:10};
+      // showProblems.value = allProblems.value.slice(0, onePageSize);
+      // allProblemsInfo.value = new Array(allProblems.value.length);
+      // 注意返回值
+      allProblemsInfo.value = []
+      const fetchPromises = allProblems.value.map((problem, index) => 
         fetchProblemData(problem.questionId).then((data) => {
-          showProblemInfo.value[index] = data;
+          allProblemsInfo.value[index] = data;
         }).catch((err) => {
           console.log(err);
+        })
+      );
+
+      Promise.all(fetchPromises).then(() => {
+        console.log("allProblemsInfo.value is", allProblemsInfo.value);
+        // console.log([1,2,3].slice(0, 1));
+        //console.log(allProblemsInfo.value.slice(0, 1));
+        showProblems.value = allProblemsInfo.value.slice(pair.value.start, pair.value.end);
+        // console.log("allProblemsInfo.value is", allProblemsInfo.value.slice(0, 1));
+        skeletonLoading.value = false;
+        console.log("showProblems.value is", showProblems.value);
       });
-      });
-      console.log("allProblems.value is", allProblems.value);
     } else {
       console.log(res.data.msg);
     }
@@ -279,12 +303,13 @@ const onePageSize = 10;
 
 const onLoadMore = (val:any) => {
     currentPage.value = val;
-    showProblems.value = allProblems.value.slice((currentPage.value - 1) * onePageSize, currentPage.value * onePageSize);
+    pair.value = {start: (currentPage.value - 1) * onePageSize, end: currentPage.value * onePageSize};
+    showProblems.value = allProblemsInfo.value.slice((currentPage.value - 1) * onePageSize, currentPage.value * onePageSize);
 }
 
 const deleteProblem = (problem_id: number) => {
     console.log(problem_id);
-    generateDelete(`/api/game/delquestion/${problem_id}?gid=${roomId.value}`).then((res) => {
+    generateDelete(`/api/game/delquestion/${problem_id}?gid=${gameId.value}`).then((res) => {
         if (res.data.status === 0) {
             message.success('删除成功');
             initGetProblems();
@@ -300,6 +325,7 @@ const fetchProblemData = async (problemId: number) => {
   const response = await generateGet(`/api/oj/problem?id=${problemId}`);
   return response.data.data.data;
 };
+
 </script>
 <style scoped>
 #app {
