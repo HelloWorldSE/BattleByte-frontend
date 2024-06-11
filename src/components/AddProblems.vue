@@ -4,16 +4,19 @@
         title="新增题目" 
         placement="right"
         width="400"
-        :closable="false"
-        :maskClosable="false"
+        :closable="true"
+        :mask="false"
+        :maskClosable="true"
         :destroyOnClose="true"
         @close=closeDrawer
+        :push="{distance: 600}"
         >
         <template v-for="tag in selectedProblems" :key="tag">
                         <Tag closable @close="handleCloseTag(tag)" :color="tag.color">{{ tag.title }}</Tag>
         </template>
+        <Button type="primary" @click="postProblems">确认添加</Button>
         <Divider />
-        <Select @change="onSelectChange" placeholder="搜索题目标签">
+        <Select @change="onSelectChange" placeholder="搜索题目标签" style="width: 100%" v-model:value="selectValue">
                     <SelectOption v-for="item in options" :key="item.value" :value="item.value">
                         <span :aria-label="item.value" :class="'custom-span-' + item.color"> {{ item.value }}</span>
                     </SelectOption>
@@ -75,18 +78,27 @@ const isDrawerOpen = ref(false);
 const curProblemId = ref(-1);
 
 const searchLoading = ref(false);
+const selectValue = ref('');
 
 const props = defineProps({
     modelValue: {
         type: Boolean,
     },
+    existedProblems: {
+        type: Array,
+        default: () => [],
+    },
+    gameId: {
+        type: Number,
+    },
 })
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'update:existedProblems', 'update']);
 
 const closeDrawer = () => {
-    modelValue.value = false;
+    // modelValue.value = false;
     emit('update:modelValue', false);
+    emit('update:existedProblems', selectedProblems.value.concat(props.existedProblems));
 };
 
 const modelValue = computed({
@@ -94,12 +106,14 @@ const modelValue = computed({
     set: v => emit('update:modelValue', v),
 });
 
+
+
 const promblems = ref<any[]>([]);
 const showProblems = ref<any[]>([]);
 const selectedProblems = ref<any[]>([]);
 
 
-const options = [{value:'Loop', color:"green"}, {value:'middle', color:"blue"}, {value:'Input and Output', color:'red'}, {value:'String', color:'orange'}];
+const options = [{value:'Loop', color:"green"}, {value:'branch', color:"blue"}, {value:'Input and Output', color:'red'}, {value:'String', color:'orange'}];
 
 const onSelectChange = (value:any) => {
     searchLoading.value = true;
@@ -110,8 +124,12 @@ const onSelectChange = (value:any) => {
             searchLoading.value = false;
             promblems.value = res.data.data.data.results;
             console.log("problems is ", promblems.value);
+            // filter existed problems
+            console.log("existedProblems is", props.existedProblems);
+            promblems.value = promblems.value.filter((item: any) => !props.existedProblems.some((existed: any) => existed._id == item._id));
             totalProblems.value = promblems.value.length;
             showProblems.value = promblems.value.slice(0, onePageSize);
+            
         } else {
             message.error(res.data.msg);
         }
@@ -150,7 +168,8 @@ const addProblem = (problem: any) => {
         id: problem.id,
         _id: problem._id,
         title: problem.title,
-        color: problem.tags[0] === "middle" ? "blue" :
+        description: problem.description,
+        color: problem.tags[0] === "branch" ? "blue" :
          problem.tags[0] === "Loop" ? "green" :
          problem.tags[0] === "String" ? "orange" :"red",
     });
@@ -170,6 +189,36 @@ const closeSecondDrawer = () => {
 const wrapAddRoom = computed(() => {
   return isDrawerOpen.value ? 'modalMask' : '';
 });
+
+const loading = ref(false);
+
+const postProblems = () => {
+    const addedProblems = selectedProblems.value.map((item) => item._id);
+
+    loading.value = true;
+    generatePost(`/api/game/gameaddbatch?id=${props.gameId}`, addedProblems ).then((res) => {
+                    if (res.data.status === 0) {
+                        console.log(res.data.data);
+                        loading.value = false;
+                        message.success('添加成功');
+                        modelValue.value = false;
+                        isDrawerOpen.value = false;
+                        console.log('selectedProblems.value', selectedProblems.value);
+                        emit('update:existedProblems', selectedProblems.value.concat(props.existedProblems));
+                        emit('update')
+                        selectedProblems.value = [];
+                        showProblems.value = [];
+                        selectValue.value = '';
+                        
+                            
+                    } else {
+                        loading.value = false;
+                        message.error(res.data.msg);
+                    }
+                }).catch((err) => {
+                    message.error('网络错误');
+                });
+}
 
 
 

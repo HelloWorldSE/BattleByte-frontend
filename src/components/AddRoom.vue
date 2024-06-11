@@ -126,6 +126,8 @@ const handleCancel = () => {
 
 const router = useRouter();
 
+const gameId = ref('');
+
 const handleOk = () => {
     formRef.value?.validate().then(() => {
         loading.value = true;
@@ -137,7 +139,8 @@ const handleOk = () => {
                 const addedProblems = selectedProblems.value.map((item) => item._id);
                 console.log("problems:", addedProblems);
                 const roomId = res.data.data.id;
-                generatePost(`/api/game/gameaddbatch?id=${res.data.data.gameId}`, addedProblems ).then((res) => {
+                gameId.value = res.data.data.gameId;
+                generatePost(`/api/game/gameaddbatch?id=${gameId.value}`, addedProblems ).then((res) => {
                     if (res.data.status === 0) {
                         console.log(res.data.data);
                         loading.value = false;
@@ -185,7 +188,7 @@ const handleOk = () => {
 
 // getProblems();
 
-const options = [{value:'Loop', color:"green"}, {value:'middle', color:"blue"}, {value:'Input and Output', color:'red'}, {value:'String', color:'orange'}];
+const options = [{value:'Loop', color:"green"}, {value:'branch', color:"blue"}, {value:'Input and Output', color:'red'}, {value:'String', color:'orange'}];
 
 const onSelectChange = (value:any) => {
     searchLoading.value = true;
@@ -236,7 +239,7 @@ const addProblem = (problem: any) => {
         id: problem.id,
         _id: problem._id,
         title: problem.title,
-        color: problem.tags[0] === "middle" ? "blue" :
+        color: problem.tags[0] === "branch" ? "blue" :
          problem.tags[0] === "Loop" ? "green" :
          problem.tags[0] === "String" ? "orange" :"red",
     });
