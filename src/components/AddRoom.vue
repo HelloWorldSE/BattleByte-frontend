@@ -70,6 +70,7 @@ import { computed, reactive, ref, watch } from 'vue';
 import type { Rule } from 'ant-design-vue/es/form';
 import { generatePost, generateGet } from '@/utils/protocol';
 import QuestionView from '@/views/QuestionView.vue';
+import { useRouter } from 'vue-router';
 
 
 const currentPage = ref(1);
@@ -123,6 +124,8 @@ const handleCancel = () => {
     isDrawerOpen.value = false;
 };
 
+const router = useRouter();
+
 const handleOk = () => {
     formRef.value?.validate().then(() => {
         loading.value = true;
@@ -133,6 +136,7 @@ const handleOk = () => {
             if (res.data.status === 0) {
                 const addedProblems = selectedProblems.value.map((item) => item._id);
                 console.log("problems:", addedProblems);
+                const roomId = res.data.data.id;
                 generatePost(`/api/game/gameaddbatch?id=${res.data.data.gameId}`, addedProblems ).then((res) => {
                     if (res.data.status === 0) {
                         console.log(res.data.data);
@@ -142,6 +146,8 @@ const handleOk = () => {
                         formState.roomName = '';
                         modalVisible.value = false;
                         isDrawerOpen.value = false;
+                        console.log("roomId is", roomId);
+                        router.push(`/roomDetails/${roomId}`);
                     } else {
                         loading.value = false;
                         message.error(res.data.msg);

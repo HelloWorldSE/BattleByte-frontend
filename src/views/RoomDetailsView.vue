@@ -53,9 +53,10 @@
           @close="closeDrawer"
           :mask="false"
           width="600"
+          :push="{distance: 600}"
           >
           <List>
-              <ListItem v-for="problem in showProblems" :key="problem.id">
+              <ListItem v-for="problem in showProblemInfo" :key="problem.id">
                   <ListItemMeta
                       :title="problem.title"
                       :description="formatDescription(problem.description)"
@@ -74,6 +75,9 @@
                   </div>
               </template>
           </List>
+          <Button type="primary" @click="()=>{addProblemsDrawer = true}">添加题目</Button>
+
+          <AddProblems :modelValue="addProblemsDrawer" />
 
           <Drawer
             title="题目详情"
@@ -82,6 +86,7 @@
             @close="closeDetailsDrawer"
             :mask="false"
             width="600"
+            :push="{distance: 600}"
           >
             <QuestionView :problem-id="curProblemId"
             v-if="curProblemId !== -1"/>
@@ -90,19 +95,29 @@
           </Drawer>
           
       </Drawer>
+
+
+
+
+
+      <!-- <FloatButton shape="circle" type="primary" :style="{ left: '40px' }" @click="()=>{router.push('/rooms')}">
+          <i class="anticon anticon-arrow-left"></i>
+      </FloatButton> -->
+
+      <!-- <FriendListDrawer userId="1" :modelValue="isDrawerOpen"/> -->
   </div>
   
 </template>
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
-import { Spin, Avatar, Tooltip, Button, Flex, Drawer, Modal, message } from 'ant-design-vue';
+import { Spin, Avatar, Tooltip, Button, Flex, Drawer, Modal, message, FloatButton, List, ListItem,ListItemMeta, Pagination } from 'ant-design-vue';
 import 'animate.css';
 import LottieJson from '@/assets/Animation_fighting.json';
 import { Vue3Lottie } from 'vue3-lottie'
 
 import { useRoute, useRouter } from 'vue-router';
-import { generateGet } from '@/utils/protocol';
+import { generateDelete, generateGet } from '@/utils/protocol';
 import Stars from '@/components/Stars.vue';
 import { useRoomState } from '@/stores/room';
 import { pageIs } from '@/utils/pageis';
@@ -110,10 +125,17 @@ import { useHallState } from '@/stores/hall';
 import { HallStatus } from '@/core/game/hall';
 import QuestionView from './QuestionView.vue';
 import FriendListDrawer from '@/components/FriendListDrawer.vue';
+import AddRoom from '@/components/AddRoom.vue';
+import AddProblems from '@/components/AddProblems.vue';
+
+
+
 
   // import LottieVuePlayer from '@lottiefiles/vue-lottie-player';
 
-pageIs('in-room')
+pageIs('in-room');
+
+const addProblemsDrawer = ref(false);
 
 // const curUserId = ref(localStorage.getItem('userId'));
 
@@ -188,6 +210,8 @@ const handleCancel = () => {
   confirmLeave.value = false
 }
 
+const showProblemInfo = ref(Array<any>());
+
 const isDrawerOpen = ref(false);
 const showProblems = ref(Array<any>());
 const totalProblems = ref(0);
@@ -199,7 +223,16 @@ const initGetProblems = () => {
     if (res.data.status === 0) {
       allProblems.value = res.data.data;
       // showProblems.value = res.data.data.content;
-      totalProblems.value = showProblems.value.length;
+      totalProblems.value = allProblems.value.length;
+      showProblems.value = allProblems.value.slice(0, onePageSize);
+      allProblems.value.forEach((problem, index) => {
+        fetchProblemData(problem.questionId).then((data) => {
+          showProblemInfo.value[index] = data;
+        }).catch((err) => {
+          console.log(err);
+      });
+      });
+      console.log("allProblems.value is", allProblems.value);
     } else {
       console.log(res.data.msg);
     }
@@ -251,7 +284,7 @@ const onLoadMore = (val:any) => {
 
 const deleteProblem = (problem_id: number) => {
     console.log(problem_id);
-    generateGet(`/api/game/delquestion/${problem_id}?gid=${roomId.value}`).then((res) => {
+    generateDelete(`/api/game/delquestion/${problem_id}?gid=${roomId.value}`).then((res) => {
         if (res.data.status === 0) {
             message.success('删除成功');
             initGetProblems();
@@ -262,6 +295,11 @@ const deleteProblem = (problem_id: number) => {
         message.error('网络错误');
     });
 }
+
+const fetchProblemData = async (problemId: number) => {
+  const response = await generateGet(`/api/oj/problem?id=${problemId}`);
+  return response.data.data.data;
+};
 </script>
 <style scoped>
 #app {

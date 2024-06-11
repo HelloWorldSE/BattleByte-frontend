@@ -11,6 +11,7 @@ useConnector()
 useHallState()
 
 import NotificationHolder from './components/next-ui/notifications/NotificationHolder.vue';
+import FriendListDrawer from './components/FriendListDrawer.vue';
 </script>
 
 <template>
@@ -21,6 +22,7 @@ import NotificationHolder from './components/next-ui/notifications/NotificationH
     <div class="router-wrapper">
       <RouterView />
     </div>
+    
   </div>
 </template>
 
