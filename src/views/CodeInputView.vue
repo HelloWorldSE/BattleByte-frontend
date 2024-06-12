@@ -449,7 +449,7 @@ const handleChangeLineHeight = (event) => {
   height: 200px;
   /* flex: 1; */
   position: relative;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 .table {
@@ -465,7 +465,7 @@ const handleChangeLineHeight = (event) => {
   float: left;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 .submit-button {
