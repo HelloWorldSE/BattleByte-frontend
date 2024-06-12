@@ -71,12 +71,12 @@
             点击进入房间后即可等待开始，人数为2时触发单人模式进行1v1单挑，人数大于等于3时触发大逃杀模式
         </TypographyParagraph>
 
-        <TypographyTitle :level="2" id="Part4">项目地址</TypographyTitle>
-        <!-- <TypographyParagraph class="paragraph"> -->
-            <TypographyLink href="https://github.com/HelloWorldSE/BattleByte-frontend" class="text">前端仓库</TypographyLink>
-            <br/>
-            <TypographyLink href="https://github.com/HelloWorldSE/BattleByte-backend" class="text">后端仓库</TypographyLink>
-        <!-- </TypographyParagraph> -->
+<!--        <TypographyTitle :level="2" id="Part4">项目地址</TypographyTitle>-->
+<!--        &lt;!&ndash; <TypographyParagraph class="paragraph"> &ndash;&gt;-->
+<!--            <TypographyLink href="https://github.com/HelloWorldSE/BattleByte-frontend" class="text">前端仓库</TypographyLink>-->
+<!--            <br/>-->
+<!--            <TypographyLink href="https://github.com/HelloWorldSE/BattleByte-backend" class="text">后端仓库</TypographyLink>-->
+<!--        &lt;!&ndash; </TypographyParagraph> &ndash;&gt;-->
         <TypographyTitle :level="2" id="Part5">内测群二维码</TypographyTitle>
         <img src="../assets/rules/QRcode.jpg" alt="二维码" style="width: 100%;"/>
         <TypographyParagraph class="paragraph">
@@ -126,10 +126,10 @@ const anchorItems = ref<Array<any>>( [
                 title: '玩法介绍',
                 href: '#Part3',
             },
-            {
-                title: '项目地址',
-                href: '#Part4',
-            },
+            // {
+            //     title: '项目地址',
+            //     href: '#Part4',
+            // },
             {
                 title: '内测群二维码',
                 href: '#Part5',
