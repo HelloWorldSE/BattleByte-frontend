@@ -6,10 +6,10 @@
       <div class="waiting-room">
           <div class="waiting-title">
               <h2>当前房间：{{ roomInfo.name }}，玩家数：{{ onlinePlayers.length }}</h2>
-              <h2 v-if="onlinePlayers.length<8">正在等待其他玩家加入...</h2>
-              <h2 v-if="onlinePlayers.length===8 && curUserId !== roomInfo.uid">请等待房主开始游戏...</h2>
-              <h2 v-if="onlinePlayers.length===8 && curUserId === roomInfo.uid">玩家已到齐，可以开始游戏</h2>
-              <button @click="hall.hall.room_leave(roomId as unknown as number)">exit (测试)</button>
+              <h2 v-if="onlinePlayers.length<2">正在等待其他玩家加入...</h2>
+              <h2 v-if="onlinePlayers.length>=2 && curUserId !== roomInfo.uid">请等待房主开始游戏...</h2>
+              <h2 v-if="onlinePlayers.length>=2 && curUserId === roomInfo.uid">可以开始游戏</h2>
+              <!-- <button @click="hall.hall.room_leave(roomId as unknown as number)">exit (测试)</button> -->
           </div>
           <div class="player-list">
               <template v-for="(player, index) in onlinePlayers" :key="player.username">
@@ -37,7 +37,7 @@
             <Button type="primary" size="large" @click="()=>{hall.hall.room_start(roomId as unknown as number)}"
             :disabled="!(onlinePlayers.length>=2)" :class="onlinePlayers.length>=2 ? undefined : 'disabled-btn'" v-if="curUserId==roomInfo.uid">开始游戏</Button>
             <Button type="primary" size="large" @click="()=>{confirmLeave=true}">退出房间</Button>
-            <Button type="primary" size="large">踢人</Button>
+            <!-- <Button type="primary" size="large">踢人</Button> -->
             <Button type="primary" size="large" v-if="curUserId==roomInfo.uid" @click="openDrawer">查看题目</Button>
 
           </Flex>
@@ -81,8 +81,7 @@
           <Button type="primary" @click="()=>{addProblemsDrawer = true}">添加题目</Button>
 
           <AddProblems v-model:modelValue="addProblemsDrawer" v-model:existedProblems="allProblemsInfo" 
-          @update="initGetProblems()"
-          :gameId="roomInfo.gameId"/>
+          @update="initGetProblems(pair.start, pair.end)" :gameId="roomInfo.gameId"/>
 
           <Drawer
             title="题目详情"
@@ -229,13 +228,20 @@ const totalProblems = ref(0);
 const allProblems = ref(Array<any>());
 
 
-const initGetProblems = () => {
+const initGetProblems = (start:number=0, end:number=10, type:number=0) => {// type=0: 初始化和删除时, type=1: 添加时
   generateGet(`/api/game/getquestion?id=${roomInfo.value.gameId}`).then((res) => {
     if (res.data.status === 0) {
       allProblems.value = res.data.data;
       // showProblems.value = res.data.data.content;
       totalProblems.value = allProblems.value.length;
-      pair.value = {start:0, end:10};
+      if (totalProblems.value <= 10) {
+        pair.value = {start:0, end:totalProblems.value};
+        currentPage.value = 1;
+      }
+      else {
+        pair.value = {start:start, end:end};
+      }
+      // pair.value = {start:start, end:end};
       // showProblems.value = allProblems.value.slice(0, onePageSize);
       // allProblemsInfo.value = new Array(allProblems.value.length);
       // 注意返回值
@@ -267,7 +273,7 @@ const initGetProblems = () => {
 
 const openDrawer = () => {
   isDrawerOpen.value = true;
-  initGetProblems();
+  initGetProblems(0, 10);
 };
 
 const closeDrawer = () => {
@@ -312,7 +318,7 @@ const deleteProblem = (problem_id: number) => {
     generateDelete(`/api/game/delquestion/${problem_id}?gid=${gameId.value}`).then((res) => {
         if (res.data.status === 0) {
             message.success('删除成功');
-            initGetProblems();
+            initGetProblems(pair.value.start, pair.value.end);
         } else {
             message.error(res.data.msg);
         }
