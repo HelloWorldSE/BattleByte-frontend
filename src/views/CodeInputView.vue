@@ -441,6 +441,7 @@ const handleChangeLineHeight = (event) => {
   /* height: 400px; */
   flex: 1;
   position: relative;
+  z-index: 0;
   min-height: 0;
 }
 
@@ -535,11 +536,11 @@ const handleChangeLineHeight = (event) => {
 
 .v-enter-active,
 .v-leave-active {
-  transition: opacity 0.5s ease;
+  transition: opacity 10000s ease;
 }
 
 .v-leave-to {
-  opacity: 0;
+  opacity: 100;
 }
 
 .pcjg {
