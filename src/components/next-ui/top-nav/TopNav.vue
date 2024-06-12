@@ -146,13 +146,13 @@ const smallButtonClick = (bid: 1|2) => {
                     <MenuItem key="1" @click="pushProfile">
                     个人中心
                     </MenuItem>
-                    <MenuItem key="2">
+                    <!-- <MenuItem key="2">
                     消息
                     </MenuItem>
                     <MenuItem key="3">
                     新的朋友
-                    </MenuItem>
-                    <MenuItem key="4" @click="log_out">
+                    </MenuItem> -->
+                    <MenuItem key="2" @click="log_out">
                     退出登录
                     </MenuItem>
                 </Menu>
