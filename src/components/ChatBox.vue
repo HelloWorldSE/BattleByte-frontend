@@ -17,7 +17,7 @@ hall.chat_msg_callback = (data) => {
     }
     setTimeout(() => {
         messages.value.shift()
-    }, 5000)
+    }, 500000000000)
 }
 
 import { Input } from 'ant-design-vue';
@@ -53,9 +53,9 @@ const isSending = ref(false)
     <div class="wrapper">
         <div class="msg-fixer">
             <div class="msg">
-                <TransitionGroup>
+<!--                <TransitionGroup>-->
                     <OneMsg v-for="item in messages" :speaker="item.speaker" :msg="item.msg" :key="item.key" ref="msgWidgets"/>
-                </TransitionGroup>
+<!--                </TransitionGroup>-->
             </div>
         </div>
         <Row>
@@ -79,7 +79,7 @@ const isSending = ref(false)
     height: 100%;
 }
 .msg-fixer {
-    position: relative;
+    position: absolute;
 }
 .msg {
     position: absolute;
@@ -89,10 +89,10 @@ const isSending = ref(false)
 .v-move,
 .v-enter-active,
 .v-leave-active {
-  transition: opacity 1s ease;
+  transition: opacity 10000000s ease;
 }
 
 .v-leave-to {
-  opacity: 0;
+  opacity: 100;
 }
 </style>
