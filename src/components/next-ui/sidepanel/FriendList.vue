@@ -1,12 +1,13 @@
 <script setup lang="ts">
 
-import { Avatar, List, ListItem, ListItemMeta, Pagination, Skeleton, InputSearch } from "ant-design-vue";
+import { Avatar, List, ListItem, ListItemMeta, Pagination, Skeleton, InputSearch, message } from "ant-design-vue";
 import { generateGet } from "@/utils/protocol";
 import { useRoute, useRouter } from "vue-router";
 import { ref } from "vue";
 import { getUserId } from "@/utils/auth";
 import { useHallState } from "@/stores/hall";
 import { useRoomState } from "@/stores/room";
+import DeleteFriend from "@/components/profile/DeleteFriend.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -49,6 +50,37 @@ const initProfile = async () => {
 }
 
 initProfile();
+
+const initFriends = (type:number=0) => {
+    generateGet("api/user/friend", { pageSize: onePageFriends, page:curFriendPage.value}).then((res) => {
+        if (res.data.status === 0) {
+            initFriendsLoading.value = false;
+            // pageUserName = res.data.username;
+            // pageEmail = res.data.email;
+            localFriends.value = res.data.data.content;
+            if (type === 1 && res.data.data.content.length === 0) {
+                generateGet("api/user/friend", { pageSize: onePageFriends, page:curFriendPage.value-1}).then((res) => {
+                    localFriends.value = res.data.data.content;
+                    curFriendPage.value = res.data.data.pageable.pageNumber + 1;
+                    totalFriendsPages.value = res.data.data.totalPages;
+                }).catch((err) => {
+                    console.log(err);
+                });
+            }
+            else {
+                console.log('localFriends', localFriends);
+                curFriendPage.value = res.data.data.pageable.pageNumber + 1;
+                console.log('curFriendPage', curFriendPage);
+                totalFriendsPages.value = res.data.data.totalPages;
+                console.log('totalFriendsPages', totalFriendsPages);
+            }
+        } else {
+            console.log(res);
+            message.error('获取朋友失败');
+        }
+    });
+}
+
 
 const friendsLoading = ref(false);
 const todo_member = ref("")
@@ -146,6 +178,8 @@ const openAddFriend = () => {
     fieldData.value.openAddFriend = true;
     console.log('fieldData', fieldData);
 }
+
+
 </script>
 
 <template>
@@ -193,7 +227,10 @@ const openAddFriend = () => {
         </ListItem>
         </template>
     </List>
+
+    <DeleteFriend :userId="deleteItem.userId" :userName="deleteItem.userName" :friendId="deleteItem.friendId"  @update="initFriends(1)" v-model="fieldData.openDeleteFriend"></DeleteFriend>
 </template>
+
 
 
 <style scoped>
