@@ -3,6 +3,7 @@ import { useConnector } from "./connector";
 import { Hall, HallStatus } from "@/core/game/hall";
 import { ref, watch } from "vue";
 import type { 
+    AcChangeData,
     ChatMsgData, FriendInvitationData, GameAddData, HpChangeData, 
     ItemUsedData, PosSyncData, 
     RoomInvitedData, RoomRefreshData } from "@/core/comm/interfaces";
@@ -27,6 +28,11 @@ export const useHallState = defineStore('hall_state', () => {
     const rcv_hp_change = ref<(data: HpChangeData) => void>((data) => {
         if (gameState.match_info) {
             gameState.match_info.hpMap[data.change_id] = data.hp
+        }
+    })
+    const rcv_ac_change = ref<(data: AcChangeData) => void>((data) => {
+        if (gameState.match_info) {
+            gameState.match_info.acMap[data.change_id] = data.ac
         }
     })
     const rcv_game_add = ref<(data: GameAddData) => void>((data) => {
@@ -78,6 +84,8 @@ export const useHallState = defineStore('hall_state', () => {
                 rcv_room_invited.value(data)
             } else if (type == 'FRIEND_INVITATION') {
                 rcv_friend_invitation.value(data)
+            } else if (type == 'AC_CHANGE') {
+                rcv_ac_change.value(data)
             }
         }
     )
