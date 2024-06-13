@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, emit } from 'vue';
+import { ref, reactive, defineEmits, defineProps } from 'vue';
 import { useRouter } from 'vue-router';
 import { generateDelete } from '@/utils/protocol';
 import { message } from 'ant-design-vue';
@@ -35,7 +35,7 @@ const props = defineProps({
     },
 });
 
-
+const emit = defineEmits(['update:curRooms', 'update']);
 
 const router = useRouter();
 const curRooms = ref(props.curRooms);
@@ -46,6 +46,8 @@ const handleDeleteRoom = () => {
           console.log('curRooms:', curRooms.value);
 
           curRooms.value = curRooms.value.filter((room) => room.id !== props.roomId);
+          emit('update:curRooms', curRooms.value);
+          emit('update');
           console.log('curRooms1:', curRooms.value);
             message.success('删除房间成功');
             // location.reload();
