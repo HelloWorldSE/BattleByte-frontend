@@ -534,13 +534,14 @@ const handleChangeLineHeight = (event) => {
   width: 75%;
 }
 
+
 .v-enter-active,
 .v-leave-active {
-  transition: opacity 10000s ease;
+  transition: opacity 0.5s ease;
 }
 
 .v-leave-to {
-  opacity: 100;
+  opacity: 0;
 }
 
 .pcjg {
