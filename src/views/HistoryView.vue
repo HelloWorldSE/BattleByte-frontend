@@ -61,7 +61,6 @@ const onRowClick = (record: HistoryItem) => {
 
 
 type HistoryItem = {
-  gameId: number,
   id: number,
   rank: number,
   gameType: number,
@@ -71,8 +70,8 @@ type HistoryItem = {
 const columns = [
   {
     title: '游戏编号',
-    dataIndex: 'gameId',
-    key: 'gameId',
+    dataIndex: 'id',
+    key: 'id',
     sorter: (a: HistoryItem, b: HistoryItem) => a.gameId - b.gameId,
   },
   {
