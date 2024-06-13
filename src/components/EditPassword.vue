@@ -4,11 +4,11 @@
             <Button key="back" @click="cancel">取消</Button>
             <Button key="submit" type="primary" @click="handleOk">确定</Button>
         </template>
-        <Form :model="formState" layout="vertical">
-            <FormItem label="密码" :rules="[{validator: passWordCheck, trigger: 'blur'}]">
+        <Form :model="formState" layout="vertical" ref="formRef">
+            <FormItem label="密码" :rules="[{validator: passWordCheck, trigger: 'blur'}]" name="password">
                 <InputPassword v-model:value="formState.password" type="password" />
             </FormItem>
-            <FormItem label="确认新密码" :rules="[{validator: againPasswordCheck, trigger: 'blur'}]">
+            <FormItem label="确认新密码" :rules="[{validator: againPasswordCheck, trigger: 'blur'}]" name="againPassword">
                 <InputPassword v-model:value="formState.againPassword" type="password" />
             </FormItem>
         </Form>
@@ -23,6 +23,8 @@
 
     import { defineProps, defineEmits, computed } from 'vue';
     import { generatePost } from '@/utils/protocol';
+
+
 
     const props = defineProps({ 
         userId: {
@@ -67,8 +69,12 @@
         set: v => emit('update:modelValue', v),
     });
 
+
+    const formRef = ref<FormInstance>();
+
     const handleOk = () => {
-        loading.value = true;
+        formRef.value?.validate().then(() => {
+            loading.value = true;
         const password = formState.password;
         generatePost('api/user/update', {id:props.userId, password: password}).then((res) => {
             if (res.data.status === 0) {
@@ -82,7 +88,11 @@
             message.error('修改失败');
             loading.value = false;
         })
+        }).catch(() => {
+            message.error('请检查输入');
+        })
     }
+    
 
     const cancel = () => {
         emit('update:modelValue', false);

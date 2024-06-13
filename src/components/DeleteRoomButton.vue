@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, emit } from 'vue';
 import { useRouter } from 'vue-router';
 import { generateDelete } from '@/utils/protocol';
 import { message } from 'ant-design-vue';
@@ -34,6 +34,8 @@ const props = defineProps({
         required: true,
     },
 });
+
+
 
 const router = useRouter();
 const curRooms = ref(props.curRooms);

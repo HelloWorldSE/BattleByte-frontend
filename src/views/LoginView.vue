@@ -98,10 +98,13 @@ const myProfile = useMyProfile()
 
 const Login_Submit = async () => {
   const userName = formState.userName;
+  console.log("password明文：", formState.passWord)
   const passWord = encryptPassword(formState.passWord);
+  console.log("password密文：", passWord)
 
   generatePost('auth/login', {userName:userName, password:passWord}).then((res) => {
     console.log(res);
+    
     if (res.data.status === 0) {
       // 登录成功
       // 保存token
@@ -118,7 +121,7 @@ const Login_Submit = async () => {
     } else {
       // 登录失败
       console.log('登录失败');
-      alert('登录失败');
+      alert('登录失败，请检查用户名和密码');
     }
   }).catch((err) => {
     console.log(err);
