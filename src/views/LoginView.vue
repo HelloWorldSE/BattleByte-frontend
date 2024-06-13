@@ -98,9 +98,9 @@ const myProfile = useMyProfile()
 
 const Login_Submit = async () => {
   const userName = formState.userName;
-  console.log("password明文：", formState.passWord)
+  // console.log("password明文：", formState.passWord)
   const passWord = encryptPassword(formState.passWord);
-  console.log("password密文：", passWord)
+  // console.log("password密文：", passWord)
 
   generatePost('auth/login', {userName:userName, password:passWord}).then((res) => {
     console.log(res);
