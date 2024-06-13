@@ -72,7 +72,7 @@ const columns = [
     title: '游戏编号',
     dataIndex: 'id',
     key: 'id',
-    sorter: (a: HistoryItem, b: HistoryItem) => a.gameId - b.gameId,
+    sorter: (a: HistoryItem, b: HistoryItem) => a.id- b.id,
   },
   {
     title: '模式',
@@ -99,7 +99,7 @@ const filteredHistory = computed(() => {
   if (!searchValue.value) {
     return history.value;
   }
-  return history.value.filter(item => item.gameId.toString().includes(searchValue.value));
+  return history.value.filter(item => item.id.toString().includes(searchValue.value));
 }); // 根据搜索值过滤历史记录数据
 
 const onSearch = (value: string) => {
