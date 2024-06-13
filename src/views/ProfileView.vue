@@ -282,6 +282,7 @@ const clickUserName = (item:any) => {
 
     // 服务器使用需要修改
     window.location.href = 'http://81.70.241.166/user/profile/' + item.id;
+    location.reload();
 
     // window.location.href = 'http://127.0.0.1:5173/user/profile/' + item.id;
     // location.reload();
