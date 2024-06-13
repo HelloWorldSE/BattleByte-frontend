@@ -75,7 +75,7 @@
     router.push('/')
   }
 
-  // 定义一个没用的玩意
+  
   const formRef = ref<FormInstance>()
 
   // 定义表单域
@@ -134,9 +134,13 @@
 
   // 登录按钮：路由跳转
   const Login_Submit = async () => {
-    const userName = formState.userName;
-    const passWord = encryptPassword(formState.passWord);
-    const email = formState.email;
+    formRef.value?.validate().then(() => {
+      const userName = formState.userName;
+      const passWord = encryptPassword(formState.passWord);
+      const email = formState.email;
+    // const userName = formState.userName;
+    // const passWord = encryptPassword(formState.passWord);
+    // const email = formState.email;
 
     console.log(userName, passWord, email);
     generatePost('auth/register', {userName:userName, password:passWord, userEmail:email}).then((res) => {
@@ -162,7 +166,7 @@
     }).catch((err) => {
       console.log(err);
 
-  });
+  });});
   }
 
   // 登录按钮：路由跳转
