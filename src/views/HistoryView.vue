@@ -20,7 +20,7 @@
           :selection="onRowClick"
       >
         <template #bodyCell="{ column, text }">
-          <template v-if="column.dataIndex === 'team'">
+          <template v-if="column.dataIndex === 'gameType'">
             <span>{{ renderTeamMode(text) }}</span>
           </template>
           <template v-else-if="column.dataIndex === 'rank'">
@@ -64,7 +64,7 @@ type HistoryItem = {
   gameId: number,
   id: number,
   rank: number,
-  team: number,
+  gameType: number,
   userId: 4
 }
 
@@ -77,8 +77,8 @@ const columns = [
   },
   {
     title: '模式',
-    dataIndex: 'team',
-    key: 'team',
+    dataIndex: 'gameType',
+    key: 'gameType',
   },
   {
     title: '排名',
@@ -88,13 +88,12 @@ const columns = [
 ];
 
 
-const renderTeamMode = (team: number | null | '') => {
-  if (team === null || team === '' || team === 1 || team === 2 || team == 0) {
+const renderTeamMode = (gameType: number) => {
+  if (gameType === 0) {
     return '单人模式';
-  } else if (team > 2) {
+  } else if (gameType === 1) {
     return '大逃杀模式';
   }
-  return team;
 };
 
 const filteredHistory = computed(() => {
