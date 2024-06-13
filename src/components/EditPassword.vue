@@ -23,6 +23,7 @@
 
     import { defineProps, defineEmits, computed } from 'vue';
     import { generatePost } from '@/utils/protocol';
+    import { encryptPassword } from "@/utils/auth";
 
 
 

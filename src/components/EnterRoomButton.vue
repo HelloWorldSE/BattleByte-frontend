@@ -16,9 +16,12 @@
         </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
+import { useHallState } from '@/stores/hall';
+import { HallStatus } from '@/core/game/hall';
+
 
 const showOpenIcon = ref(false);
 
@@ -30,9 +33,14 @@ const props = defineProps({
 });
 
 const router = useRouter();
-const handleEnterRoom = () => {
+const hall = useHallState();
 
-    router.push(`/roomDetails/${props.roomId}`);
+
+const handleEnterRoom = () => {
+  hall.hall.room_enter(props.roomId as unknown as number)
+  
+
+  router.push(`/roomDetails/${props.roomId}`);
 };
 
 
