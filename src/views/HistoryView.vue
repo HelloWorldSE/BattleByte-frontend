@@ -25,7 +25,7 @@
           </template>
           <template v-else-if="column.dataIndex === 'rank'">
             <Tag :color="getStatusColor(text)">
-              {{ text }}
+              {{ text === null ? '进行中' : text }}
             </Tag>
           </template>
           <template v-else>
