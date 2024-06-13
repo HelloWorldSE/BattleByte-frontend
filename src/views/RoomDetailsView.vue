@@ -203,10 +203,15 @@ const onlinePlayers = computed(() => {
 });
 
 const hall = useHallState()
-hall.hall.room_enter(roomId.value as unknown as number);
-// if (hall.hall.status == HallStatus.ONLINE) {
-//   hall.hall.room_enter(roomId.value as unknown as number)
-// }
+// hall.hall.room_enter(roomId.value as unknown as number);
+if (hall.hall.status == HallStatus.ONLINE) {
+  hall.hall.room_enter(roomId.value as unknown as number)
+} else if (hall.hall.status == HallStatus.OFFLINE ||
+           hall.hall.status == HallStatus.LOGGING_IN) {
+  hall.append_after_login(() => {
+    hall.hall.room_enter(roomId.value as unknown as number)
+  })
+}
 
 const confirmLeave = ref(false)
 const handleOk = () => {
