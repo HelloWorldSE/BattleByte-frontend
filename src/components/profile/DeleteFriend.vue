@@ -32,7 +32,7 @@ const props = defineProps({
     },
 })
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'update']);
 
 const modalVisible = computed({
     get: () => props.modelValue,
@@ -44,7 +44,8 @@ const handleOk = () => {
         if (res.data.status === 0) {
             message.success('删除好友成功');
             emit('update:modelValue', false);
-            location.reload();
+            emit('update');
+            // location.reload();
         } else {
             message.error('删除好友失败');
         }

@@ -77,7 +77,8 @@
         formRef.value?.validate().then(() => {
             loading.value = true;
         const password = formState.password;
-        generatePost('api/user/update', {id:props.userId, password: password}).then((res) => {
+        const enPassWord = encryptPassword(password);
+        generatePost('api/user/update', {id:props.userId, password: enPassWord}).then((res) => {
             if (res.data.status === 0) {
                 message.success('修改成功');
                 emit('update:modelValue', false);

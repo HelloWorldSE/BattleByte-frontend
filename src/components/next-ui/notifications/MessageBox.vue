@@ -4,6 +4,8 @@ import { ref, watch } from 'vue';
 import MBButton from '@/components/next-ui/notifications/MBButton.vue'
 import { useRouter } from 'vue-router';
 import { generateGet } from '@/utils/protocol';
+import { useHallState } from '@/stores/hall';
+import { HallStatus } from '@/core/game/hall';
 
 const open = ref(true)
 
@@ -57,10 +59,11 @@ watch(()=> props.roomid, (val) => {
 }, { immediate: true })
 
 
-
+const hall = useHallState();
 const router = useRouter()
 const enter = () => {
     open.value = false
+    hall.hall.room_enter(props.roomid as unknown as number);
     router.push(`/roomDetails/${props.roomid}`)
 }
 
