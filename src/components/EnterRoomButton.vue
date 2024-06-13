@@ -37,9 +37,7 @@ const hall = useHallState();
 
 
 const handleEnterRoom = () => {
-  hall.hall.room_enter(props.roomId as unknown as number)
-  
-
+  hall.hall.room_enter(props.roomId as unknown as number);
   router.push(`/roomDetails/${props.roomId}`);
 };
 

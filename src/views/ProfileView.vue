@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Grid, Row, Col, Avatar, Card, TabPane, Table, Tabs, List, ListItem, ListItemMeta, Pagination, Button, Skeleton, Flex, InputSearch } from "ant-design-vue";
+import { Grid, Row, Col, Avatar, Card, TabPane, Table, Tabs, List, ListItem, ListItemMeta, Pagination, Button, Skeleton, Flex, InputSearch, message } from "ant-design-vue";
 import { generateGet } from "@/utils/protocol";
 import { useRoute, useRouter } from "vue-router";
 import { ref, computed, reactive, onMounted, nextTick, onUpdated } from "vue";
@@ -102,6 +102,37 @@ const initProfile = async () => {
 }
 
 initProfile();
+
+const initFriends = (type:number=0) => {
+    generateGet("api/user/friend", { pageSize: onePageFriends, page:curFriendPage.value}).then((res) => {
+        if (res.data.status === 0) {
+            initFriendsLoading.value = false;
+            // pageUserName = res.data.username;
+            // pageEmail = res.data.email;
+            localFriends.value = res.data.data.content;
+            if (type === 1 && res.data.data.content.length === 0) {
+                generateGet("api/user/friend", { pageSize: onePageFriends, page:curFriendPage.value-1}).then((res) => {
+                    localFriends.value = res.data.data.content;
+                    curFriendPage.value = res.data.data.pageable.pageNumber + 1;
+                    totalFriendsPages.value = res.data.data.totalPages;
+                }).catch((err) => {
+                    console.log(err);
+                });
+            }
+            else {
+                console.log('localFriends', localFriends);
+                curFriendPage.value = res.data.data.pageable.pageNumber + 1;
+                console.log('curFriendPage', curFriendPage);
+                totalFriendsPages.value = res.data.data.totalPages;
+                console.log('totalFriendsPages', totalFriendsPages);
+            }
+        } else {
+            console.log(res);
+            message.error('获取朋友失败');
+        }
+    });
+}
+
 // onMounted(() => {
 //     initProfile();
 // });
@@ -340,7 +371,7 @@ const openAddFriend = () => {
 
                                     <template #actions>
                                     <a key="list-loadmore-edit" @click="deleteOneFriend(item)">删除</a>
-                                    <a key="list-loadmore-more">聊天</a>
+                                    <!-- <a key="list-loadmore-more">聊天</a> -->
                                     </template>
                                     <Skeleton avatar :title="false" :loading="!!item.loading" active>
                                     <ListItemMeta
@@ -375,7 +406,7 @@ const openAddFriend = () => {
     <EditProfile :userId="pageUserId" v-model="fieldData.openEditProfile" :userName="pageUserName" :userEmail="pageEmail" :avatar="pageAvatar"/>
     <EditPassword :userId="pageUserId" v-model="fieldData.openEditPassword"/>
 
-    <DeleteFriend :userId="deleteItem.userId" :userName="deleteItem.userName" :friendId="deleteItem.friendId" v-model="fieldData.openDeleteFriend"></DeleteFriend>
+    <DeleteFriend :userId="deleteItem.userId" :userName="deleteItem.userName" :friendId="deleteItem.friendId"  @update="initFriends(1)" v-model="fieldData.openDeleteFriend"></DeleteFriend>
 
     <AddFriend :userId="pageUserId" v-model="fieldData.openAddFriend"></AddFriend>
 </div>
