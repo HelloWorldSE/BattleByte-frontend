@@ -41,10 +41,21 @@ export const useHallState = defineStore('hall_state', () => {
         openNotification(data.name, '想添加您为好友', data.friendid)
     })
 
+    const handlers_after_login: (()=>void)[] = []
+    const append_after_login = (handler: () => void) => {
+        handlers_after_login.push(handler)
+    }
+
 
     const hall = new Hall(
         (val) => {
             hallStatus.value = val
+            if (val == HallStatus.ONLINE) {
+                handlers_after_login.forEach((h) => {
+                    h()
+                })
+                handlers_after_login.splice(0, handlers_after_login.length)
+            }
         },
         (type, data) => {
             if (type == 'CHAT_MSG') {
@@ -80,6 +91,7 @@ export const useHallState = defineStore('hall_state', () => {
         answer_result_callback: rcv_answer_result,
         pos_sync_callback: rcv_pos_sync,
         game_end_callback: rcv_game_end,
-        item_used_callback: rcv_item_used
+        item_used_callback: rcv_item_used,
+        append_after_login
     }
 })
