@@ -17,7 +17,8 @@
           </template>
           <template #actions>
             <EnterRoomButton :roomId="room.id"/>
-            <DeleteRoomButton :roomId="room.id" :curRooms="curRooms" v-if="curUserId==room.uid"/>
+            <DeleteRoomButton :roomId="room.id" :curRooms="curRooms" v-if="curUserId==room.uid"
+            @update="initGetRooms(0, 1)"/>
         <!-- <Button type="primary" @click="color='blue'">Change Color</Button> -->
           </template>
           <CardMeta :title="room.name" description="等待中...">
@@ -112,15 +113,28 @@ const curRooms = ref<any[]>([]);
 
 const roomsLoading = ref(false);
 
-const initGetRooms = (status:number) => {
+const initGetRooms = (status:number, type:number=0) => {
+  
   generateGet(`/api/room?status=${0}`, {pageSize: onePageSize.value, page:currentPage.value}).then((res) => {
     if (res.data.status === 0) {
-      curRooms.value = res.data.data.content;
-      getAvatars(curRooms.value);
-      console.log("roomAvatar.value is",roomAvatar.value);
-      totalPages.value = res.data.data.totalPages;
-      console.log("totalPages.value is",totalPages.value);
-      console.log("curUserId.value is",curUserId.value);
+        if (type===1 && res.data.data.content.length === 0) {
+          currentPage.value -= 1;
+          generateGet(`/api/room?status=${0}`, {pageSize: onePageSize.value, page:currentPage.value}).then((res) => {
+            curRooms.value = res.data.data.content;
+            getAvatars(curRooms.value);
+            totalPages.value = res.data.data.totalPages;
+          }).catch((err) => {
+            console.log(err);
+          });
+        }
+       else {
+        curRooms.value = res.data.data.content;
+        getAvatars(curRooms.value);
+        console.log("roomAvatar.value is",roomAvatar.value);
+        totalPages.value = res.data.data.totalPages;
+        console.log("totalPages.value is",totalPages.value);
+        console.log("curUserId.value is",curUserId.value);
+    }
     } else {
       console.log(res.data.msg);
     }
@@ -130,6 +144,7 @@ const initGetRooms = (status:number) => {
 };
 
 initGetRooms(0);
+
 
 const status = ref(0)
 

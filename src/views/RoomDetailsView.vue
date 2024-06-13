@@ -203,9 +203,9 @@ const onlinePlayers = computed(() => {
 });
 
 const hall = useHallState()
-if (hall.hall.status == HallStatus.ONLINE) {
-  hall.hall.room_enter(roomId.value as unknown as number)
-}
+// if (hall.hall.status == HallStatus.ONLINE) {
+//   hall.hall.room_enter(roomId.value as unknown as number)
+// }
 
 const confirmLeave = ref(false)
 const handleOk = () => {
