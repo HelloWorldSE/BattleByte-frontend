@@ -5,10 +5,10 @@
 
       <div class="waiting-room">
           <div class="waiting-title">
-              <h2>当前房间：{{ roomInfo.name }}，玩家数：{{ onlinePlayers.length }}</h2>
-              <h2 v-if="onlinePlayers.length<2">正在等待其他玩家加入...</h2>
-              <h2 v-if="onlinePlayers.length>=2 && curUserId !== roomInfo.uid">请等待房主开始游戏...</h2>
-              <h2 v-if="onlinePlayers.length>=2 && curUserId === roomInfo.uid">可以开始游戏</h2>
+              <h3>当前房间：{{ roomInfo.name }}，玩家数：{{ onlinePlayers.length }}</h3>
+              <h3 v-if="onlinePlayers.length<2">正在等待其他玩家加入...</h3>
+              <h3 v-if="onlinePlayers.length>=2 && curUserId !== roomInfo.uid">请等待房主开始游戏...</h3>
+              <h3 v-if="onlinePlayers.length>=2 && curUserId === roomInfo.uid">可以开始游戏</h3>
               <!-- <button @click="hall.hall.room_leave(roomId as unknown as number)">exit (测试)</button> -->
           </div>
           <div class="player-list">
@@ -26,8 +26,8 @@
           </div>
           <div class="waiting-animation">
                   <Vue3Lottie
-                  width="300px"
-                  height="300px"
+                  width="200px"
+                  height="200px"
                   :speed=1
                   loop
                   :animation-data="LottieJson">
@@ -343,6 +343,8 @@ align-items: stretch; /* 使子元素填满容器宽度 */
 }
 
 .waiting-room {
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -353,6 +355,7 @@ align-items: stretch; /* 使子元素填满容器宽度 */
 }
 
 .waiting-title {
+  margin-top: -50px;
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 24px;
@@ -392,8 +395,8 @@ align-items: stretch; /* 使子元素填满容器宽度 */
 
 
 .self-avatar {
-  width: 128px;
-  height: 128px;
+  width: 96px;
+  height: 96px;
   animation: pulse 2s infinite;
 }
 
